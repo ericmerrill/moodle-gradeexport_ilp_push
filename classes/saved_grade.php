@@ -67,7 +67,6 @@ class saved_grade {
     }
 
     // ******* Record Manipulation Methods.
-
     /**
      * Create a object with the given record.
      *
@@ -112,7 +111,6 @@ class saved_grade {
     }
 
     // ******* Database Interaction Methods.
-
     /**
      * Load the record for a given id.
      *

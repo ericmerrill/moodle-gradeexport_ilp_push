@@ -31,172 +31,116 @@ require_once($CFG->libdir . '/csvlib.class.php');
 
 use grade_item;
 use grade_helper;
-use grade_export;
-use csv_export_writer;
 use grade_export_update_buffer;
 use graded_users_iterator;
 
-class grade_exporter extends grade_export {
+/**
+ * The main export plugin class.
+ *
+ * @package    gradeexport_ilp_push
+ * @author     Eric Merrill (merrill@oakland.edu)
+ * @copyright  2019 Oakland University (https://www.oakland.edu)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class grade_exporter {
 
-    public $plugin = 'ilp_push';
+    protected $decimalpoints = 2; // TODO - Setting?
+
+    protected $onlyactive = true; // TODO - Setting.
+
+    protected $gradeitems;
+
+    protected $coursegradeitem;
+
+    protected $currentgradeitem;
+
+    protected $groupid;
+
+    protected $course;
 
     /**
-     * Constructor should set up all the private variables ready to be pulled
+     * Constructor to set everything up.
+     *
      * @param object $course
      * @param int $groupid id of selected group, 0 means all
-     * @param stdClass $formdata The validated data from the grade export form.
      */
-    public function __construct($course, $groupid, $formdata) {
-        parent::__construct($course, $groupid, $formdata);
+    public function __construct($course, $groupid = null) {
+        $this->course = $course;
+        $this->groupid = $groupid;
 
-        $courseitem = grade_item::fetch_course_item($course->id);
+        // Get all course grade items and the course grade item.
+        $this->gradeitems = grade_item::fetch_all(array('courseid'=>$this->course->id));
+        $this->coursegradeitem = grade_item::fetch_course_item($course->id);
 
-        $this->grade_items = [$courseitem->id => $courseitem];
-
-        $this->columns = [];
-
-        foreach ($this->grade_items as $itemid=>$unused) {
-            $this->columns[$itemid] =& $this->grade_items[$itemid];
-        }
-
-        // Overrides.
-        $this->usercustomfields = true;
+        $this->currentgradeitem = $this->coursegradeitem; // TODO.
     }
 
-    public function get_export_params() {
-        $params = parent::get_export_params();
-        $params['separator'] = $this->separator;
-        return $params;
-    }
-
-    public function process_form($formdata) {
-
+    protected function get_grade_columns() {
+        return [$this->currentgradeitem->id => $this->currentgradeitem];
     }
 
     public function get_user_data() {
-        $profilefields = grade_helper::get_user_profile_fields($this->course->id, $this->usercustomfields);
-        $this->displaytype = ['real', 'percentage', 'letter'];
+        $profilefields = grade_helper::get_user_profile_fields($this->course->id, true);
+        $this->displaytype = [GRADE_DISPLAY_TYPE_REAL, GRADE_DISPLAY_TYPE_PERCENTAGE, GRADE_DISPLAY_TYPE_LETTER];
 
-        $geub = new grade_export_update_buffer();
-        $gui = new graded_users_iterator($this->course, $this->columns, $this->groupid);
+        // $geub = new grade_export_update_buffer();$status = $geub->track($grade);$geub->close(); TODO.
+        $gui = new graded_users_iterator($this->course, $this->get_grade_columns(), $this->groupid);
         $gui->require_active_enrolment($this->onlyactive);
-        $gui->allow_user_custom_fields($this->usercustomfields);
+        $gui->allow_user_custom_fields(true);
         $gui->init();
 
         $output = [];
+        $userrows = [];
 
         while ($userdata = $gui->next_user()) {
-
-            $exportdata = array();
             $user = $userdata->user;
 
-            foreach ($profilefields as $field) {
-                $fieldvalue = grade_helper::get_user_field_value($user, $field);
-                $exportdata[] = $fieldvalue;
-            }
-            if (!$this->onlyactive) {
-                $issuspended = ($user->suspendedenrolment) ? get_string('yes') : '';
-                $exportdata[] = $issuspended;
-            }
-            foreach ($userdata->grades as $itemid => $grade) {
-//                 if ($export_tracking) {
-//                     $status = $geub->track($grade);
-//                 }
+            // We only use one grade item, so that is easy...
+            $grade = reset($userdata->grades);
 
-                foreach ($this->displaytype as $gradedisplayconst) {
-                    $exportdata[] = $this->format_grade($grade, $gradedisplayconst);
-                }
+            $userrow = new user_grade_row($user, $grade, $this->currentgradeitem);
 
-                if ($this->export_feedback) {
-                    $exportdata[] = $this->format_feedback($userdata->feedbacks[$itemid]);
-                }
-            }
-            // Time exported.
-            $exportdata[] = time();
-            $output[] = $exportdata;
+            $userrows[] = $userrow;
+
+
         }
         $gui->close();
-        $geub->close();
 
-        return $output;
+
+        return $userrows;
     }
 
-    public function print_grades() {
-        global $CFG;
 
-        $export_tracking = $this->track_exports();
 
-        $strgrades = get_string('grades');
-        $profilefields = grade_helper::get_user_profile_fields($this->course->id, $this->usercustomfields);
-
-        $shortname = format_string($this->course->shortname, true, array('context' => context_course::instance($this->course->id)));
-        $downloadfilename = clean_filename("$shortname $strgrades");
-        $csvexport = new csv_export_writer($this->separator);
-        $csvexport->set_filename($downloadfilename);
-
-        // Print names of all the fields
-        $exporttitle = array();
-        foreach ($profilefields as $field) {
-            $exporttitle[] = $field->fullname;
+    /**
+     * Returns string representation of final grade
+     * @param object $grade instance of grade_grade class
+     * @param integer $gradedisplayconst grade display type constant.
+     * @return string
+     */
+    public function format_grade($grade, $gradedisplayconst = null) {
+        $displaytype = $this->displaytype;
+        if (is_array($this->displaytype) && !is_null($gradedisplayconst)) {
+            $displaytype = $gradedisplayconst;
         }
 
-        if (!$this->onlyactive) {
-            $exporttitle[] = get_string("suspended");
-        }
+        $gradeitem = $this->gradeitems[$grade->itemid];
 
-        // Add grades and feedback columns.
-        foreach ($this->columns as $grade_item) {
-            foreach ($this->displaytype as $gradedisplayname => $gradedisplayconst) {
-                $exporttitle[] = $this->format_column_name($grade_item, false, $gradedisplayname);
-            }
-            if ($this->export_feedback) {
-                $exporttitle[] = $this->format_column_name($grade_item, true);
-            }
-        }
-        // Last downloaded column header.
-        $exporttitle[] = get_string('timeexported', 'gradeexport_txt');
-        $csvexport->add_data($exporttitle);
+        // We are going to store the min and max so that we can "reset" the grade_item for later.
+        $grademax = $gradeitem->grademax;
+        $grademin = $gradeitem->grademin;
 
-        // Print all the lines of data.
-        $geub = new grade_export_update_buffer();
-        $gui = new graded_users_iterator($this->course, $this->columns, $this->groupid);
-        $gui->require_active_enrolment($this->onlyactive);
-        $gui->allow_user_custom_fields($this->usercustomfields);
-        $gui->init();
-        while ($userdata = $gui->next_user()) {
+        // Updating grade_item with this grade_grades min and max.
+        $gradeitem->grademax = $grade->get_grade_max();
+        $gradeitem->grademin = $grade->get_grade_min();
 
-            $exportdata = array();
-            $user = $userdata->user;
+        $formattedgrade = grade_format_gradevalue($grade->finalgrade, $gradeitem, false, $displaytype, $this->decimalpoints);
 
-            foreach ($profilefields as $field) {
-                $fieldvalue = grade_helper::get_user_field_value($user, $field);
-                $exportdata[] = $fieldvalue;
-            }
-            if (!$this->onlyactive) {
-                $issuspended = ($user->suspendedenrolment) ? get_string('yes') : '';
-                $exportdata[] = $issuspended;
-            }
-            foreach ($userdata->grades as $itemid => $grade) {
-                if ($export_tracking) {
-                    $status = $geub->track($grade);
-                }
+        // Resetting the grade item in case it is reused.
+        $gradeitem->grademax = $grademax;
+        $gradeitem->grademin = $grademin;
 
-                foreach ($this->displaytype as $gradedisplayconst) {
-                    $exportdata[] = $this->format_grade($grade, $gradedisplayconst);
-                }
-
-                if ($this->export_feedback) {
-                    $exportdata[] = $this->format_feedback($userdata->feedbacks[$itemid]);
-                }
-            }
-            // Time exported.
-            $exportdata[] = time();
-            $csvexport->add_data($exportdata);
-        }
-        $gui->close();
-        $geub->close();
-        $csvexport->download_file();
-        exit;
+        return $formattedgrade;
     }
 }
 

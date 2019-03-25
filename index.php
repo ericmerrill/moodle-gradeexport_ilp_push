@@ -32,7 +32,7 @@ $id = required_param('id', PARAM_INT); // course id
 
 $PAGE->set_url('/grade/export/ilp/index.php', array('id'=>$id));
 
-if (!$course = $DB->get_record('course', array('id'=>$id))) {
+if (!$course = $DB->get_record('course', array('id' => $id))) {
     print_error('invalidcourseid');
 }
 
@@ -42,7 +42,7 @@ $context = context_course::instance($id);
 require_capability('moodle/grade:export', $context);
 require_capability('gradeexport/ilp_push:view', $context);
 
-print_grade_page_head($COURSE->id, 'export', 'ilp', get_string('exportto', 'grades') . ' ' . get_string('pluginname', 'gradeexport_txt'));
+print_grade_page_head($COURSE->id, 'export', 'ilp_push', get_string('exportto', 'grades') . ' ' . get_string('pluginname', 'gradeexport_ilp_push'));
 export_verify_grades($COURSE->id);
 
 if (!empty($CFG->gradepublishing)) {
