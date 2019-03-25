@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="grade/export/ilp_push/db" VERSION="20190325" COMMENT="XMLDB file for Moodle grade/export/ilp_push"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="gradeexport_ilp_push_grades" COMMENT="Grades sent to banner">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="status" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="gradetype" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false" COMMENT="Constant to indicate the type of grade this is (midterm, final, etc)."/>
+        <FIELD NAME="revision" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Each time a user goes to save a new grade, we are going to save it in a new record with a new revision number."/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The Moodle course ID where this was submitted from."/>
+        <FIELD NAME="courseilpid" TYPE="char" LENGTH="127" NOTNULL="true" SEQUENCE="false" COMMENT="The courses ILP ID (crn.term generally)"/>
+        <FIELD NAME="submitterid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Moodle user ID of the user submitting."/>
+        <FIELD NAME="submitterilpid" TYPE="char" LENGTH="127" NOTNULL="true" SEQUENCE="false" COMMENT="The ILP ID of the user submitting."/>
+        <FIELD NAME="studentid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The Moodle user ID of the student being submitted for."/>
+        <FIELD NAME="studentilpid" TYPE="char" LENGTH="127" NOTNULL="true" SEQUENCE="false" COMMENT="The ILP ID of the student we are submitting for."/>
+        <FIELD NAME="grade" TYPE="char" LENGTH="127" NOTNULL="true" SEQUENCE="false" COMMENT="The grade string being submitted for the user."/>
+        <FIELD NAME="incompletegrade" TYPE="char" LENGTH="127" NOTNULL="false" SEQUENCE="false" COMMENT="The grade to use if the incomplete grade isn't completed on time."/>
+        <FIELD NAME="incompletedeadline" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Date to complete a incomplete by."/>
+        <FIELD NAME="datelastattended" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Date student last attended."/>
+        <FIELD NAME="resultstatus" TYPE="int" LENGTH="2" NOTNULL="false" SEQUENCE="false" COMMENT="The status result from Banner."/>
+        <FIELD NAME="additionaldata" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Additional data stored in a json format."/>
+        <FIELD NAME="usersubmittime" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="The time the user submitted the grade."/>
+        <FIELD NAME="ilpsendtime" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Time the message was submitted to ILP."/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="status" UNIQUE="false" FIELDS="status"/>
+        <INDEX NAME="courseid-submitterilpid-status" UNIQUE="false" FIELDS="courseid, submitterilpid, status"/>
+        <INDEX NAME="courseid-studentid-revision" UNIQUE="true" FIELDS="courseid, studentid, revision"/>
+      </INDEXES>
+    </TABLE>
+  </TABLES>
+</XMLDB>
