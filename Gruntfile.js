@@ -16,9 +16,9 @@
 /**
  * Gruntfile.
  *
- * @package    local_vectscript
- * @author     Eric Merrill <eric.a.merrill@gmail.com>
- * @copyright  2019 Vectorworks
+ * @package    gradeexport_ilp_push
+ * @author     Eric Merrill (merrill@oakland.edu)
+ * @copyright  2019 Oakland University (https://www.oakland.edu)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -31,7 +31,7 @@ module.exports = function (grunt) {
 
     // We need to include the core Moodle grunt file too, otherwise we can't run tasks like "amd".
     require("grunt-load-gruntfile")(grunt);
-    grunt.loadGruntfile("../../Gruntfile.js");
+    grunt.loadGruntfile("../../../Gruntfile.js");
 
     var uglifyRename = function(destPath, srcPath) {
         destPath = srcPath.replace('src', 'build');
@@ -42,7 +42,7 @@ module.exports = function (grunt) {
     grunt.initConfig({
         exec: {
             decache: {
-                cmd: 'php "../../admin/cli/purge_caches.php"',
+                cmd: 'php "../../../admin/cli/purge_caches.php"',
                 callback: function(error) {
                     // Warning: Be careful when executing this task.  It may give
                     // file permission errors accessing Moodle because of the directory permissions
@@ -96,7 +96,7 @@ module.exports = function (grunt) {
             options: {report: 'none'}
         },
     });
-    
+
     grunt.loadNpmTasks("grunt-exec");
 
     grunt.registerTask('decache', ['exec:decache']);

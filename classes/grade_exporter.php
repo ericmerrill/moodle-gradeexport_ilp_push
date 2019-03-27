@@ -27,7 +27,6 @@
 namespace gradeexport_ilp_push;
 
 require_once($CFG->dirroot.'/grade/export/lib.php');
-require_once($CFG->libdir . '/csvlib.class.php');
 
 use grade_item;
 use grade_helper;
@@ -111,37 +110,6 @@ class grade_exporter {
     }
 
 
-
-    /**
-     * Returns string representation of final grade
-     * @param object $grade instance of grade_grade class
-     * @param integer $gradedisplayconst grade display type constant.
-     * @return string
-     */
-    public function format_grade($grade, $gradedisplayconst = null) {
-        $displaytype = $this->displaytype;
-        if (is_array($this->displaytype) && !is_null($gradedisplayconst)) {
-            $displaytype = $gradedisplayconst;
-        }
-
-        $gradeitem = $this->gradeitems[$grade->itemid];
-
-        // We are going to store the min and max so that we can "reset" the grade_item for later.
-        $grademax = $gradeitem->grademax;
-        $grademin = $gradeitem->grademin;
-
-        // Updating grade_item with this grade_grades min and max.
-        $gradeitem->grademax = $grade->get_grade_max();
-        $gradeitem->grademin = $grade->get_grade_min();
-
-        $formattedgrade = grade_format_gradevalue($grade->finalgrade, $gradeitem, false, $displaytype, $this->decimalpoints);
-
-        // Resetting the grade item in case it is reused.
-        $gradeitem->grademax = $grademax;
-        $gradeitem->grademin = $grademin;
-
-        return $formattedgrade;
-    }
 }
 
 

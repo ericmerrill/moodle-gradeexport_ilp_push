@@ -28,7 +28,12 @@ namespace gradeexport_ilp_push;
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once($CFG->dirroot.'/grade/export/lib.php');
+
 use stdClass;
+use templatable;
+use html_writer;
+use moodle_url;
 
 /**
  * A object that represents a row of users.
@@ -38,7 +43,7 @@ use stdClass;
  * @copyright  2019 Oakland University (https://www.oakland.edu)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class user_grade_row {
+class user_grade_row implements templatable {
 
 
 
@@ -63,6 +68,68 @@ class user_grade_row {
         $this->gradeitem = $gradeitem;
     }
 
+
+
+
+    /**
+     * Returns string representation of a grade.
+     *
+     * TODO - Possibly need to switch between different grade values, not just grade->finalgrade.
+     *
+     * @param grade_grade   $grade Instance of grade_grade class
+     * @return string
+     */
+    public function get_formatted_grade($format) {
+        $grade = $this->grade;
+        $item = $this->gradeitem;
+
+        // We are going to store the min and max so that we can "reset" the grade_item for later.
+        $grademax = $item->grademax;
+        $grademin = $item->grademin;
+
+        // Updating grade_item with this grade_grades min and max.
+        $item->grademax = $grade->get_grade_max();
+        $item->grademin = $grade->get_grade_min();
+
+        $formatted = grade_format_gradevalue($grade->finalgrade, $item, true, $format);
+
+        // Resetting the grade item in case it is reused.
+        $item->grademax = $grademax;
+        $item->grademin = $grademin;
+
+        return $formatted;
+    }
+
+    public function export_for_template(\renderer_base $renderer) {
+        global $OUTPUT, $COURSE;
+        //$source = $this->get_data_source();
+
+        //$output = $source->export_for_template($renderer);
+        $output = new stdClass();
+
+        $fullname = fullname($this->user);
+        $output->userimage = $OUTPUT->user_picture($this->user, ['visibletoscreenreaders' => false]);
+        $output->fullname = $fullname;
+        $output->username = $this->user->username;
+
+        $params = ['id' => $this->user->id, 'course' => $COURSE->id];
+        $output->fullnamelink = html_writer::link(new moodle_url('/user/view.php', $params), $fullname);
+
+        $lettergrade = $this->get_formatted_grade(GRADE_DISPLAY_TYPE_LETTER);
+        $output->gradeletter = $lettergrade;
+        $output->gradereal = $this->get_formatted_grade(GRADE_DISPLAY_TYPE_REAL);
+        $output->gradepercent = $this->get_formatted_grade(GRADE_DISPLAY_TYPE_PERCENTAGE);
+
+        $output->gradeselect = $renderer->render_select_menu($this);
+
+        $output->incompletegradeselect = $renderer->render_incomplete_select_menu($this);
+
+        $currentkey = banner_grades::find_key_for_letter($output->gradeletter);
+        $output->showincomplete = (bool)in_array($currentkey, banner_grades::get_incomplete_grade_ids());
+        $output->showfailing = (bool)in_array($currentkey, banner_grades::get_failing_grade_ids());
+
+        return $output;
+    }
 
 }
 

@@ -27,8 +27,12 @@ namespace gradeexport_ilp_push\output;
 
 defined('MOODLE_INTERNAL') || die();
 
+//require_once($CFG->dirroot.'/grade/export/lib.php');
+
 use plugin_renderer_base;
 use html_writer;
+use gradeexport_ilp_push\user_grade_row;
+use gradeexport_ilp_push\banner_grades;
 
 /**
  * A renderer for the export.
@@ -40,9 +44,71 @@ use html_writer;
  */
 class export_renderer extends plugin_renderer_base {
 
+    public function render_user_rows($rows) {
+        $output = '<table class="gradingtable generaltable">';
+        $output .= '<tr>
+                        <th>User Name</th>
+                        <th>Grade</th>
+                        <th>Letter</th>
+                        <th>Banner Grade</th>
+                        <th>Confirm</th>
+                        <th>Status</th>
+                    </tr>';
 
+        foreach ($rows as $row) {
+            $data = $row->export_for_template($this);
+            $output .= $this->render_from_template('gradeexport_ilp_push/user_row', $data);
+        }
+        $output .= '</table>';
+        return $output;
+    }
 
+    public function render_select_menu(user_grade_row $userrow) {
+        $options = banner_grades::get_possible_grades();
+        $selected = banner_grades::get_banner_equivilant_grade($userrow);
 
+        $output = html_writer::select($options, 'bannergrade-TODO', $selected);
+
+        return $output;
+    }
+
+    public function render_incomplete_select_menu(user_grade_row $userrow) {
+        // TODO - need to make it so if a different one is already selected, that is returned.
+        $options = banner_grades::get_possible_grades();
+        $selected = banner_grades::get_default_incomplete_grade();
+
+        $output = html_writer::select($options, 'incompletegrade-TODO', $selected);
+
+        return $output;
+    }
+
+    /**
+     * Returns string representation of a grade.
+     *
+     * TODO - Possibly need to switch between different grade values, not just grade->finalgrade.
+     *
+     * @param grade_grade   $grade Instance of grade_grade class
+     * @param grade_item    $item The grade item we are working with.
+     * @param integer       $format Grade display type constant.
+     * @return string
+     */
+//     public function render_format_gradevalue($grade, $item, $format) {
+//         // We are going to store the min and max so that we can "reset" the grade_item for later.
+//         $grademax = $item->grademax;
+//         $grademin = $item->grademin;
+//
+//         // Updating grade_item with this grade_grades min and max.
+//         $item->grademax = $grade->get_grade_max();
+//         $item->grademin = $grade->get_grade_min();
+//
+//         $formatted = grade_format_gradevalue($grade->finalgrade, $item, true, $format);
+//
+//         // Resetting the grade item in case it is reused.
+//         $item->grademax = $grademax;
+//         $item->grademin = $grademin;
+//
+//         return $formatted;
+//     }
 
 // ***************** Old stuff to delete.
 

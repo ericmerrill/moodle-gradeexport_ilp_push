@@ -30,7 +30,7 @@ require_once $CFG->dirroot.'/grade/export/lib.php';
 
 $id = required_param('id', PARAM_INT); // course id
 
-$PAGE->set_url('/grade/export/ilp/index.php', array('id'=>$id));
+$PAGE->set_url('/grade/export/ilp_push/index.php', array('id'=>$id));
 
 if (!$course = $DB->get_record('course', array('id' => $id))) {
     print_error('invalidcourseid');
@@ -75,9 +75,15 @@ if (!empty($CFG->gradepublishing)) {
 //
 // $mform->display();
 
+$renderer = $PAGE->get_renderer('gradeexport_ilp_push', 'export');
+
 $ilp = new \gradeexport_ilp_push\grade_exporter($COURSE, 0, null);
 
-print "<pre>";var_export($ilp->get_user_data());print "</pre>";
+$data = $ilp->get_user_data();
+
+print $renderer->render_user_rows($data);
+
+print "<pre>";var_export();print "</pre>";
 
 
 echo $OUTPUT->footer();
