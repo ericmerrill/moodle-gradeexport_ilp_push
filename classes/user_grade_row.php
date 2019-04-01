@@ -38,6 +38,9 @@ use moodle_url;
 /**
  * A object that represents a row of users.
  *
+ * This object is used to track all the data about a row. This can include form submission data, saved grade rows, and current
+ * grade records.
+ *
  * @package    gradeexport_ilp_push
  * @author     Eric Merrill (merrill@oakland.edu)
  * @copyright  2019 Oakland University (https://www.oakland.edu)
@@ -46,30 +49,76 @@ use moodle_url;
 class user_grade_row implements templatable {
 
 
-
     /** @var saved_grade The most recent saved grade record. */
     protected $currentsavedgrade;
 
     protected $pastsavedgrades = [];
 
+    protected $newgradesave;
+
     protected $user;
+
+    protected $course;
+
+    protected $exporter;
 
     protected $grade;
 
     protected $gradeitem;
 
 
+
+
     /**
      * Basic constructor.
      */
-    public function __construct($user, $grade, $gradeitem) {
+    public function __construct($user, $exporter, $grade, $gradeitem) {
         $this->user = $user;
+        $this->exporter = $exporter;
+        $this->course = $exporter->get_course();
         $this->grade = $grade;
         $this->gradeitem = $gradeitem;
     }
 
+    public function get_form_id($prefix = false) {
+        global $COURSE;
 
+        if (empty($prefix)) {
+            $prefix = '';
+        } else {
+            $prefix .= '-';
+        }
 
+        return $prefix.$COURSE->id.'-'.$this->user->id;
+    }
+
+    public function get_current_menu_selection() {
+        $letter = null;
+        if ($this->currentsavedgrade) {
+            // TODO - May need to refine how this works later...
+            $letter = $this->currentsavedgrade->grade;
+        }
+
+        if (is_null($letter)) {
+            $letter = $this->get_formatted_grade(GRADE_DISPLAY_TYPE_LETTER);
+        }
+
+        return banner_grades::find_key_for_letter($letter);
+    }
+
+    public function get_current_incomplete_menu_selection() {
+        $letter = null;
+        if ($this->currentsavedgrade) {
+            // TODO - May need to refine how this works later...
+            $letter = $this->currentsavedgrade->incompletegrade;
+        }
+
+        if (is_null($letter)) {
+            return banner_grades::get_default_incomplete_grade();
+        }
+
+        return banner_grades::find_key_for_letter($letter);
+    }
 
     /**
      * Returns string representation of a grade.
@@ -111,6 +160,8 @@ class user_grade_row implements templatable {
         $output->userimage = $OUTPUT->user_picture($this->user, ['visibletoscreenreaders' => false]);
         $output->fullname = $fullname;
         $output->username = $this->user->username;
+        $output->userid = $this->user->id;
+        $output->formid = $this->get_form_id();
 
         $params = ['id' => $this->user->id, 'course' => $COURSE->id];
         $output->fullnamelink = html_writer::link(new moodle_url('/user/view.php', $params), $fullname);
@@ -129,6 +180,33 @@ class user_grade_row implements templatable {
         $output->showfailing = (bool)in_array($currentkey, banner_grades::get_failing_grade_ids());
 
         return $output;
+    }
+
+    protected function get_next_revision_number() {
+        if ($this->currentsavedgrade) {
+            return $this->currentsavedgrade->revision + 1;
+        }
+
+        return 0;
+    }
+
+    public function process_data(stdClass $data, grade_exporter $exporter) {
+        global $USER;
+
+        $save = new saved_grade();
+
+        $save->studentid = $this->user->id;
+        $save->studentilpid = $this->user->idnumber; // TODO - This can be sourced elsewhere.
+        $save->courseid = $this->course->id;
+        $save->courseilpid = $this->course->idnumber; // TODO - Won't work with crosslists...
+        $save->submitterid = $USER->id;
+        $save->submitterilpid = $USER->idnumber; // TODO - This can be sourced elsewhere.
+
+        $save->revision = $this->get_next_revision_number();
+
+
+        print "<pre>";print_r($save);print "</pre>";
+
     }
 
 }

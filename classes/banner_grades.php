@@ -44,7 +44,7 @@ class banner_grades {
     protected static $incomplete = ['I'];
     protected static $incompleteids = null;
 
-    public static function get_possible_grades() {
+    public static function get_possible_grades($userrow = null) {
         // TODO - Grade options.
         $options = [1 => 'A',
                     2 => 'A-',

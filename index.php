@@ -79,11 +79,16 @@ $renderer = $PAGE->get_renderer('gradeexport_ilp_push', 'export');
 
 $ilp = new \gradeexport_ilp_push\grade_exporter($COURSE, 0, null);
 
-$data = $ilp->get_user_data();
+if ($formdata = data_submitted()) {
+    $ilp->process_data($formdata);
+}
 
-print $renderer->render_user_rows($data);
+//$data = $ilp->get_user_data();
 
-print "<pre>";var_export();print "</pre>";
+//print $renderer->render_user_rows($data);
+print $renderer->render_exporter($ilp);
+
+//print "<pre>";var_export();print "</pre>";
 
 
 echo $OUTPUT->footer();

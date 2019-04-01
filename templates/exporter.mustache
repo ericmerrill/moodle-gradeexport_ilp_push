@@ -1,0 +1,77 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template gradeexport_ilp_push/exporter
+
+    The transcript course table.
+
+    Example context (json):
+    {
+        "actionurl": "https://example.com/mod/forum/search.php",
+        "courseid": "2",
+        "words": "apples",
+        "phrase": "Lorem ipsum dolor",
+        "notwords": "Not these words",
+        "showfullwords": [
+            {
+                "fullwords": "Exactly"
+            }
+        ],
+        "datefromchecked": 1,
+        "datetochecked": "",
+        "forumoptions": [
+            {
+                "name": "Forum One",
+                "value": "23"
+            },
+            {
+                "name": "Forum Two",
+                "value": "34"
+            }
+        ],
+        "subject": "Help me please",
+        "user": "Helpy McUser"
+    }
+}}
+
+<form method="POST">
+    <input type="hidden" name="courseid" value="{{courseid}}">
+    <input type="hidden" name="groupid" value="{{groupid}}">
+    <input type="hidden" name="graderid" value="{{graderid}}">
+    <input type="hidden" name="sesskey" value="{{sesskey}}">
+    <table class="gradingtable generaltable">
+        <tr>
+            <th>User Name</th>
+            <th>Grade</th>
+            <th>Letter</th>
+            <th>Banner Grade</th>
+            <th>Confirm</th>
+            <th>Status</th>
+        </tr>
+    
+        {{#userrows}}
+            {{> gradeexport_ilp_push/user_row }}
+        {{/userrows}}
+
+    </table>
+
+    {{{formbuttons}}}
+    
+    <div class="submit">
+        <input type="submit" id="gradersubmit" class="btn btn-primary" value="{{# str }} savechanges {{/ str }}" />
+    </div>
+</form>

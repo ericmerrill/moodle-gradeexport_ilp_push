@@ -50,7 +50,7 @@
 
 
 
-<tr class="status-normal">
+<tr class="usergraderow status-normal" data-row-id="{{{formid}}}" data-user-id="{{{userid}}}">
     <td class="userinfo">
         {{{userimage}}}
         <div class="userdetails">
@@ -70,12 +70,12 @@
         {{{gradeselect}}}
         <div class="fail {{^showfailing}}hide{{/showfailing}}">
             <div class="datelastattended">
-                <label>Date Last Attended</label><input type="date">
+                <label>Date Last Attended</label><input type="date" name="datelastattended-{{{formid}}}">
             </div>
         </div>
         <div class="incomplete {{^showincomplete}}hide{{/showincomplete}}">
             <div class="incompletedate">
-                <label>Incomplete Deadline</label><input type="date">
+                <label>Incomplete Deadline</label><input type="date" name="incompletedate-{{{formid}}}">
             </div>
             <div class="incompletegrade">
                 <label>Incomplete Default Grade</label>{{{incompletegradeselect}}}

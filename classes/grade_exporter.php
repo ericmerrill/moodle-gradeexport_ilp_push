@@ -32,6 +32,8 @@ use grade_item;
 use grade_helper;
 use grade_export_update_buffer;
 use graded_users_iterator;
+use templatable;
+use stdClass;
 
 /**
  * The main export plugin class.
@@ -41,7 +43,16 @@ use graded_users_iterator;
  * @copyright  2019 Oakland University (https://www.oakland.edu)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class grade_exporter {
+class grade_exporter implements templatable {
+
+
+    const GRADE_TYPE_MIDTERM_1 = 1;
+    const GRADE_TYPE_MIDTERM_2 = 2;
+    const GRADE_TYPE_MIDTERM_3 = 3;
+    const GRADE_TYPE_MIDTERM_4 = 4;
+    const GRADE_TYPE_MIDTERM_5 = 5;
+    const GRADE_TYPE_MIDTERM_6 = 6;
+    const GRADE_TYPE_FINAL = 9;
 
     protected $decimalpoints = 2; // TODO - Setting?
 
@@ -56,6 +67,11 @@ class grade_exporter {
     protected $groupid;
 
     protected $course;
+
+    protected $userrows;
+
+    protected $gradetype = self::GRADE_TYPE_FINAL;
+
 
     /**
      * Constructor to set everything up.
@@ -72,13 +88,15 @@ class grade_exporter {
         $this->coursegradeitem = grade_item::fetch_course_item($course->id);
 
         $this->currentgradeitem = $this->coursegradeitem; // TODO.
+
+        $this->build_user_data();
     }
 
     protected function get_grade_columns() {
         return [$this->currentgradeitem->id => $this->currentgradeitem];
     }
 
-    public function get_user_data() {
+    protected function build_user_data() {
         $profilefields = grade_helper::get_user_profile_fields($this->course->id, true);
         $this->displaytype = [GRADE_DISPLAY_TYPE_REAL, GRADE_DISPLAY_TYPE_PERCENTAGE, GRADE_DISPLAY_TYPE_LETTER];
 
@@ -88,7 +106,6 @@ class grade_exporter {
         $gui->allow_user_custom_fields(true);
         $gui->init();
 
-        $output = [];
         $userrows = [];
 
         while ($userdata = $gui->next_user()) {
@@ -97,7 +114,7 @@ class grade_exporter {
             // We only use one grade item, so that is easy...
             $grade = reset($userdata->grades);
 
-            $userrow = new user_grade_row($user, $grade, $this->currentgradeitem);
+            $userrow = new user_grade_row($user, $this, $grade, $this->currentgradeitem);
 
             $userrows[] = $userrow;
 
@@ -106,10 +123,50 @@ class grade_exporter {
         $gui->close();
 
 
-        return $userrows;
+        $this->userrows = $userrows;
     }
 
+    public function get_course() {
+        return $this->course;
+    }
 
+    public function get_grade_type() {
+        return $gradetype;
+    }
+
+    public function get_user_data() {
+        return $this->userrows;
+    }
+
+    public function export_for_template(\renderer_base $renderer) {
+        global $USER;
+
+        $output = new stdClass;
+
+        $rows = [];
+        foreach ($this->userrows as $row) {
+            $rows[] = $row->export_for_template($renderer);
+        }
+
+        $output->userrows = $rows;
+
+        $output->courseid = $this->course->id;
+        $output->groupid = $this->groupid;
+        $output->graderid = $USER->id;
+        $output->sesskey = sesskey();
+
+        return $output;
+    }
+
+    public function process_data(stdClass $data) {
+        // TODO check sesskey.
+        // TODO check grader id.
+        // TODO check courseid.
+
+        foreach ($this->userrows as $row) {
+            $row->process_data($data, $this);
+        }
+    }
 }
 
 
