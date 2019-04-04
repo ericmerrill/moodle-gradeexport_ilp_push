@@ -31,3 +31,15 @@ $string['privacy:metadata'] = 'The Banner grade export TODO Privacy.';
 //$string['timeexported'] = 'Last downloaded from this course';
 $string['ilp_push:publish'] = 'Publish Banner grade export';
 $string['ilp_push:view'] = 'Use Banner grade export';
+
+$string['invalid_datelastattended_early'] = 'Date last attended cannot be before the start of the course.';
+$string['invalid_datelastattended_late'] = 'Date last attended cannot be after the end of the course.';
+$string['invalid_datelastattended_missing'] = 'Date last attended must be entered for a failing student.';
+
+$string['invalid_grade'] = 'A valid grade must be selected.';
+
+$string['invalid_incomplete_date_early'] = 'Incomplete deadline cannot be before the end of the course.';
+$string['invalid_incomplete_date_late'] = 'Incomplete deadline cannot be more than a year after the course ends.';
+$string['invalid_incomplete_date_missing'] = 'Incomplete deadline must be entered for an incomplete grade.';
+$string['invalid_incomplete_grade_missing'] = 'A default incomplete grade must be selected.';
+$string['invalid_incomplete_grade_wrong'] = 'Default incomplete grade cannot be changed from the default.';

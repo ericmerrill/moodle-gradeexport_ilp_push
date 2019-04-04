@@ -29,6 +29,7 @@ namespace gradeexport_ilp_push;
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/grade/export/lib.php');
+require_once($CFG->libdir . '/form/dateselector.php');
 
 use stdClass;
 use templatable;
@@ -66,6 +67,7 @@ class user_grade_row implements templatable {
 
     protected $gradeitem;
 
+    protected $currenterrors;
 
 
 
@@ -78,6 +80,25 @@ class user_grade_row implements templatable {
         $this->course = $exporter->get_course();
         $this->grade = $grade;
         $this->gradeitem = $gradeitem;
+        $this->fetch_existing_rows();
+    }
+
+    /**
+     * Load the existing saved grades for this row.
+     */
+    public function fetch_existing_rows() {
+        if (!$savedgrades = saved_grade::get_records_for_user_course($this->user, $this->course)) {
+            // We will create a default saved_grade object if there are none existing.
+            $grade = $this->create_new_saved_grade();
+
+            $this->currentsavedgrade = $grade;
+            $this->pastsavedgrades[$grade->revision] = $grade;
+            return;
+        }
+
+        $this->currentsavedgrade = end($savedgrades);
+        reset($savedgrades);
+        $this->pastsavedgrades = $savedgrades;
     }
 
     public function get_form_id($prefix = false) {
@@ -92,7 +113,7 @@ class user_grade_row implements templatable {
         return $prefix.$COURSE->id.'-'.$this->user->id;
     }
 
-    public function get_current_menu_selection() {
+    public function get_current_grade_key() {
         $letter = null;
         if ($this->currentsavedgrade) {
             // TODO - May need to refine how this works later...
@@ -106,7 +127,7 @@ class user_grade_row implements templatable {
         return banner_grades::find_key_for_letter($letter);
     }
 
-    public function get_current_incomplete_menu_selection() {
+    public function get_current_incomplete_grade_key() {
         $letter = null;
         if ($this->currentsavedgrade) {
             // TODO - May need to refine how this works later...
@@ -151,6 +172,9 @@ class user_grade_row implements templatable {
 
     public function export_for_template(\renderer_base $renderer) {
         global $OUTPUT, $COURSE;
+if (!empty($this->currenterrors)) {
+    print "<pre>";print_r($this->currenterrors);print "</pre>";
+}
         //$source = $this->get_data_source();
 
         //$output = $source->export_for_template($renderer);
@@ -175,9 +199,22 @@ class user_grade_row implements templatable {
 
         $output->incompletegradeselect = $renderer->render_incomplete_select_menu($this);
 
-        $currentkey = banner_grades::find_key_for_letter($output->gradeletter);
-        $output->showincomplete = (bool)in_array($currentkey, banner_grades::get_incomplete_grade_ids());
-        $output->showfailing = (bool)in_array($currentkey, banner_grades::get_failing_grade_ids());
+        if ($this->currentsavedgrade->datelastattended) {
+            $output->datelastattended = date_format_string($this->currentsavedgrade->datelastattended, '%F');
+        } else {
+            $output->datelastattended = false;
+        }
+        if ($this->currentsavedgrade->incompletedeadline) {
+            $output->incompletedeadline = date_format_string($this->currentsavedgrade->incompletedeadline, '%F');
+        } else {
+            $output->incompletedeadline = false;
+        }
+
+        $output->status = $this->currentsavedgrade->status;
+
+        $currentkey = $this->get_current_grade_key();
+        $output->showincomplete = banner_grades::grade_key_is_incomplete($currentkey);
+        $output->showfailing = banner_grades::grade_key_is_failing($currentkey);
 
         return $output;
     }
@@ -190,25 +227,176 @@ class user_grade_row implements templatable {
         return 0;
     }
 
-    public function process_data(stdClass $data, grade_exporter $exporter) {
+    public function process_data(stdClass $data) {
         global $USER;
 
-        $save = new saved_grade();
+        // Track if we should unconditionally save to the db.
+        $savetodb = false;
 
-        $save->studentid = $this->user->id;
-        $save->studentilpid = $this->user->idnumber; // TODO - This can be sourced elsewhere.
-        $save->courseid = $this->course->id;
-        $save->courseilpid = $this->course->idnumber; // TODO - Won't work with crosslists...
-        $save->submitterid = $USER->id;
-        $save->submitterilpid = $USER->idnumber; // TODO - This can be sourced elsewhere.
+        if ($this->currentsavedgrade && $this->currentsavedgrade->status == saved_grade::GRADING_STATUS_EDITING) {
+            $grade = $this->currentsavedgrade;
+        } else {
+            $grade = $this->create_new_saved_grade();
+        }
 
-        $save->revision = $this->get_next_revision_number();
+        // Confirm is a special data element. It is not saved between data loads.
+        // If it is true later, then it was for sure clicked this time around.
+        $key = $this->get_form_id('confirm');
+        if (!empty($data->$key)) {
+            $grade->confirmed = true;
+        }
 
+        $grade->submitterid = $USER->id;
+        $grade->submitterilpid = id_converter::get_user_id($USER);
 
-        print "<pre>";print_r($save);print "</pre>";
+        $grade->grade = $this->get_ilp_grade_from_data($data, 'grade');
+        $key = $this->get_form_id('grade');
+        if (is_null($grade->grade)) {
+            // If the grade resolved to null (not a valid banner grade), we are also going to null the data, for latter use.
+            $data->$key = null;
+        }
+        $grade->gradekey = $data->$key;
+
+        // Check if the grade changed, so we know if we should unconditionally store it.
+        if ($this->check_grade_changed($data, 'grade')) {
+            $savetodb = true;
+        }
+
+        // Stuff only for incomplete grades.
+        if (banner_grades::grade_key_is_incomplete($grade->gradekey)) {
+            $grade->incompletegrade = $this->get_ilp_grade_from_data($data, 'incompletegrade');
+            $key = $this->get_form_id('incompletegrade');
+            if (is_null($grade->incompletegrade)) {
+                // If the grade resolved to null (not a valid banner grade), we are also going to null the data, for latter use.
+                $data->$key = null;
+            }
+            if ($this->check_grade_changed($data, 'incompletegrade') || $grade->confirmed) {
+                $grade->incompletegradekey = $data->$key;
+                $savetodb = true;
+            }
+
+            $deadline = $this->get_timestamp_from_data($data, 'incompletedeadline');
+            $grade->incompletedeadline = $deadline;
+            if ($this->currentsavedgrade->incompletedeadline != $deadline) {
+                $savetodb = true;
+            }
+        }
+
+        // Stuff only for failing grades.
+        if (banner_grades::grade_key_is_failing($grade->gradekey)) {
+            $lastattended = $this->get_timestamp_from_data($data, 'datelastattended');
+            $grade->datelastattended = $lastattended;
+            if ($this->currentsavedgrade->datelastattended != $lastattended) {
+                $savetodb = true;
+            }
+
+        }
+
+        $grade->timecreated = time();
+
+        $grade->gradetype = $this->exporter->get_grade_type();
+
+        if (!$savetodb && !$grade->confirmed
+                && $this->currentsavedgrade !== $grade && !$this->currentsavedgrade->objects_are_different($grade)) {
+            // In this case, we don't need to actually use this object to do anything.
+            return;
+        }
+
+        // Get validation results.
+        $validation = rule_validator::validate_row($grade, $this->exporter);
+
+        // If there are no errors, and they confirmed on this submit.
+        if (empty($validation['errors']) && $grade->confirmed) {
+            // Then we can move the status up.
+            $grade->status = saved_grade::GRADING_STATUS_SUBMITTED;
+            $grade->usersubmittime = time();
+            $grade->save_to_db();
+        } else {
+            if (!empty($validation['errors'])) {
+                $this->currenterrors = $validation['errors'];
+            }
+
+            if ($savetodb) {
+                $grade->save_to_db();
+            }
+        }
+
+        if ($this->currentsavedgrade !== $grade) {
+            $this->currentsavedgrade = $grade;
+            $this->pastsavedgrades[$grade->revision] = $grade;
+        }
+    }
+
+    protected function check_grade_changed($data, $formkey) {
+        $startkey = $this->get_form_id($formkey.'-starting');
+        if (empty($data->$startkey)) {
+            $start = null;
+        } else {
+            $start = $data->$startkey;
+        }
+
+        $submitkey = $this->get_form_id($formkey);
+        if (empty($data->$submitkey)) {
+            $submitted = null;
+        } else {
+            $submitted = $data->$submitkey;
+        }
+
+        if ($start == $submitted) {
+            // It did not change.
+            return false;
+        } else {
+            return true;
+        }
 
     }
 
+    protected function get_ilp_grade_from_data($data, $formkey) {
+        $datakey = $this->get_form_id($formkey);
+
+        if (!isset($data->$datakey)) {
+            return null;
+        }
+
+        return banner_grades::get_ilp_grade_for_key($data->$datakey);
+    }
+
+    protected function get_timestamp_from_data($data, $formkey) {
+        // TODO - move to moodle date picker.
+        $datakey = $this->get_form_id($formkey);
+
+        if (!isset($data->$datakey)) {
+            return null;
+        }
+
+        $date = trim($data->$datakey);
+
+        // HTML5 date field is always expected to return YYYY-MM-DD format data.
+        if (!preg_match('|^(\d{2,4})[-\/](\d{1,2})[-\/](\d{1,2})$|', $date, $matches)) {
+            return null;
+        }
+
+        $timestamp = make_timestamp($matches[1], $matches[2], $matches[3], 0, 0, 0, 99, true);
+
+        if ($timestamp === false) {
+            return null;
+        }
+
+        return $timestamp;
+    }
+
+
+    protected function create_new_saved_grade() {
+        $grade = new saved_grade();
+        $grade->studentid = $this->user->id;
+        $grade->studentilpid = id_converter::get_user_id($this->user);
+        $grade->courseid = $this->course->id;
+        $grade->courseilpid = id_converter::get_course_id_for_user($this->course, $this->user);
+
+        $grade->revision = $this->get_next_revision_number();
+
+        return $grade;
+    }
 }
 
 

@@ -16,7 +16,7 @@
         <FIELD NAME="submitterilpid" TYPE="char" LENGTH="127" NOTNULL="true" SEQUENCE="false" COMMENT="The ILP ID of the user submitting."/>
         <FIELD NAME="studentid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The Moodle user ID of the student being submitted for."/>
         <FIELD NAME="studentilpid" TYPE="char" LENGTH="127" NOTNULL="true" SEQUENCE="false" COMMENT="The ILP ID of the student we are submitting for."/>
-        <FIELD NAME="grade" TYPE="char" LENGTH="127" NOTNULL="true" SEQUENCE="false" COMMENT="The grade string being submitted for the user."/>
+        <FIELD NAME="grade" TYPE="char" LENGTH="127" NOTNULL="false" SEQUENCE="false" COMMENT="The grade string being submitted for the user."/>
         <FIELD NAME="incompletegrade" TYPE="char" LENGTH="127" NOTNULL="false" SEQUENCE="false" COMMENT="The grade to use if the incomplete grade isn't completed on time."/>
         <FIELD NAME="incompletedeadline" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Date to complete a incomplete by."/>
         <FIELD NAME="datelastattended" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Date student last attended."/>

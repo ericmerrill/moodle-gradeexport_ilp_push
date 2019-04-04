@@ -73,5 +73,19 @@ function xmldb_gradeexport_ilp_push_upgrade($oldversion=0) {
         upgrade_plugin_savepoint(true, 2019032500, 'gradeexport', 'ilp_push');
     }
 
+    if ($oldversion < 2019040400) {
+
+        // Changing nullability of field grade on table gradeexport_ilp_push_grades to null.
+        $table = new xmldb_table('gradeexport_ilp_push_grades');
+        $field = new xmldb_field('grade', XMLDB_TYPE_CHAR, '127', null, null, null, null, 'studentilpid');
+
+        // Launch change of nullability for field grade.
+        $dbman->change_field_notnull($table, $field);
+
+        // Ilp_push savepoint reached.
+        upgrade_plugin_savepoint(true, 2019040400, 'gradeexport', 'ilp_push');
+    }
+
+
 
 }

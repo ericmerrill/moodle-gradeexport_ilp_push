@@ -39,6 +39,14 @@ use stdClass;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class saved_grade {
+    // Intentionally leaving gaps, incase we need more statuses.
+    const GRADING_STATUS_EDITING = 5;
+    const GRADING_STATUS_SUBMITTED = 10;
+    const GRADING_STATUS_PROCESSING = 15;
+    const GRADING_STATUS_PROCESSED = 20;
+    const GRADING_STATUS_FAILURE = 25;
+    const GRADING_STATUS_LOCKED = 30;
+
     /** @var object The database record object */
     protected $record;
 
@@ -48,10 +56,17 @@ class saved_grade {
                          'resultstatus', 'additional', 'usersubmittime', 'ilpsendtime', 'timecreated', 'timemodified'];
 
     /** @var array An array of default property->value pairs */
-    protected $defaults = [];
+    protected $defaults = ['status' => self::GRADING_STATUS_EDITING];
 
     /** @var object Object that contains additional data about the object. This will be JSON encoded. */
     protected $additionaldata;
+
+    /** @var array Array of keys will be used to see if two objects are the same. */
+    protected $diffkeys = ['gradetype', 'courseid', 'courseilpid', 'studentid', 'studentilpid', 'grade', 'incompletegrade',
+                           'incompletedeadline', 'datelastattended'];
+
+    /** @var bool Intentionally public key, this will not be saved, only used transiently. */
+    public $confirmed = false;
 
     /**
      * The table name of this object.
@@ -148,6 +163,52 @@ class saved_grade {
             // Existing record.
             $DB->update_record(static::TABLE, $new);
         }
+    }
+
+    /**
+     * Check if the provided object is materially different from this object.
+     *
+     * @param saved_grade $grade Another object to check against
+     * @return bool True if they are different
+     */
+    public function objects_are_different($grade) {
+        foreach ($this->diffkeys as $key) {
+            if ($this->__isset($key) !== $grade->__isset($key)) {
+                return true;
+            }
+
+            if ($this->$key != $grade->$key) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Return an array of saved_grade objects that go with provided user/course combo. Sorted oldest to newest, keyed by revision.
+     *
+     * @param stdClass $user The user.
+     * @param stdClass $course The course.
+     * @return saved_grades[]
+     */
+    public static function get_records_for_user_course(stdClass $user, stdClass $course) {
+        global $DB;
+
+        $params = ['studentid' => $user->id, 'courseid' => $course->id];
+        if (!$records = $DB->get_records(static::TABLE, $params, 'id ASC')) {
+            return false;
+        }
+
+        $grades = [];
+        foreach ($records as $record) {
+            $grade = new static();
+            $grade->load_from_record($record);
+
+            $grades[$record->revision] = $grade;
+        }
+
+        return $grades;
     }
 
     // ******* Magic Methods.

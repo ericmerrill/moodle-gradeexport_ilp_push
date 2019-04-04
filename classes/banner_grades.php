@@ -75,6 +75,16 @@ class banner_grades {
         return $key;
     }
 
+    public static function get_ilp_grade_for_key($key) {
+        $options = self::get_possible_grades();
+
+        if (!isset($options[$key])) {
+            return null;
+        }
+
+        return $options[$key];
+    }
+
     public static function get_banner_equivilant_grade($userrow) {
         // TODO - Better options here...
 
@@ -89,6 +99,26 @@ class banner_grades {
         return self::find_key_for_letter('F');
     }
 
+    public static function grade_key_is_failing($key) {
+        $keys = static::get_failing_grade_ids();
+
+        if (isset($keys[$key])) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public static function grade_key_is_incomplete($key) {
+        $keys = static::get_incomplete_grade_ids();
+
+        if (isset($keys[$key])) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public static function get_failing_grade_ids() {
         // TODO - need to find the logic behind this better.
         if (!is_null(self::$failingids)) {
@@ -97,7 +127,8 @@ class banner_grades {
 
         $ids = [];
         foreach (self::$failing as $grade) {
-            $ids[] = self::find_key_for_letter($grade);
+            $key = self::find_key_for_letter($grade);
+            $ids[$key] = $key;
         }
 
         self::$failingids = $ids;
@@ -113,7 +144,8 @@ class banner_grades {
 
         $ids = [];
         foreach (self::$incomplete as $grade) {
-            $ids[] = self::find_key_for_letter($grade);
+            $key = self::find_key_for_letter($grade);
+            $ids[$key] = $key;
         }
 
         self::$incompleteids = $ids;

@@ -70,12 +70,12 @@
         {{{gradeselect}}}
         <div class="fail {{^showfailing}}hide{{/showfailing}}">
             <div class="datelastattended">
-                <label>Date Last Attended</label><input type="date" name="datelastattended-{{{formid}}}">
+                <label>Date Last Attended</label><input type="date" name="datelastattended-{{{formid}}}" value="{{{datelastattended}}}">
             </div>
         </div>
         <div class="incomplete {{^showincomplete}}hide{{/showincomplete}}">
-            <div class="incompletedate">
-                <label>Incomplete Deadline</label><input type="date" name="incompletedate-{{{formid}}}">
+            <div class="incompletedeadline">
+                <label>Incomplete Deadline</label><input type="date" name="incompletedeadline-{{{formid}}}" value="{{{incompletedeadline}}}">
             </div>
             <div class="incompletegrade">
                 <label>Incomplete Default Grade</label>{{{incompletegradeselect}}}
@@ -83,10 +83,10 @@
         </div>
     </td>
     <td>
-        <input type="checkbox" class="mycheckbox form-control">
+        <input type="checkbox" class="mycheckbox form-control" name="confirm-{{{formid}}}">
     </td>
     <td>
-        ICON<br>Status
+        ICON<br>Status-{{status}}
     </td>
 </tr>
 

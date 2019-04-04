@@ -131,7 +131,7 @@ class grade_exporter implements templatable {
     }
 
     public function get_grade_type() {
-        return $gradetype;
+        return $this->gradetype;
     }
 
     public function get_user_data() {
@@ -164,7 +164,7 @@ class grade_exporter implements templatable {
         // TODO check courseid.
 
         foreach ($this->userrows as $row) {
-            $row->process_data($data, $this);
+            $row->process_data($data);
         }
     }
 }

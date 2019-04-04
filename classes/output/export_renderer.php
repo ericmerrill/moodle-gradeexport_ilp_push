@@ -55,9 +55,12 @@ class export_renderer extends plugin_renderer_base {
 
     public function render_select_menu(user_grade_row $userrow) {
         $options = banner_grades::get_possible_grades($userrow);
-        $selected = $userrow->get_current_menu_selection();
+        $selected = $userrow->get_current_grade_key();
 
-        $output = html_writer::select($options, $userrow->get_form_id('bannergrade'), $selected);
+        $output = html_writer::select($options, $userrow->get_form_id('grade'), $selected);
+        // Add an input that indicates what was already selected.
+        $attributes = ['type' => 'hidden', 'name' => $userrow->get_form_id('grade-starting'), 'value' => $selected];
+        $output .= html_writer::empty_tag('input', $attributes);
 
         return $output;
     }
@@ -65,9 +68,11 @@ class export_renderer extends plugin_renderer_base {
     public function render_incomplete_select_menu(user_grade_row $userrow) {
         // TODO - need to make it so if a different one is already selected, that is returned.
         $options = banner_grades::get_possible_grades();
-        $selected = banner_grades::get_default_incomplete_grade();
+        $selected = $userrow->get_current_incomplete_grade_key();
 
         $output = html_writer::select($options, $userrow->get_form_id('incompletegrade'), $selected);
+        $attributes = ['type' => 'hidden', 'name' => $userrow->get_form_id('incompletegrade-starting'), 'value' => $selected];
+        $output .= html_writer::empty_tag('input', $attributes);
 
         return $output;
     }
