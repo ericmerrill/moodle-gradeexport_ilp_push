@@ -32,6 +32,7 @@ $string['privacy:metadata'] = 'The Banner grade export TODO Privacy.';
 $string['ilp_push:publish'] = 'Publish Banner grade export';
 $string['ilp_push:view'] = 'Use Banner grade export';
 
+// Rule validation.
 $string['invalid_datelastattended_early'] = 'Date last attended cannot be before the start of the course.';
 $string['invalid_datelastattended_late'] = 'Date last attended cannot be after the end of the course.';
 $string['invalid_datelastattended_missing'] = 'Date last attended must be entered for a failing student.';
@@ -43,3 +44,12 @@ $string['invalid_incomplete_date_late'] = 'Incomplete deadline cannot be more th
 $string['invalid_incomplete_date_missing'] = 'Incomplete deadline must be entered for an incomplete grade.';
 $string['invalid_incomplete_grade_missing'] = 'A default incomplete grade must be selected.';
 $string['invalid_incomplete_grade_wrong'] = 'Default incomplete grade cannot be changed from the default.';
+
+
+// Settings.
+$string['ilpid'] = 'ILP Connection ID';
+$string['ilpid_help'] = 'The connection ID setup in the ILP admin.';
+$string['ilppassword'] = 'ILP Connection Password';
+$string['ilppassword_help'] = 'The connection password setup in the ILP admin.';
+$string['ilpurl'] = 'ILP URL';
+$string['ilpurl_help'] = 'The base URL of the ILP server being used';

@@ -10,6 +10,7 @@ Things to be done:
 * Event logging
 * Check wording for default incomplete date.
 * Add gradetype to course-user-revision index.
+* Add support for additional certs
 
 Things that need to be looked into:
 * Default incomplete grade, and should changing that be a setting?
