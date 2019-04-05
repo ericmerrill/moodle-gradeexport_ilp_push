@@ -53,7 +53,7 @@ class saved_grade {
     /** @var array Array of keys that go in the database object */
     protected $dbkeys = ['id', 'status', 'gradetype', 'revision', 'courseid', 'courseilpid', 'submitterid', 'submitterilpid',
                          'studentid', 'studentilpid', 'grade', 'incompletegrade', 'incompletedeadline', 'datelastattended',
-                         'resultstatus', 'additional', 'usersubmittime', 'ilpsendtime', 'timecreated', 'timemodified'];
+                         'resultstatus', 'additionaldata', 'usersubmittime', 'ilpsendtime', 'timecreated', 'timemodified'];
 
     /** @var array An array of default property->value pairs */
     protected $defaults = ['status' => self::GRADING_STATUS_EDITING];
@@ -103,7 +103,9 @@ class saved_grade {
      */
     protected function load_from_record($record) {
         $this->record = $record;
-        $this->additionaldata = json_decode($record->additional);
+        if (isset($record->additionaldata)) {
+            $this->additionaldata = json_decode($record->additionaldata);
+        }
     }
 
     /**
@@ -221,7 +223,7 @@ class saved_grade {
     public function &__get($name) {
         // First check the DB keys, then additional.
         if (in_array($name, $this->dbkeys)) {
-            if ($name == 'additional') {
+            if ($name == 'additionaldata') {
                 // Allows easier interaction with outside scripts of DB modification than serialize.
                 $this->record->$name = json_encode($this->additionaldata, JSON_UNESCAPED_UNICODE);
                 return $this->record->$name;

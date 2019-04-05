@@ -67,7 +67,7 @@ class user_grade_row implements templatable {
 
     protected $gradeitem;
 
-    protected $currenterrors;
+    protected $currenterrors = [];
 
 
 
@@ -172,12 +172,7 @@ class user_grade_row implements templatable {
 
     public function export_for_template(\renderer_base $renderer) {
         global $OUTPUT, $COURSE;
-if (!empty($this->currenterrors)) {
-    print "<pre>";print_r($this->currenterrors);print "</pre>";
-}
-        //$source = $this->get_data_source();
 
-        //$output = $source->export_for_template($renderer);
         $output = new stdClass();
 
         $fullname = fullname($this->user);
@@ -211,6 +206,12 @@ if (!empty($this->currenterrors)) {
         }
 
         $output->status = $this->currentsavedgrade->status;
+
+
+        foreach ($this->currenterrors as $id => $string) {
+            $key = $id.'error';
+            $output->$key = $renderer->render_form_error($string);
+        }
 
         $currentkey = $this->get_current_grade_key();
         $output->showincomplete = banner_grades::grade_key_is_incomplete($currentkey);
@@ -270,14 +271,16 @@ if (!empty($this->currenterrors)) {
                 // If the grade resolved to null (not a valid banner grade), we are also going to null the data, for latter use.
                 $data->$key = null;
             }
+
+            $grade->incompletegradekey = $data->$key;
             if ($this->check_grade_changed($data, 'incompletegrade') || $grade->confirmed) {
-                $grade->incompletegradekey = $data->$key;
                 $savetodb = true;
             }
 
             $deadline = $this->get_timestamp_from_data($data, 'incompletedeadline');
+            $currentvalue = $this->currentsavedgrade->incompletedeadline;
             $grade->incompletedeadline = $deadline;
-            if ($this->currentsavedgrade->incompletedeadline != $deadline) {
+            if ($currentvalue != $deadline) {
                 $savetodb = true;
             }
         }
@@ -285,8 +288,9 @@ if (!empty($this->currenterrors)) {
         // Stuff only for failing grades.
         if (banner_grades::grade_key_is_failing($grade->gradekey)) {
             $lastattended = $this->get_timestamp_from_data($data, 'datelastattended');
+            $currentvalue = $this->currentsavedgrade->datelastattended;
             $grade->datelastattended = $lastattended;
-            if ($this->currentsavedgrade->datelastattended != $lastattended) {
+            if ($currentvalue != $lastattended) {
                 $savetodb = true;
             }
 

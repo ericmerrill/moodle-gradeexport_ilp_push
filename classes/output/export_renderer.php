@@ -77,6 +77,12 @@ class export_renderer extends plugin_renderer_base {
         return $output;
     }
 
+    public function render_form_error($errorstring) {
+
+        return $this->pix_icon('i/warning', $errorstring);
+
+    }
+
 
 // ***************** Old stuff to delete.
 

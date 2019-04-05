@@ -68,17 +68,21 @@
     </td>
     <td class="bannergradeselect">
         {{{gradeselect}}}
+        {{{gradeerror}}}
         <div class="fail {{^showfailing}}hide{{/showfailing}}">
             <div class="datelastattended">
                 <label>Date Last Attended</label><input type="date" name="datelastattended-{{{formid}}}" value="{{{datelastattended}}}">
+                {{{datelastattendederror}}}
             </div>
         </div>
         <div class="incomplete {{^showincomplete}}hide{{/showincomplete}}">
             <div class="incompletedeadline">
                 <label>Incomplete Deadline</label><input type="date" name="incompletedeadline-{{{formid}}}" value="{{{incompletedeadline}}}">
+                {{{incompletedeadlineerror}}}
             </div>
             <div class="incompletegrade">
                 <label>Incomplete Default Grade</label>{{{incompletegradeselect}}}
+                {{{incompletegradeerror}}}
             </div>
         </div>
     </td>
