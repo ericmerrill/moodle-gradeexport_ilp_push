@@ -86,6 +86,27 @@ function xmldb_gradeexport_ilp_push_upgrade($oldversion=0) {
         upgrade_plugin_savepoint(true, 2019040400, 'gradeexport', 'ilp_push');
     }
 
+    if ($oldversion < 2019040900) {
+
+        // Define index courseid-studentid-revision (unique) to be dropped form gradeexport_ilp_push_grades.
+        $table = new xmldb_table('gradeexport_ilp_push_grades');
+        $index = new xmldb_index('courseid-studentid-revision', XMLDB_INDEX_UNIQUE, array('courseid', 'studentid', 'revision'));
+
+        // Conditionally launch drop index courseid-studentid-revision.
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+
+        $index = new xmldb_index('courseid-studentid-gradetype-revision', XMLDB_INDEX_UNIQUE, array('courseid', 'studentid', 'gradetype', 'revision'));
+
+        // Conditionally launch add index courseid-studentid-gradetype-revision.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Ilp_push savepoint reached.
+        upgrade_plugin_savepoint(true, 2019040900, 'gradeexport', 'ilp_push');
+    }
 
 
 }

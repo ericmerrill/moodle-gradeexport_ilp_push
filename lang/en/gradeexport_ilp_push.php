@@ -32,6 +32,8 @@ $string['privacy:metadata'] = 'The Banner grade export TODO Privacy.';
 $string['ilp_push:publish'] = 'Publish Banner grade export';
 $string['ilp_push:view'] = 'Use Banner grade export';
 
+$string['ilp_response_missing'] = 'No response received from banner.';
+
 // Rule validation.
 $string['invalid_datelastattended_early'] = 'Date last attended cannot be before the start of the course.';
 $string['invalid_datelastattended_late'] = 'Date last attended cannot be after the end of the course.';
@@ -53,3 +55,6 @@ $string['ilppassword'] = 'ILP Connection Password';
 $string['ilppassword_help'] = 'The connection password setup in the ILP admin.';
 $string['ilpurl'] = 'ILP URL';
 $string['ilpurl_help'] = 'The base URL of the ILP server being used';
+
+// Exceptions.
+$string['exception_submitter_mismatch'] = 'Not all saved grades have the same submitter ILP id.';

@@ -28,7 +28,7 @@ namespace gradeexport_ilp_push\local\ilp;
 
 defined('MOODLE_INTERNAL') || die();
 
-use gradeexport_ilp_push\settings;
+//use gradeexport_ilp_push\settings;
 
 /**
  * Connector that interacts with ILP.
@@ -38,7 +38,7 @@ use gradeexport_ilp_push\settings;
  * @copyright  2019 Oakland University (https://www.oakland.edu)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class ilp_connector {
+class connector {
 
     $endpoints = ['grades' => 'api/coursesection/grades'];
 
@@ -80,11 +80,12 @@ class ilp_connector {
         if (isset($this->endpoints[$endpoint])) {
             $url = settings::get_setting('ilpurl') . '/' . $this->endpoints[$endpoint];
             $options[CURLOPT_URL] = $url;
+        } else {
+            // TODO - throw exception.
         }
 
         return $options;
     }
-
 
     public function send_request($endpoint, $body) {
         $curl = curl_init();
@@ -103,6 +104,8 @@ class ilp_connector {
 
 
         curl_close($curl);
+
+        // Return as decoded json.
     }
 }
 

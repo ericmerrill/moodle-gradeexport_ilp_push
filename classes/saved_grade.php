@@ -44,7 +44,7 @@ class saved_grade {
     const GRADING_STATUS_SUBMITTED = 10;
     const GRADING_STATUS_PROCESSING = 15;
     const GRADING_STATUS_PROCESSED = 20;
-    const GRADING_STATUS_FAILURE = 25;
+    const GRADING_STATUS_FAILED = 25;
     const GRADING_STATUS_LOCKED = 30;
 
     /** @var object The database record object */
@@ -198,7 +198,7 @@ class saved_grade {
         global $DB;
 
         $params = ['studentid' => $user->id, 'courseid' => $course->id];
-        if (!$records = $DB->get_records(static::TABLE, $params, 'id ASC')) {
+        if (!$records = $DB->get_recordset(static::TABLE, $params, 'id ASC')) {
             return false;
         }
 
@@ -212,6 +212,65 @@ class saved_grade {
 
         return $grades;
     }
+
+    /**
+     * Get an array of saved_grade records for a give submitterilp id and $courseilpid
+     *
+     * @param string $submitterilp The submitter's ILP id.
+     * @param string $courseilp The course's ILP id.
+     * @return
+     */
+    public static function get_for_submitter_course(string $submitterilp, string $courseilp, $status = null) {
+        $params = ['submitterilpid' => $submitterilp, 'courseilpid' => $courseilp];
+
+        if (!is_null($status)) {
+            $params['status'] = $status;
+        }
+
+        return static::get_for_params($params);
+    }
+
+    /**
+     * Return an array of records for a given set of parameters
+     *
+     * @param
+     * @return
+     */
+    public static function get_for_params(array $params, $sort = 'id ASC', $limitfrom = 0, $count = 0) {
+        global $DB;
+
+        if (!$records = $DB->get_recordset(static::TABLE, $params, $sort, '*', $limitfrom, $count)) {
+            return false;
+        }
+
+        $grades = [];
+        foreach ($records as $record) {
+            $grade = new static();
+            $grades[$record->id] = $grade->load_from_record($record);
+        }
+
+        $records->close();
+
+        return $grades;
+    }
+
+    /**
+     * Load an array of saved_grades from an array of records
+     *
+     * @param stdClass[] $records An array of records.
+     * @return saved_grade[] An array of loaded saved_grades.
+     */
+//     public static function load_from_records(array $records) {
+//         $grades = [];
+//         foreach ($records as $record) {
+//             $grade = new static();
+//             $grade->load_from_record($record);
+//
+//             $grades[$record->id] = $grade;
+//         }
+//
+//         return $grades;
+//     }
 
     // ******* Magic Methods.
     /**
