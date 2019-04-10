@@ -56,6 +56,10 @@ class rule_validator {
         if (banner_grades::grade_key_is_failing($grade->gradekey)) {
             if (is_null($grade->datelastattended)) {
                 $results['errors']['datelastattended'] = get_string('invalid_datelastattended_missing', 'gradeexport_ilp_push');
+            } else if ($grade->datelastattended > time()) {
+                // Cannot be later than today.
+                // TODO do time/date check better.
+                $results['errors']['datelastattended'] = get_string('invalid_datelastattended_today', 'gradeexport_ilp_push');
             } else if ($grade->datelastattended < $course->startdate) {
                 // The date last attended must be withing a certain date range.
                 // TODO better date ranges and error messages...
@@ -78,6 +82,7 @@ class rule_validator {
 
             // If the grade is incomplete, there must be a deadline date.
             if (is_null($grade->incompletedeadline)) {
+                // TODO - this might not be required...
                 $results['errors']['incompletedeadline'] = get_string('invalid_incomplete_date_missing', 'gradeexport_ilp_push');
             } else if ($grade->incompletedeadline < $course->enddate) {
                 // If present, the incomplete date must be within a certain timeline (settings dependent).

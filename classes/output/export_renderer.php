@@ -57,9 +57,14 @@ class export_renderer extends plugin_renderer_base {
         $options = banner_grades::get_possible_grades($userrow);
         $selected = $userrow->get_current_grade_key();
 
-        $output = html_writer::select($options, $userrow->get_form_id('grade'), $selected);
+        $attributes = [];
+        if ($userrow->should_prevent_editing()) {
+            $attributes['disabled'] = true;
+        }
+        $output = html_writer::select($options, $userrow->get_form_id('grade'), $selected, ['' => 'choosedots'], $attributes);
         // Add an input that indicates what was already selected.
         $attributes = ['type' => 'hidden', 'name' => $userrow->get_form_id('grade-starting'), 'value' => $selected];
+
         $output .= html_writer::empty_tag('input', $attributes);
 
         return $output;
@@ -70,8 +75,13 @@ class export_renderer extends plugin_renderer_base {
         $options = banner_grades::get_possible_grades();
         $selected = $userrow->get_current_incomplete_grade_key();
 
-        $output = html_writer::select($options, $userrow->get_form_id('incompletegrade'), $selected);
+        $attributes = [];
+        if ($userrow->should_prevent_editing()) {
+            $attributes['disabled'] = true;
+        }
+        $output = html_writer::select($options, $userrow->get_form_id('incompletegrade'), $selected, ['' => 'choosedots'], $attributes);
         $attributes = ['type' => 'hidden', 'name' => $userrow->get_form_id('incompletegrade-starting'), 'value' => $selected];
+
         $output .= html_writer::empty_tag('input', $attributes);
 
         return $output;

@@ -182,6 +182,8 @@ class user_grade_row implements templatable {
         $output->userid = $this->user->id;
         $output->formid = $this->get_form_id();
 
+        $output->locked = $this->should_prevent_editing();
+
         $params = ['id' => $this->user->id, 'course' => $COURSE->id];
         $output->fullnamelink = html_writer::link(new moodle_url('/user/view.php', $params), $fullname);
 
@@ -228,11 +230,35 @@ class user_grade_row implements templatable {
         return 0;
     }
 
+    /**
+     * If this returns true, then editing for this record is currently not allowed.
+     *
+     * @return bool True if this row should be locked, false if not.
+     */
+    public function should_prevent_editing() {
+        $status = $this->currentsavedgrade->status;
+
+        switch ($this->currentsavedgrade->status) {
+            case (saved_grade::GRADING_STATUS_LOCKED):
+            case (saved_grade::GRADING_STATUS_PROCESSING):
+            case (saved_grade::GRADING_STATUS_SUBMITTED):
+                return true;
+                break;
+            default:
+                return false;
+        }
+    }
+
     public function process_data(stdClass $data) {
         global $USER;
 
         // Track if we should unconditionally save to the db.
         $savetodb = false;
+
+        if ($this->should_prevent_editing()) {
+            // TODO - should show a error message if an edit attempt is made while locked.
+            return;
+        }
 
         if ($this->currentsavedgrade && $this->currentsavedgrade->status == saved_grade::GRADING_STATUS_EDITING) {
             $grade = $this->currentsavedgrade;

@@ -26,22 +26,32 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-
 use gradeexport_ilp_push\settings;
-
+use gradeexport_ilp_push\log;
 
 if ($ADMIN->fulltree) {
-    $setting = new admin_setting_configtext('ilpurl', new lang_string('ilpurl', 'gradeexport_ilp_push'),
+    $setting = new admin_setting_configtext('gradeexport_ilp_push/ilpurl', new lang_string('ilpurl', 'gradeexport_ilp_push'),
             new lang_string('ilpurl_help', 'gradeexport_ilp_push'), '', PARAM_URL);
     $settings->add($setting);
 
-    $setting = new admin_setting_configtext('ilpid', new lang_string('ilpid', 'gradeexport_ilp_push'),
+    $setting = new admin_setting_configtext('gradeexport_ilp_push/ilpid', new lang_string('ilpid', 'gradeexport_ilp_push'),
             new lang_string('ilpid_help', 'gradeexport_ilp_push'), '');
     $settings->add($setting);
 
-    $setting = new admin_setting_configpasswordunmask('ilppassword', new lang_string('ilppassword', 'gradeexport_ilp_push'),
+    $setting = new admin_setting_configpasswordunmask('gradeexport_ilp_push/ilppassword', new lang_string('ilppassword', 'gradeexport_ilp_push'),
             new lang_string('ilppassword_help', 'gradeexport_ilp_push'), '', PARAM_URL);
     $settings->add($setting);
 
+    $settings->add(new admin_setting_configfile('gradeexport_ilp_push/logpath', get_string('logpath', 'gradeexport_ilp_push'),
+            get_string('logpath_help', 'gradeexport_ilp_push'), ''));
+
+    $loggingoptions = array(log::ERROR_NONE => get_string('error_all', 'gradeexport_ilp_push'),
+                            log::ERROR_NOTICE => get_string('error_notice', 'gradeexport_ilp_push'),
+                            log::ERROR_WARN => get_string('error_warn', 'gradeexport_ilp_push'),
+                            log::ERROR_MAJOR => get_string('error_major', 'gradeexport_ilp_push'));
+
+    $settings->add(new admin_setting_configselect('gradeexport_ilp_push/logginglevel',
+            get_string('logginglevel', 'gradeexport_ilp_push'),
+            get_string('logginglevel_help', 'gradeexport_ilp_push'), log::ERROR_NOTICE, $loggingoptions));
 }
 

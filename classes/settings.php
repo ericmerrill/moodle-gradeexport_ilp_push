@@ -55,7 +55,7 @@ class settings {
     }
 
     protected function __construct() {
-        $this->settings = get_config('enrol_lmb');
+        $this->settings = get_config('gradeexport_ilp_push');
     }
 
     /**

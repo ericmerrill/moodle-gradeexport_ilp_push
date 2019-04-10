@@ -38,6 +38,7 @@ $string['ilp_response_missing'] = 'No response received from banner.';
 $string['invalid_datelastattended_early'] = 'Date last attended cannot be before the start of the course.';
 $string['invalid_datelastattended_late'] = 'Date last attended cannot be after the end of the course.';
 $string['invalid_datelastattended_missing'] = 'Date last attended must be entered for a failing student.';
+$string['invalid_datelastattended_today'] = 'Date last attended cannot be later than today.';
 
 $string['invalid_grade'] = 'A valid grade must be selected.';
 
@@ -56,5 +57,18 @@ $string['ilppassword_help'] = 'The connection password setup in the ILP admin.';
 $string['ilpurl'] = 'ILP URL';
 $string['ilpurl_help'] = 'The base URL of the ILP server being used';
 
+$string['logginglevel'] = 'Error logging';
+$string['logginglevel_help'] = 'Log messages at this level or higher will be logged. TODO.';
+$string['error_all'] = 'All';
+$string['error_notice'] = 'Notices';
+$string['error_warn'] = 'Warnings';
+$string['error_major'] = 'Major Errors';
+$string['logpath'] = 'Log file location';
+$string['logpath_help'] = 'This is the location you would like the log file to be saved to. This should be an absolute path on the server. The file specified should already exist, and needs to be writable by the webserver process.';
+
 // Exceptions.
 $string['exception_submitter_mismatch'] = 'Not all saved grades have the same submitter ILP id.';
+$string['exception_connector_failure'] = 'A connector failure has occurred.';
+$string['exception_unknown_endpoint'] = 'Endpoint {$a} is unknown.';
+$string['exception_curl_failure'] = 'Curl execution failed. Error: {$a}.';
+$string['exception_bad_response'] = 'Bad response from ILP. {$a}';

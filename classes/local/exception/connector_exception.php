@@ -16,7 +16,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * A class for dealing with locks.
+ * Exception for when a set of grades sent to the converter don't have the same submitter id.
  *
  * @package    gradeexport_ilp_push
  * @author     Eric Merrill (merrill@oakland.edu)
@@ -24,48 +24,30 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace gradeexport_ilp_push;
+namespace gradeexport_ilp_push\local\exception;
 
 defined('MOODLE_INTERNAL') || die();
 
-use core\lock;
-
 /**
- * A class for dealing with locks.
+ * Exception for when a set of grades sent to the converter don't have the same submitter id.
  *
  * @package    gradeexport_ilp_push
  * @author     Eric Merrill (merrill@oakland.edu)
  * @copyright  2019 Oakland University (https://www.oakland.edu)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class locks {
-
-    protected static $factory = [];
-
-    protected static function get_factory($type = 'gradeexport_ilp_push') {
-        if (!isset(static::$factory[$type])) {
-            static::$factory[$type] = lock\lock_config::get_lock_factory($type);
-        }
-
-        return static::$factory[$type];
-    }
-
-    public static function get_course_submitter_lock($courseid, $submitterid, $timeout = null, $maxlifetime = null) {
-        $factory = static::get_factory();
-
-        // TODO - Probably from settings...
-        if (is_null($timeout)) {
-            $timeout = 10;
-        }
-        if (is_null($maxlifetime)) {
-            $maxlifetime = 600;
-        }
-
-        $key = 'gradeexport_ilp_push-c-'.$courseid.'-s-'.$submitterid;
-
-        $lock = $factory->get_lock($key, $timeout, $maxlifetime);
-
-        return $lock;
+class connector_exception extends \moodle_exception {
+    /**
+     * Constructor
+     *
+     * @param string $errorcode The name of the string to print.
+     * @param string $link The url where the user will be prompted to continue.
+     *                  If no url is provided the user will be directed to the site index page.
+     * @param mixed $a Extra words and phrases that might be required in the error string.
+     * @param string $debuginfo optional debugging information.
+     */
+    public function __construct($errorcode = 'exception_connector_failure', $a=null, $debuginfo=null) {
+        parent::__construct($errorcode, 'gradeexport_ilp_push', '', $a, $debuginfo);
     }
 }
 
