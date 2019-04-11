@@ -242,6 +242,7 @@ class user_grade_row implements templatable {
             case (saved_grade::GRADING_STATUS_LOCKED):
             case (saved_grade::GRADING_STATUS_PROCESSING):
             case (saved_grade::GRADING_STATUS_SUBMITTED):
+            case (saved_grade::GRADING_STATUS_RESUBMIT):
                 return true;
                 break;
             default:

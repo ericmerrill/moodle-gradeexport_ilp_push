@@ -32,6 +32,7 @@ defined('MOODLE_INTERNAL') || die();
 use gradeexport_ilp_push\saved_grade;
 use gradeexport_ilp_push\locks;
 use gradeexport_ilp_push\log;
+use gradeexport_ilp_push\id_converter;
 
 /**
  * Controller for managing ILP exchanges.
@@ -43,32 +44,108 @@ use gradeexport_ilp_push\log;
  */
 class controller {
 
+    public function process_course_user($courseid, $userid) {
+        log::instance()->start_message("Processing grades for course {$courseid} and user {$userid}.");
 
-
-    public function process_course_submitter($courseilp, $submitterilp) {
-        // Grab a lock to make sure nobody else is working on this right now.
-        if (!$lock = locks::get_course_submitter_lock($courseilp, $submitterilp)) {
-            // Couldn't get lock on course. TODO - Log.
-            return;
-        }
-
-        // TODO - chunk into small(er) groups.
-        $grades = saved_grade::get_for_submitter_course($submitterilp, $courseilp, saved_grade::GRADING_STATUS_SUBMITTED);
-
-        if (empty($grades)) {
+        // We are going to process each course ILP id seperately, just in case.
+        $ilpids = $this->get_pending_course_ilp_ids($courseid, $userid);
+        if (empty($ilpids)) {
             // Nothing to do.
-            $lock->release();
+            log::instance()->end_message("No records to process. Exiting.", log::ERROR_NONE);
             return;
         }
 
-        $this->set_grades_status($grades, saved_grade::GRADING_STATUS_PROCESSING);
+        $submitterilpid = id_converter::get_user_id_for_userid($userid);
 
-        // Now that we have marked these as in processing, we can release the lock.
-        $lock->release();
+        if (empty($submitterilpid)) {
+            log::instance()->end_message("Could not get submitting user's ILP ID. Exiting.", log::ERROR_WARN);
+            return;
+        }
 
-        // TODO - for most exceptions we probably want to put the grade back to submitted status so we try again later.
+        foreach ($ilpids as $courseilpid) {
+            log::instance()->start_message("Processing grades for ILP course {$courseilpid} and submitter {submitterilpid}.");
+            // Grab a lock to make sure nobody else is working on this right now.
+            if (!$lock = locks::get_course_lock($courseilpid)) {
+                log::instance()->end_message("Could not get course lock. Exiting.", log::ERROR_WARN);
+                log::instance()->end_message();
+                return;
+            }
 
-        $this->process_grade_request($grades);
+            // TODO - chunk into small(er) groups.
+            $grades = saved_grade::get_for_submitter_course($submitterilpid, $courseilpid, saved_grade::GRADING_STATUS_SUBMITTED);
+
+            if (empty($grades)) {
+                // Nothing to do.
+                $lock->release();
+                log::instance()->end_message("No grades to process");
+                break;
+            }
+
+            $this->set_grades_status($grades, saved_grade::GRADING_STATUS_PROCESSING);
+
+            // Now that we have marked these as in processing, we can release the lock.
+            $lock->release();
+
+            log::instance()->log_line("Processing ".count($grades)." grades.");
+            $this->process_grade_request($grades);
+
+            log::instance()->end_message("Done");
+        }
+
+        log::instance()->end_message();
+    }
+
+    protected function get_pending_course_ilp_ids($courseid, $userid) {
+        global $DB;
+
+        $sql = 'SELECT courseilpid FROM {'.saved_grade::TABLE.'}
+                 WHERE courseid = :courseid
+                   AND submitterid = :userid
+                   AND status = :status
+              GROUP BY courseilpid
+              ORDER BY MIN(usersubmittime)';
+
+        $params = ['courseid' => $courseid, 'userid' => $userid, 'status' => saved_grade::GRADING_STATUS_SUBMITTED];
+
+        $ilpids = $DB->get_fieldset_sql($sql, $params);
+        if (empty($ilpids)) {
+            return false;
+        }
+
+        return $ilpids;
+    }
+
+    /**
+     * Depreciate. TODO.
+     *
+     * @param
+     * @return
+     */
+    public function process_course_submitter($courseilp, $submitterilp) {
+        debugging("process_course_submitter depreciated");
+        // Grab a lock to make sure nobody else is working on this right now.
+//         if (!$lock = locks::get_course_submitter_lock($courseilp, $submitterilp)) {
+//             // Couldn't get lock on course. TODO - Log.
+//             return;
+//         }
+//
+//         // TODO - chunk into small(er) groups.
+//         $grades = saved_grade::get_for_submitter_course($submitterilp, $courseilp, saved_grade::GRADING_STATUS_SUBMITTED);
+//
+//         if (empty($grades)) {
+//             // Nothing to do.
+//             $lock->release();
+//             return;
+//         }
+//
+//         $this->set_grades_status($grades, saved_grade::GRADING_STATUS_PROCESSING);
+//
+//         // Now that we have marked these as in processing, we can release the lock.
+//         $lock->release();
+//
+//         // TODO - for most exceptions we probably want to put the grade back to submitted status so we try again later.
+//
+//         $this->process_grade_request($grades);
     }
 
     protected function process_grade_request($grades) {
@@ -83,7 +160,7 @@ class controller {
             $response = $conn->send_request('grades', $request);
         } catch (exception\connector_exception $e) {
             // In cases where we have a connection erorr, we probably just want to reset the grades back to the waiting state.
-            $this->set_grades_status($grades, saved_grade::GRADING_STATUS_SUBMITTED);
+            $this->set_grades_status($grades, saved_grade::GRADING_STATUS_RESUBMIT, true);
 
             log::instance()->log_exception($e);
 
@@ -99,10 +176,13 @@ class controller {
         if (!isset($response->messages)) {
             // For a connection error, we'll reset them.
             log::instance()->log_line('No response messages received from ILP.', log::ERROR_WARN);
-            if ($connectionerror) {
-                $this->set_grades_status($grades, saved_grade::GRADING_STATUS_SUBMITTED);
+            if ($connectionerror || !isset($response->isConnectivityFailure)) {
+                // We are going to just reset them all since ILP reported a connection failure, or reported no status.
+                $this->set_grades_status($grades, saved_grade::GRADING_STATUS_RESUBMIT, true);
+                return;
             }
-            return;
+            // We are going to just place an empty array here, so the rest can do it's thing.
+            $response->messages = [];
         }
 
         // Setup an array we will use to see which grades we have processed responses for.
@@ -130,10 +210,12 @@ class controller {
                 $currgrade->status = saved_grade::GRADING_STATUS_PROCESSED;
             } else if ($message->data->status === 'failure') {
                 $currgrade->status = saved_grade::GRADING_STATUS_FAILED;
+                $currgrade->mark_failure();
             } else {
                 // TODO - log unknown status.
                 error_log('Unknown status '.$message->data->status.var_export($message, true));
                 $currgrade->status = saved_grade::GRADING_STATUS_FAILED;
+                $currgrade->mark_failure();
             }
 
             if (!empty($message->message)) {
@@ -157,25 +239,27 @@ class controller {
 
         // Anything left in the tracking array didn't have a response from ILP.
         foreach ($tracking as $missing) {
-            // TODO - Log no response.
             log::instance()->log_line('Grade didn\'t receive a response message.', log::ERROR_WARN, $missing);
 
             if ($connectionerror) {
-                $missing->status = saved_grade::GRADING_STATUS_SUBMITTED;
+                $missing->status = saved_grade::GRADING_STATUS_RESUBMIT;
             } else {
                 $missing->status = saved_grade::GRADING_STATUS_FAILED;
             }
-            $currgrade->status = saved_grade::GRADING_STATUS_FAILED;
-            $currgrade->ilpmessage = get_string('ilp_response_missing', 'gradeexport_ilp_push');
-            $currgrade->save_to_db();
+            $missing->mark_failure();
+            $missing->ilpmessage = get_string('ilp_response_missing', 'gradeexport_ilp_push');
+            $missing->save_to_db();
         }
 
         return;
     }
 
-    protected function set_grades_status($grades, $status) {
+    protected function set_grades_status($grades, $status, $failure = false) {
         foreach ($grades as $grade) {
             $grade->status = $status;
+            if ($failure) {
+                $grade->mark_failure();
+            }
             $grade->save_to_db();
         }
     }

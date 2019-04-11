@@ -10,10 +10,12 @@ Things to be done:
 * Event logging
 * Check wording for default incomplete date.
 * Add support for additional certs
-* Workout grade status handling after one is sent for processing.
 * Prevent page reloads
 * Filterting
 * ClearFinalGradeExpirationDateFlag and ClearLastAttendanceDateFlag
+* Make sure course has idnumber returned.
+* Make sure gradee has idnumber
+* Start/end date (if missing enddate in particular)
 
 Things that need to be looked into:
 * Default incomplete grade, and should changing that be a setting? (SHAINCG)

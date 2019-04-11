@@ -42,10 +42,14 @@ class saved_grade {
     // Intentionally leaving gaps, incase we need more statuses.
     const GRADING_STATUS_EDITING = 5;
     const GRADING_STATUS_SUBMITTED = 10;
+    const GRADING_STATUS_RESUBMIT = 12;
     const GRADING_STATUS_PROCESSING = 15;
     const GRADING_STATUS_PROCESSED = 20;
     const GRADING_STATUS_FAILED = 25;
     const GRADING_STATUS_LOCKED = 30;
+
+    // The minimum delay time before resubmitting a failed grade. TODO - setting?
+    const RESUBMIT_TIME = 300;
 
     /** @var object The database record object */
     protected $record;
@@ -125,6 +129,15 @@ class saved_grade {
         }
 
         return $obj;
+    }
+
+    // ******* Use Specific Methods.
+    public function mark_failure() {
+        if ($this->__isset('failcount')) {
+            $this->failcount += 1;
+        } else {
+            $this->failcount = 1;
+        }
     }
 
     // ******* Database Interaction Methods.
@@ -254,24 +267,6 @@ class saved_grade {
 
         return $grades;
     }
-
-    /**
-     * Load an array of saved_grades from an array of records
-     *
-     * @param stdClass[] $records An array of records.
-     * @return saved_grade[] An array of loaded saved_grades.
-     */
-//     public static function load_from_records(array $records) {
-//         $grades = [];
-//         foreach ($records as $record) {
-//             $grade = new static();
-//             $grade->load_from_record($record);
-//
-//             $grades[$record->id] = $grade;
-//         }
-//
-//         return $grades;
-//     }
 
     // ******* Magic Methods.
     /**

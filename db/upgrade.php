@@ -108,5 +108,6 @@ function xmldb_gradeexport_ilp_push_upgrade($oldversion=0) {
         upgrade_plugin_savepoint(true, 2019040900, 'gradeexport', 'ilp_push');
     }
 
+    return true;
 
 }

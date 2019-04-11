@@ -67,6 +67,24 @@ class locks {
 
         return $lock;
     }
+
+    public static function get_course_lock($courseid, $timeout = null, $maxlifetime = null) {
+        $factory = static::get_factory();
+
+        // TODO - Probably from settings...
+        if (is_null($timeout)) {
+            $timeout = 10;
+        }
+        if (is_null($maxlifetime)) {
+            $maxlifetime = 600;
+        }
+
+        $key = 'gradeexport_ilp_push-c-'.$courseid;
+
+        $lock = $factory->get_lock($key, $timeout, $maxlifetime);
+
+        return $lock;
+    }
 }
 
 

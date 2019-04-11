@@ -28,6 +28,8 @@ namespace gradeexport_ilp_push;
 
 defined('MOODLE_INTERNAL') || die();
 
+use \core_user;
+
 /**
  * A class that is used to provide ILP IDs to use.
  *
@@ -40,6 +42,8 @@ defined('MOODLE_INTERNAL') || die();
  */
 class id_converter {
 
+    protected static $courseenrolids = [];
+
     public static function get_user_id($user) {
         if (empty($user->idnumber)) {
             return null;
@@ -48,13 +52,60 @@ class id_converter {
         return $user->idnumber;
     }
 
+    public static function get_user_id_for_userid($userid) {
+        $user = core_user::get_user($userid);
+
+        return static::get_user_id($user);
+    }
+
     public static function get_course_id_for_user($course, $user) {
+
+
+
+        if (!isset(static::$courseenrolids[$course->id])) {
+            static::load_course_user_mappings($course);
+        }
+
+        if (!empty(static::$courseenrolids[$course->id][$user->id])) {
+            return static::$courseenrolids[$course->id][$user->id];
+        }
+
         if (empty($course->idnumber)) {
             return null;
         }
 
         // TODO - Crosslists.
         return $course->idnumber;
+    }
+
+    protected static function load_course_user_mappings($course) {
+        global $DB;
+
+        // This is currently set to do the magic way that LMB NXT works. TODO - generalize.
+        $sql = "SELECT ue.id, ue.userid, e.customchar1 FROM {user_enrolments} ue
+                  JOIN {enrol} e ON ue.enrolid = e.id
+                 WHERE e.courseid = :courseid";
+
+        $params = ['courseid' => $course->id];
+
+        $records = $DB->get_recordset_sql($sql, $params);
+
+        static::$courseenrolids[$course->id] = [];
+        $map = [];
+        foreach ($records as $record) {
+            if (isset($map[$record->userid])) {
+                $text = "User {$record->userid} has more than one enrolments in {$course->id}.";
+                log::instance()->log_line($text, log::ERROR_WARN);
+                if (empty($map[$record->userid])) {
+
+                    $map[$record->userid] = $record->customchar1;
+                }
+            } else {
+                $map[$record->userid] = $record->customchar1;
+            }
+        }
+        static::$courseenrolids[$course->id] = $map;
+        $records->close();
     }
 }
 

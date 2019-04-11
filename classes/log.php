@@ -181,8 +181,12 @@ class log {
     }
 
     // End a complete message and reset.
-    public function end_message($error = self::ERROR_NONE) {
-        $this->set_error_level($error);
+    public function end_message($message = null, $error = self::ERROR_NONE) {
+        if (!is_null($message)) {
+            $this->log_line($message, $error);
+        } else {
+            $this->set_error_level($error);
+        }
 
         $this->end_level();
         $this->purge_buffer();

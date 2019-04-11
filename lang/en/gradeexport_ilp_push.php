@@ -33,6 +33,7 @@ $string['ilp_push:publish'] = 'Publish Banner grade export';
 $string['ilp_push:view'] = 'Use Banner grade export';
 
 $string['ilp_response_missing'] = 'No response received from banner.';
+$string['reregister_failed_task'] = 'Resubmit temp failed submissions.';
 
 // Rule validation.
 $string['invalid_datelastattended_early'] = 'Date last attended cannot be before the start of the course.';

@@ -54,8 +54,8 @@ if ($options['help']) {
 Reports on, and removes, excess enrollments.
 
 Options:
--s, --submitter         The ILP ID of the submitter to process.
--c, --course            The ILP ID of the course to process
+-s, --submitter         The user ID of the submitter to process.
+-c, --course            The ID of the course to process
 -h, --help              Print out this help
 
 
@@ -71,5 +71,5 @@ Example:
 if (isset($options['submitter']) && isset($options['course'])) {
     $controller = new controller();
 
-    $controller->process_course_submitter($options['course'], $options['submitter']);
+    $controller->process_course_user($options['course'], $options['submitter']);
 }

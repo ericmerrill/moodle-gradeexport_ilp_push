@@ -61,7 +61,7 @@ class connector {
                     'Accept: application/json'];
 
         // This locks us to the v1 version of the API until we might be ready to change.
-        $headers = 'X-Ellucian-Media-Type: application/vnd.ellucian.v1';
+        $headers[] = 'X-Ellucian-Media-Type: application/vnd.ellucian.v1';
 
         return $headers;
     }

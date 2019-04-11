@@ -14,18 +14,24 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
- * Version details
+ * The tasks file.
  *
- * @package    gradeexport
- * @subpackage ilp_push
+ * @package    gradeexport_ilp_push
  * @author     Eric Merrill (merrill@oakland.edu)
  * @copyright  2019 Oakland University (https://www.oakland.edu)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-defined('MOODLE_INTERNAL') || die();
-
-$plugin->version   = 2019040902;        // The current plugin version (Date: YYYYMMDDXX)
-$plugin->requires  = 2018050800;        // Requires this Moodle version
-$plugin->component = 'gradeexport_ilp_push'; // Full name of the plugin (used for diagnostics)
+$tasks = array(
+    array(
+        'classname' => 'gradeexport_ilp_push\task\reregister_failed_task',
+        'blocking' => 1,
+        'minute' => '*/10',
+        'hour' => '*',
+        'day' => '*',
+        'dayofweek' => '*',
+        'month' => '*'
+    ),
+);

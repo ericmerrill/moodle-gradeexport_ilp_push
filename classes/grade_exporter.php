@@ -159,13 +159,19 @@ class grade_exporter implements templatable {
     }
 
     public function process_data(stdClass $data) {
+        global $USER;
+
         // TODO check sesskey.
         // TODO check grader id.
         // TODO check courseid.
 
+        $submissions = false;
         foreach ($this->userrows as $row) {
-            $row->process_data($data);
+            $submissions = $row->process_data($data) || $submissions;
         }
+
+        // TODO register task if needed.
+        task\process_user_course_task::register_task_for_user_course($USER->id, $this->course->id);
     }
 }
 
