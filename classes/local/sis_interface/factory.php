@@ -1,0 +1,54 @@
+<?php
+
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Factory for prividing a SIS interface object.
+ *
+ * @package    gradeexport_ilp_push
+ * @author     Eric Merrill (merrill@oakland.edu)
+ * @copyright  2019 Oakland University (https://www.oakland.edu)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+namespace gradeexport_ilp_push\local\sis_interface;
+
+defined('MOODLE_INTERNAL') || die();
+
+/**
+ * Factory for prividing a SIS interface object.
+ *
+ * @package    gradeexport_ilp_push
+ * @author     Eric Merrill (merrill@oakland.edu)
+ * @copyright  2019 Oakland University (https://www.oakland.edu)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class factory {
+
+    protected static $interface = null;
+
+    public static function instance() {
+        if (!isset(self::$interface)) {
+            // TODO should be settings based.
+            self::$interface = new enrol_lmb;
+        }
+
+        return self::$interface;
+    }
+
+}
+
+

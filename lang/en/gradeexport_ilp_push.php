@@ -49,6 +49,9 @@ $string['invalid_incomplete_date_missing'] = 'Incomplete deadline must be entere
 $string['invalid_incomplete_grade_missing'] = 'A default incomplete grade must be selected.';
 $string['invalid_incomplete_grade_wrong'] = 'Default incomplete grade cannot be changed from the default.';
 
+$string['grader_no_id'] = 'The current user has no SIS ID, and so cannot export grades to Banner.';
+$string['course_no_id'] = 'The current course has no SIS ID, and so cannot be exported to Banner.';
+
 
 // Settings.
 $string['ilpid'] = 'ILP Connection ID';
@@ -73,3 +76,5 @@ $string['exception_connector_failure'] = 'A connector failure has occurred.';
 $string['exception_unknown_endpoint'] = 'Endpoint {$a} is unknown.';
 $string['exception_curl_failure'] = 'Curl execution failed. Error: {$a}.';
 $string['exception_bad_response'] = 'Bad response from ILP. {$a}';
+$string['exception_course_mismatch'] = 'Course submitted does match page course.';
+$string['exception_user_mismatch'] = 'Submitting user does not match data in form.';

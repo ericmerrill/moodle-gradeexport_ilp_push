@@ -34,6 +34,7 @@ use grade_export_update_buffer;
 use graded_users_iterator;
 use templatable;
 use stdClass;
+use gradeexport_ilp_push\local\sis_interface;
 
 /**
  * The main export plugin class.
@@ -83,13 +84,27 @@ class grade_exporter implements templatable {
         $this->course = $course;
         $this->groupid = $groupid;
 
+        $this->regrade_if_needed();
+
         // Get all course grade items and the course grade item.
         $this->gradeitems = grade_item::fetch_all(array('courseid'=>$this->course->id));
         $this->coursegradeitem = grade_item::fetch_course_item($course->id);
 
         $this->currentgradeitem = $this->coursegradeitem; // TODO.
 
+        // TODO - probably move to later, so we can do things before building everything...
         $this->build_user_data();
+    }
+
+    public function regrade_if_needed() {
+
+        $callback = function() {
+            global $PAGE;
+
+            return $PAGE->url;
+        };
+
+        grade_regrade_final_grades_if_required($this->course, $callback);
     }
 
     protected function get_grade_columns() {
@@ -162,16 +177,31 @@ class grade_exporter implements templatable {
         global $USER;
 
         // TODO check sesskey.
-        // TODO check grader id.
-        // TODO check courseid.
+
+        // Check that the user id of the grader hasn't changed.
+        if ($data->graderid != $USER->id) {
+            throw new moodle_exception('exception_user_mismatch', 'gradeexport_ilp_push');
+        }
+
+        // Check that the course id is right.
+        if ($data->courseid != $this->course->id) {
+            throw new moodle_exception('exception_course_mismatch', 'gradeexport_ilp_push');
+        }
 
         $submissions = false;
         foreach ($this->userrows as $row) {
             $submissions = $row->process_data($data) || $submissions;
         }
 
-        // TODO register task if needed.
         task\process_user_course_task::register_task_for_user_course($USER->id, $this->course->id);
+    }
+
+    public static function check_grading_allowed($course) {
+        global $USER;
+
+        $result = sis_interface\factory::instance()->teacher_allowed_to_grade_course($USER, $course);
+
+        return $result;
     }
 }
 

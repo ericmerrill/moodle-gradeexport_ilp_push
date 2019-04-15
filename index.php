@@ -25,6 +25,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use gradeexport_ilp_push\grade_exporter;
+
 require_once '../../../config.php';
 require_once $CFG->dirroot.'/grade/export/lib.php';
 
@@ -43,50 +45,33 @@ require_capability('moodle/grade:export', $context);
 require_capability('gradeexport/ilp_push:view', $context);
 
 print_grade_page_head($COURSE->id, 'export', 'ilp_push', get_string('exportto', 'grades') . ' ' . get_string('pluginname', 'gradeexport_ilp_push'));
-export_verify_grades($COURSE->id);
 
 if (!empty($CFG->gradepublishing)) {
     $CFG->gradepublishing = has_capability('gradeexport/txt:publish', $context);
 }
 
-// $actionurl = new moodle_url('/grade/export/ilp/export.php');
-// $formoptions = array(
-//     'includeseparator'=>true,
-//     'publishing' => true,
-//     'simpleui' => true,
-//     'multipledisplaytypes' => true
-// );
-//
-// $mform = new grade_export_form($actionurl, $formoptions);
-//
-// $groupmode    = groups_get_course_groupmode($course);   // Groups are being used.
-// $currentgroup = groups_get_course_group($course, true);
-// if (($groupmode == SEPARATEGROUPS) &&
-//         (!$currentgroup) &&
-//         (!has_capability('moodle/site:accessallgroups', $context))) {
-//
-//     echo $OUTPUT->heading(get_string("notingroup"));
-//     echo $OUTPUT->footer();
-//     die;
-// }
-//
-// groups_print_course_menu($course, 'index.php?id='.$id);
-// echo '<div class="clearer"></div>';
-//
-// $mform->display();
-
 $renderer = $PAGE->get_renderer('gradeexport_ilp_push', 'export');
 
-$ilp = new \gradeexport_ilp_push\grade_exporter($COURSE, 0, null);
+$results = grade_exporter::check_grading_allowed($COURSE);
 
-if ($formdata = data_submitted()) {
-    $ilp->process_data($formdata);
+if ($results === true) {
+    $ilp = new grade_exporter($COURSE, 0, null);
+
+    if ($formdata = data_submitted()) {
+        $ilp->process_data($formdata);
+    }
+
+    echo $renderer->render_exporter($ilp);
+} else {
+    echo $renderer->render_error($results);
 }
+
+
 
 //$data = $ilp->get_user_data();
 
 //print $renderer->render_user_rows($data);
-print $renderer->render_exporter($ilp);
+
 
 //print "<pre>";var_export();print "</pre>";
 

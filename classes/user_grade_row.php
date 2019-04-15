@@ -35,6 +35,7 @@ use stdClass;
 use templatable;
 use html_writer;
 use moodle_url;
+use gradeexport_ilp_push\local\sis_interface;
 
 /**
  * A object that represents a row of users.
@@ -69,6 +70,8 @@ class user_grade_row implements templatable {
 
     protected $currenterrors = [];
 
+    protected $sis = null;
+
 
 
     /**
@@ -80,6 +83,7 @@ class user_grade_row implements templatable {
         $this->course = $exporter->get_course();
         $this->grade = $grade;
         $this->gradeitem = $gradeitem;
+        $this->sis = sis_interface\factory::instance();
         $this->fetch_existing_rows();
     }
 
@@ -182,6 +186,10 @@ class user_grade_row implements templatable {
         $output->userid = $this->user->id;
         $output->formid = $this->get_form_id();
 
+        $output->courseilpid = $this->currentsavedgrade->courseilpid;
+
+        $output->userdisplayid = $this->sis->get_user_display_id($this->user);
+
         $output->locked = $this->should_prevent_editing();
 
         $params = ['id' => $this->user->id, 'course' => $COURSE->id];
@@ -275,7 +283,7 @@ class user_grade_row implements templatable {
         }
 
         $grade->submitterid = $USER->id;
-        $grade->submitterilpid = id_converter::get_user_id($USER);
+        $grade->submitterilpid = $this->sis->get_user_id($USER);
 
         $grade->grade = $this->get_ilp_grade_from_data($data, 'grade');
         $key = $this->get_form_id('grade');
@@ -420,9 +428,9 @@ class user_grade_row implements templatable {
     protected function create_new_saved_grade() {
         $grade = new saved_grade();
         $grade->studentid = $this->user->id;
-        $grade->studentilpid = id_converter::get_user_id($this->user);
+        $grade->studentilpid = $this->sis->get_user_id($this->user);
         $grade->courseid = $this->course->id;
-        $grade->courseilpid = id_converter::get_course_id_for_user($this->course, $this->user);
+        $grade->courseilpid = $this->sis->get_course_id_for_user($this->course, $this->user);
 
         $grade->revision = $this->get_next_revision_number();
 

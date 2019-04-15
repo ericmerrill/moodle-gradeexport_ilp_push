@@ -93,6 +93,11 @@ class export_renderer extends plugin_renderer_base {
 
     }
 
+    public function render_error($string) {
+        $message = $this->error_text($string);
+
+        return html_writer::div($message, 'alert alert-warning');
+    }
 
 // ***************** Old stuff to delete.
 

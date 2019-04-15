@@ -32,7 +32,7 @@ defined('MOODLE_INTERNAL') || die();
 use gradeexport_ilp_push\saved_grade;
 use gradeexport_ilp_push\locks;
 use gradeexport_ilp_push\log;
-use gradeexport_ilp_push\id_converter;
+use gradeexport_ilp_push\local\sis_interface;
 
 /**
  * Controller for managing ILP exchanges.
@@ -55,7 +55,7 @@ class controller {
             return;
         }
 
-        $submitterilpid = id_converter::get_user_id_for_userid($userid);
+        $submitterilpid = sis_interface\factory::instance()->get_user_id_for_userid($userid);
 
         if (empty($submitterilpid)) {
             log::instance()->end_message("Could not get submitting user's ILP ID. Exiting.", log::ERROR_WARN);

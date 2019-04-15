@@ -16,7 +16,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * A class that is used to provide ILP IDs to use.
+ * An interface for getting information from the SIS using the LMB NXT plugin.
  *
  * @package    gradeexport_ilp_push
  * @author     Eric Merrill (merrill@oakland.edu)
@@ -24,61 +24,45 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace gradeexport_ilp_push;
+namespace gradeexport_ilp_push\local\sis_interface;
 
 defined('MOODLE_INTERNAL') || die();
 
-use \core_user;
+use gradeexport_ilp_push\log;
 
 /**
- * A class that is used to provide ILP IDs to use.
- *
- * Override this to change how users and courses are ID'ed in ILP.
+ * An interface for getting information from the SIS using the LMB NXT plugin.
  *
  * @package    gradeexport_ilp_push
  * @author     Eric Merrill (merrill@oakland.edu)
  * @copyright  2019 Oakland University (https://www.oakland.edu)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class id_converter {
+class enrol_lmb extends base {
 
-    protected static $courseenrolids = [];
+    protected $courseenrolids = [];
 
-    public static function get_user_id($user) {
-        if (empty($user->idnumber)) {
-            return null;
+
+    public function get_course_id_for_user($course, $user) {
+
+
+
+        if (!isset($this->courseenrolids[$course->id])) {
+            $this->load_course_user_mappings($course);
         }
 
-        return $user->idnumber;
-    }
-
-    public static function get_user_id_for_userid($userid) {
-        $user = core_user::get_user($userid);
-
-        return static::get_user_id($user);
-    }
-
-    public static function get_course_id_for_user($course, $user) {
-
-
-
-        if (!isset(static::$courseenrolids[$course->id])) {
-            static::load_course_user_mappings($course);
-        }
-
-        if (!empty(static::$courseenrolids[$course->id][$user->id])) {
-            return static::$courseenrolids[$course->id][$user->id];
+        if (!empty($this->courseenrolids[$course->id][$user->id])) {
+            return $this->courseenrolids[$course->id][$user->id];
         }
 
         if (empty($course->idnumber)) {
             return null;
         }
 
-        // TODO - Crosslists.
         return $course->idnumber;
     }
 
-    protected static function load_course_user_mappings($course) {
+    protected function load_course_user_mappings($course) {
         global $DB;
 
         // This is currently set to do the magic way that LMB NXT works. TODO - generalize.
@@ -90,7 +74,7 @@ class id_converter {
 
         $records = $DB->get_recordset_sql($sql, $params);
 
-        static::$courseenrolids[$course->id] = [];
+        $this->courseenrolids[$course->id] = [];
         $map = [];
         foreach ($records as $record) {
             if (isset($map[$record->userid])) {
@@ -104,9 +88,21 @@ class id_converter {
                 $map[$record->userid] = $record->customchar1;
             }
         }
-        static::$courseenrolids[$course->id] = $map;
+        $this->courseenrolids[$course->id] = $map;
         $records->close();
     }
+
+    /**
+     * Check if a particular user is allowed to grade a given course.
+     *
+     * @param
+     * @return true|string True if allowed, or an error string if not.
+     */
+    public function teacher_allowed_to_grade_course($user, $course) {
+        // TODO - check LMB enrolled.
+        return parent::teacher_allowed_to_grade_course($user, $course);
+    }
+
 }
 
 

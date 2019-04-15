@@ -1,3 +1,14 @@
+* Event logging
+* Prevent reload
+* Improve submitter checks to also check for banner assignment local/sis\_interface/enrol\_lmb
+
+Test immediate:
+* GNumber Display
+* Test XLS
+* Submitter checks
+* Limit to courses with id number
+
+
 Things to be done:
 * Different grading "schemes"
 * Don't allow logged-in-as users to submit grades
@@ -21,7 +32,7 @@ Things that need to be looked into:
 * Default incomplete grade, and should changing that be a setting? (SHAINCG)
 
 Possibly remove:
-* saved_grade_revision? (??)
+* saved\_grade\_revision? (??)
 * resultstatus column
 
 
