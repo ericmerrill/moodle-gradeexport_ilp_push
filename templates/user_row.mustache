@@ -50,7 +50,7 @@
 
 
 
-<tr class="usergraderow status-normal" data-row-id="{{{formid}}}" data-user-id="{{{userid}}}">
+<tr class="usergraderow {{#locked}}locked{{/locked}}{{{classes}}}" data-row-id="{{{formid}}}" data-user-id="{{{userid}}}">
     <td class="userinfo">
         {{{userimage}}}
         <div class="userdetails">
@@ -69,26 +69,27 @@
     </td>
     <td class="bannergradeselect">
         {{{gradeselect}}}
-        {{{gradeerror}}}
+         <span class="gradeerror">{{{gradeerror}}}</span>
+        <!-- <span class="gradeerror {{^gradeerror}}hide{{/gradeerror}}">{{# pix }} i/warning, core, {{# str }} invalid_grade, gradeexport_ilp_push {{/ str }}{{/ pix }}</span> -->
         <div class="fail {{^showfailing}}hide{{/showfailing}}">
             <div class="datelastattended">
                 <label>Date Last Attended</label><input type="date" name="datelastattended-{{{formid}}}" value="{{{datelastattended}}}"{{#locked}} disabled{{/locked}}>
-                {{{datelastattendederror}}}
+                <span class="datelastattendederror">{{{datelastattendederror}}}</span>
             </div>
         </div>
         <div class="incomplete {{^showincomplete}}hide{{/showincomplete}}">
             <div class="incompletedeadline">
                 <label>Incomplete Deadline</label><input type="date" name="incompletedeadline-{{{formid}}}" value="{{{incompletedeadline}}}"{{#locked}} disabled{{/locked}}>
-                {{{incompletedeadlineerror}}}
+                <span class="incompletedateerror">{{{incompletedeadlineerror}}}</span>
             </div>
             <div class="incompletegrade">
                 <label>Incomplete Default Grade</label>{{{incompletegradeselect}}}
-                {{{incompletegradeerror}}}
+                <span class="incompletegradeerror">{{{incompletegradeerror}}}</span>
             </div>
         </div>
     </td>
     <td>
-        <input type="checkbox" class="mycheckbox form-control" name="confirm-{{{formid}}}"{{#locked}} disabled{{/locked}}>
+        <input type="checkbox" class="confirmcheckbox form-control" name="confirm-{{{formid}}}"{{#locked}} disabled{{/locked}}>
     </td>
     <td>
         ICON<br>Status-{{status}}

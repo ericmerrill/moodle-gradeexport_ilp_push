@@ -46,6 +46,32 @@ use gradeexport_ilp_push\grade_exporter;
 class export_renderer extends plugin_renderer_base {
 
     public function render_exporter(grade_exporter $exporter) {
+        global $PAGE;
+
+        $dateformat = get_string('strftimedatefullshort', 'langconfig');
+
+        // Need to get dates in a couple formats for JS to use.
+        $deadlinedates = banner_grades::get_allowed_last_incomplete_deadline_dates($exporter->get_course(), '%F');
+        $userdates = banner_grades::get_allowed_last_incomplete_deadline_dates($exporter->get_course(), $dateformat);
+
+        $deadlinedates->userstart = $userdates->start;
+        $deadlinedates->userend = $userdates->end;
+
+        $lastattenddates = banner_grades::get_allowed_last_attend_dates($exporter->get_course(), '%F');
+        $userdates = banner_grades::get_allowed_last_attend_dates($exporter->get_course(), $dateformat);
+
+        $lastattenddates->userstart = $userdates->start;
+        $lastattenddates->userend = $userdates->end;
+
+        // Sending various data to the page for it to use later.
+        $params = [banner_grades::get_failing_grade_ids(),
+                   banner_grades::get_incomplete_grade_ids(),
+                   banner_grades::get_default_incomplete_grade(),
+                   $deadlinedates,
+                   $lastattenddates];
+        $PAGE->requires->js_call_amd('gradeexport_ilp_push/page_info', 'init', $params);
+        $PAGE->requires->js_call_amd('gradeexport_ilp_push/row_control', 'initAll');
+
         $data = $exporter->export_for_template($this);
 
         $output = $this->render_from_template('gradeexport_ilp_push/exporter', $data);
@@ -57,7 +83,7 @@ class export_renderer extends plugin_renderer_base {
         $options = banner_grades::get_possible_grades($userrow);
         $selected = $userrow->get_current_grade_key();
 
-        $attributes = [];
+        $attributes = ['class' => 'gradeselect'];
         if ($userrow->should_prevent_editing()) {
             $attributes['disabled'] = true;
         }
@@ -75,7 +101,7 @@ class export_renderer extends plugin_renderer_base {
         $options = banner_grades::get_possible_grades();
         $selected = $userrow->get_current_incomplete_grade_key();
 
-        $attributes = [];
+        $attributes = ['class' => 'incompletegradeselect'];
         if ($userrow->should_prevent_editing()) {
             $attributes['disabled'] = true;
         }

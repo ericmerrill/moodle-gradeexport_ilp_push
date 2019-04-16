@@ -1,12 +1,19 @@
 * Event logging
 * Prevent reload
 * Improve submitter checks to also check for banner assignment local/sis\_interface/enrol\_lmb
+* Date/timezone issues
+
+* Status icons
+* Filtering
+* Course settings
+* error reporting display
 
 Test immediate:
 * GNumber Display
 * Test XLS
 * Submitter checks
 * Limit to courses with id number
+* Date/timezone issues
 
 
 Things to be done:

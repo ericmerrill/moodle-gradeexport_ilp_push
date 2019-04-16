@@ -49,6 +49,10 @@ $string['invalid_incomplete_date_missing'] = 'Incomplete deadline must be entere
 $string['invalid_incomplete_grade_missing'] = 'A default incomplete grade must be selected.';
 $string['invalid_incomplete_grade_wrong'] = 'Default incomplete grade cannot be changed from the default.';
 
+$string['invalid_incomplete_grade'] = 'Default incomplete grade must be set to "{$a}".';
+$string['invalid_incomplete_date'] = 'Incomplete deadline must be between "{$a->start}" and "{$a->end}".';
+$string['invalid_datelastattended'] = 'Date last attended must be between "{$a->start}" and "{$a->end}".';
+
 $string['grader_no_id'] = 'The current user has no SIS ID, and so cannot export grades to Banner.';
 $string['course_no_id'] = 'The current course has no SIS ID, and so cannot be exported to Banner.';
 

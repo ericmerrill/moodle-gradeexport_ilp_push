@@ -28,6 +28,8 @@ namespace gradeexport_ilp_push;
 
 defined('MOODLE_INTERNAL') || die();
 
+use stdClass;
+
 /**
  * Deals with the interaction of banner grading.
  *
@@ -151,6 +153,65 @@ class banner_grades {
         self::$incompleteids = $ids;
 
         return self::$incompleteids;
+    }
+
+    public static function get_allowed_last_attend_dates($course, $format = false, $tz = 99) {
+        $dates = new stdClass();
+
+        $dates->start = $course->startdate;
+
+        if (empty($course->enddate)) {
+            // We just have to guess. TODO better.
+            $end = $course->startdate + (3600 * 24 * 7 * 16);
+        } else {
+            $end = $course->enddate;
+        }
+
+        if ($end > time()) {
+            $end = time();
+        }
+
+        $dates->end = $end;
+
+        if (!$format) {
+            return $dates;
+        }
+
+        // Convert to a format.
+        $dates->start = date_format_string($dates->start, $format, $tz);
+        $dates->end = date_format_string($dates->end, $format, $tz);
+        // $dates->start = date('c', $dates->start);
+//         $dates->end = date('c', $dates->end);
+
+        return $dates;
+    }
+
+    public static function get_allowed_last_incomplete_deadline_dates($course, $format = false, $tz = 99) {
+        $dates = new stdClass();
+
+        if (empty($course->enddate)) {
+            // We just have to guess. TODO better.
+            $courseend = $course->startdate + (3600 * 24 * 7 * 16);
+        } else {
+            $courseend = $course->enddate;
+        }
+
+        // The day after the end of the course is the first allowed date (I think TODO).
+        $courseend += 3600 * 24;
+
+        $dates->start = $courseend;
+
+        $dates->end = $courseend + (3600 * 24 * 365);
+
+        if (!$format) {
+            return $dates;
+        }
+
+        // Convert to a format.
+        $dates->start = date_format_string($dates->start, $format, $tz);
+        $dates->end = date_format_string($dates->end, $format, $tz);
+
+        return $dates;
     }
 }
 

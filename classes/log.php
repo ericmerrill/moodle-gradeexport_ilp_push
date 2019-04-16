@@ -53,7 +53,7 @@ class log {
     protected $outputerrorlevel = self::ERROR_NONE;
 
     /** @var bool If true, don't output to the std out */
-    protected $silencestdout = false;
+    protected $silencestdout = true;
 
     /** @var resource File pointer to the log file */
     protected $logfilehandle = false;

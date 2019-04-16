@@ -52,6 +52,8 @@ class rule_validator {
             }
         }
 
+        // TODO - use banner_grades or SIS and settings to get dates and rules.
+
         // If the grade is failing, there must be a date last attended.
         if (banner_grades::grade_key_is_failing($grade->gradekey)) {
             if (is_null($grade->datelastattended)) {

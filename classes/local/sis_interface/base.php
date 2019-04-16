@@ -85,7 +85,7 @@ abstract class base {
             return get_string('grader_no_id', 'gradeexport_ilp_push');
         }
 
-        if (empty($course)) {
+        if (empty($course->idnumber)) {
             return get_string('course_no_id', 'gradeexport_ilp_push');
         }
 
