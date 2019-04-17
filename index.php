@@ -45,6 +45,18 @@ $context = context_course::instance($id);
 require_capability('moodle/grade:export', $context);
 require_capability('gradeexport/ilp_push:view', $context);
 
+$gradingallowed = grade_exporter::check_grading_allowed($COURSE);
+
+if ($gradingallowed === true) {
+    $ilp = new grade_exporter($COURSE, 0, null);
+
+    if ($formdata = data_submitted()) {
+        $ilp->process_data($formdata);
+        // We redirect to prevent the reprocessing for form data on reload.
+        redirect($PAGE->url);
+    }
+}
+
 print_grade_page_head($COURSE->id, 'export', 'ilp_push', get_string('exportto', 'grades') . ' ' . get_string('pluginname', 'gradeexport_ilp_push'));
 
 if (!empty($CFG->gradepublishing)) {
@@ -53,14 +65,10 @@ if (!empty($CFG->gradepublishing)) {
 
 $renderer = $PAGE->get_renderer('gradeexport_ilp_push', 'export');
 
-$results = grade_exporter::check_grading_allowed($COURSE);
 
-if ($results === true) {
-    $ilp = new grade_exporter($COURSE, 0, null);
 
-    if ($formdata = data_submitted()) {
-        $ilp->process_data($formdata);
-    }
+if ($gradingallowed === true) {
+
 
     echo $renderer->render_exporter($ilp);
 
@@ -68,7 +76,7 @@ if ($results === true) {
     $event->trigger();
 
 } else {
-    echo $renderer->render_error($results);
+    echo $renderer->render_error($gradingallowed);
 }
 
 

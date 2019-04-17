@@ -1,8 +1,6 @@
-* Prevent reload
 * Improve submitter checks to also check for banner assignment local/sis\_interface/enrol\_lmb
 * Date/timezone issues
 * Notifications!
-
 
 * Filtering
 * Course settings
@@ -24,7 +22,6 @@ Things to be done:
 * Display that grade is changed from default (maybe with arrow pointing between them?)
 * Check wording for default incomplete date.
 * Add support for additional certs
-* Prevent page reloads
 * Filterting
 * ClearFinalGradeExpirationDateFlag and ClearLastAttendanceDateFlag
 * Start/end date (if missing enddate in particular)
