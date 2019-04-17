@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Event for XYZ.
+ * Event for when a grade is modified by a user.
  *
  * @package    gradeexport_ilp_push
  * @author     Eric Merrill (merrill@oakland.edu)
@@ -30,7 +30,7 @@ defined('MOODLE_INTERNAL') || die();
 use gradeexport_ilp_push\saved_grade;
 
 /**
- * Event for XYZ.
+ * Event for when a grade is modified by a user.
  *
  * @package    gradeexport_ilp_push
  * @author     Eric Merrill (merrill@oakland.edu)
