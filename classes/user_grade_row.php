@@ -177,6 +177,8 @@ class user_grade_row implements templatable {
     public function export_for_template(\renderer_base $renderer) {
         global $OUTPUT, $COURSE;
 
+        $grade = $this->currentsavedgrade;
+
         $output = new stdClass();
 
         $fullname = fullname($this->user);
@@ -186,7 +188,7 @@ class user_grade_row implements templatable {
         $output->userid = $this->user->id;
         $output->formid = $this->get_form_id();
 
-        $output->courseilpid = $this->currentsavedgrade->courseilpid;
+        $output->courseilpid = $grade->courseilpid;
 
         $output->userdisplayid = $this->sis->get_user_display_id($this->user);
 
@@ -204,19 +206,19 @@ class user_grade_row implements templatable {
 
         $output->incompletegradeselect = $renderer->render_incomplete_select_menu($this);
 
-        if ($this->currentsavedgrade->datelastattended) {
-            $output->datelastattended = date_format_string($this->currentsavedgrade->datelastattended, '%F');
+        if ($grade->datelastattended) {
+            $output->datelastattended = date_format_string($grade->datelastattended, '%F');
         } else {
             $output->datelastattended = false;
         }
-        if ($this->currentsavedgrade->incompletedeadline) {
-            $output->incompletedeadline = date_format_string($this->currentsavedgrade->incompletedeadline, '%F');
+        if ($grade->incompletedeadline) {
+            $output->incompletedeadline = date_format_string($grade->incompletedeadline, '%F');
         } else {
             $output->incompletedeadline = false;
         }
 
-        $output->status = $this->currentsavedgrade->status;
-
+        $output->status = $grade->status;
+$output->status = $this->get_status_contents();
 
         foreach ($this->currenterrors as $id => $string) {
             $key = $id.'error';
@@ -226,6 +228,18 @@ class user_grade_row implements templatable {
         $currentkey = $this->get_current_grade_key();
         $output->showincomplete = banner_grades::grade_key_is_incomplete($currentkey);
         $output->showfailing = banner_grades::grade_key_is_failing($currentkey);
+
+        $output->statusclasses = $this->get_display_status();
+
+        // Now for any current messages;
+        if (isset($grade->statusmessages)) {
+            $output->statusmessage = $grade->statusmessages;
+
+            $output->messageclasses = $output->statusclasses;
+            $output->statusclasses .= " combinedstatus";
+        }
+
+
 
         return $output;
     }
@@ -257,6 +271,78 @@ class user_grade_row implements templatable {
                 return false;
         }
     }
+
+    public function get_status_contents() {
+
+        $class = '';
+        $message = '';
+
+        switch ($this->currentsavedgrade->status) {
+            case (saved_grade::GRADING_STATUS_EDITING):
+                $class = 'fa-edit';
+                $message = get_string('status_editing', 'gradeexport_ilp_push');
+                break;
+            case (saved_grade::GRADING_STATUS_PROCESSING):
+            case (saved_grade::GRADING_STATUS_SUBMITTED):
+            case (saved_grade::GRADING_STATUS_RESUBMIT):
+                $class = 'fa-refresh';
+                $message = get_string('status_processing', 'gradeexport_ilp_push');
+                break;
+            case (saved_grade::GRADING_STATUS_PROCESSED):
+                $class = 'fa-check';
+                $message = get_string('status_success', 'gradeexport_ilp_push');
+                break;
+            case (saved_grade::GRADING_STATUS_FAILED):
+                $class = 'fa-times-circle';
+                $message = get_string('status_failed', 'gradeexport_ilp_push');
+                break;
+            case (saved_grade::GRADING_STATUS_LOCKED):
+                $class = 'fa-lock';
+                $message = get_string('status_locked', 'gradeexport_ilp_push');
+                break;
+            default:
+                return false;
+        }
+
+        // TODO - should use a proper renderer for all this...
+        $attr = ['class' => "fa {$class} fa-fw statusicon",
+                 'title' => $message,
+                 'aria-label' => $message];
+
+        $output = html_writer::tag('i', ' ', $attr);
+
+        $output .= html_writer::div($message, 'statustext');
+
+        //<i class="icon fa fa-pencil fa-fw " title="comething" aria-label="comething"></i>
+        return $output;
+    }
+
+    public function get_display_status() {
+        $status = $this->currentsavedgrade->status;
+
+        switch ($this->currentsavedgrade->status) {
+            case (saved_grade::GRADING_STATUS_EDITING):
+                return '';
+                break;
+            case (saved_grade::GRADING_STATUS_PROCESSING):
+            case (saved_grade::GRADING_STATUS_SUBMITTED):
+            case (saved_grade::GRADING_STATUS_RESUBMIT):
+                return 'alert-info';
+                break;
+            case (saved_grade::GRADING_STATUS_PROCESSED):
+                return 'alert-success';
+                break;
+            case (saved_grade::GRADING_STATUS_FAILED):
+                return 'alert-danger';
+                break;
+            case (saved_grade::GRADING_STATUS_LOCKED):
+                return 'alert-info';
+                break;
+            default:
+                return false;
+        }
+    }
+
 
     public function process_data(stdClass $data) {
         global $USER;

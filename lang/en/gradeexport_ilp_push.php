@@ -38,6 +38,12 @@ $string['ilp_connection_error'] = 'There was an error connecting to ILP.';
 $string['ilp_no_response'] = 'No responses received from ILP.';
 $string['ilp_unknown_status'] = 'ILP responded with an unknown status of "{$a}"';
 
+$string['status_editing'] = 'Editing';
+$string['status_processing'] = 'Processing';
+$string['status_success'] = 'Succeeded';
+$string['status_failed'] = 'Failed';
+$string['status_locked'] = 'Locked';
+
 // Rule validation.
 $string['invalid_datelastattended_early'] = 'Date last attended cannot be before the start of the course.';
 $string['invalid_datelastattended_late'] = 'Date last attended cannot be after the end of the course.';

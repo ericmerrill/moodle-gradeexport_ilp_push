@@ -51,7 +51,7 @@
 
 
 <tr class="usergraderow {{#locked}}locked{{/locked}}{{{classes}}}" data-row-id="{{{formid}}}" data-user-id="{{{userid}}}">
-    <td class="userinfo">
+    <td {{#statusmessage}}rowspan=2{{/statusmessage}} class="userinfo">
         {{{userimage}}}
         <div class="userdetails">
             <div class="fullname">{{{fullnamelink}}}</div>
@@ -91,8 +91,26 @@
     <td>
         <input type="checkbox" class="confirmcheckbox form-control" name="confirm-{{{formid}}}"{{#locked}} disabled{{/locked}}>
     </td>
-    <td>
-        ICON<br>Status-{{status}}
+    <td class="status">
+        <div class="statuscontainer {{statusclasses}}">
+            {{{status}}}
+        </div>
+        </div>
     </td>
 </tr>
+{{#statusmessage}}
+    <!-- This is just a space row used to keep the even/off rows correct. -->
+    <tr class="spacerrow" style="visibility:hidden" aria-hidden="true" data-row-id="{{{formid}}}" data-user-id="{{{userid}}}">
+        <td colspan="6" class="spacerrow">&nbsp;</td>
+    </tr>
 
+    <tr class="statusmessagerow" data-row-id="{{{formid}}}" data-user-id="{{{userid}}}">
+        <td colspan="5" class="statusmessage">
+            <div class="statusmessagebox {{messageclasses}}">
+                {{{statusmessage}}}
+            </div>
+        </td>
+    </tr>
+    
+
+{{/statusmessage}}
