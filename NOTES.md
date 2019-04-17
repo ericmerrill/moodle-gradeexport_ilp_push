@@ -1,7 +1,7 @@
-* Event logging
 * Prevent reload
 * Improve submitter checks to also check for banner assignment local/sis\_interface/enrol\_lmb
 * Date/timezone issues
+* Notifications!
 
 * Status icons
 * Filtering

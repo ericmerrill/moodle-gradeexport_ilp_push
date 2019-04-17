@@ -61,7 +61,7 @@ abstract class base {
     public function get_user_id_for_userid($userid) {
         $user = core_user::get_user($userid);
 
-        return $self->get_user_id($user);
+        return $this->get_user_id($user);
     }
 
     public function get_course_id_for_user($course, $user) {

@@ -100,6 +100,11 @@ define(['jquery', 'gradeexport_ilp_push/page_info', 'core/templates', 'core/str'
         },
 
         updateVerification: function(row) {
+            if (row.hasClass('locked')) {
+                // We don't do anything with locked rows.
+                return;
+            }
+
             var select = row.find('.gradeselect').eq(0);
             var key = select.val();
             var confirm = row.find('.confirmcheckbox').eq(0);

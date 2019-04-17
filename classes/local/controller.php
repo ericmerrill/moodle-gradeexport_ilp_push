@@ -33,6 +33,7 @@ use gradeexport_ilp_push\saved_grade;
 use gradeexport_ilp_push\locks;
 use gradeexport_ilp_push\log;
 use gradeexport_ilp_push\local\sis_interface;
+use gradeexport_ilp_push\event;
 
 /**
  * Controller for managing ILP exchanges.
@@ -115,39 +116,6 @@ class controller {
         return $ilpids;
     }
 
-    /**
-     * Depreciate. TODO.
-     *
-     * @param
-     * @return
-     */
-    public function process_course_submitter($courseilp, $submitterilp) {
-        debugging("process_course_submitter depreciated");
-        // Grab a lock to make sure nobody else is working on this right now.
-//         if (!$lock = locks::get_course_submitter_lock($courseilp, $submitterilp)) {
-//             // Couldn't get lock on course. TODO - Log.
-//             return;
-//         }
-//
-//         // TODO - chunk into small(er) groups.
-//         $grades = saved_grade::get_for_submitter_course($submitterilp, $courseilp, saved_grade::GRADING_STATUS_SUBMITTED);
-//
-//         if (empty($grades)) {
-//             // Nothing to do.
-//             $lock->release();
-//             return;
-//         }
-//
-//         $this->set_grades_status($grades, saved_grade::GRADING_STATUS_PROCESSING);
-//
-//         // Now that we have marked these as in processing, we can release the lock.
-//         $lock->release();
-//
-//         // TODO - for most exceptions we probably want to put the grade back to submitted status so we try again later.
-//
-//         $this->process_grade_request($grades);
-    }
-
     protected function process_grade_request($grades) {
         $converter = new ilp\converter();
         // TODO - exception handling?
@@ -160,7 +128,8 @@ class controller {
             $response = $conn->send_request('grades', $request);
         } catch (exception\connector_exception $e) {
             // In cases where we have a connection erorr, we probably just want to reset the grades back to the waiting state.
-            $this->set_grades_status($grades, saved_grade::GRADING_STATUS_RESUBMIT, true);
+            $str = get_string('ilp_connection_error', 'gradeexport_ilp_push');
+            $this->set_grades_status($grades, saved_grade::GRADING_STATUS_RESUBMIT, true, $str);
 
             log::instance()->log_exception($e);
 
@@ -178,7 +147,8 @@ class controller {
             log::instance()->log_line('No response messages received from ILP.', log::ERROR_WARN);
             if ($connectionerror || !isset($response->isConnectivityFailure)) {
                 // We are going to just reset them all since ILP reported a connection failure, or reported no status.
-                $this->set_grades_status($grades, saved_grade::GRADING_STATUS_RESUBMIT, true);
+                $str = get_string('ilp_no_response', 'gradeexport_ilp_push');
+                $this->set_grades_status($grades, saved_grade::GRADING_STATUS_RESUBMIT, true, $str);
                 return;
             }
             // We are going to just place an empty array here, so the rest can do it's thing.
@@ -201,8 +171,7 @@ class controller {
             }
 
             if (is_null($currgrade)) {
-                // TODO - log. Could not find record to go with message.
-                error_log('Could not find grade to go with message.'.var_export($message, true));
+                log::instance()->log_line('Could not find grade to go with message.'.var_export($message, true), log::ERROR_WARN);
                 break;
             }
 
@@ -212,18 +181,13 @@ class controller {
                 $currgrade->status = saved_grade::GRADING_STATUS_FAILED;
                 $currgrade->mark_failure();
             } else {
-                // TODO - log unknown status.
-                error_log('Unknown status '.$message->data->status.var_export($message, true));
+                log::instance()->log_line('Unknown status '.$message->data->status.var_export($message, true), log::ERROR_WARN);
                 $currgrade->status = saved_grade::GRADING_STATUS_FAILED;
-                $currgrade->mark_failure();
+                $currgrade->mark_failure(get_string('ilp_unknown_status', 'gradeexport_ilp_push', $message->data->status));
             }
 
             if (!empty($message->message)) {
-                if (isset($currgrade->ilpmessage)) {
-                    $currgrade->ilpmessage .= "\n".$message->message;
-                } else {
-                    $currgrade->ilpmessage = $message->message;
-                }
+                $currgrade->add_status_message($message->message);
 
                 if (stripos($message->message, 'GE09') !== false) {
                     // GE09 indicates a rolled grade.
@@ -246,19 +210,31 @@ class controller {
             } else {
                 $missing->status = saved_grade::GRADING_STATUS_FAILED;
             }
-            $missing->mark_failure();
-            $missing->ilpmessage = get_string('ilp_response_missing', 'gradeexport_ilp_push');
+            $missing->mark_failure(get_string('ilp_response_missing', 'gradeexport_ilp_push'));
             $missing->save_to_db();
+        }
+
+        // Fire events for the log about processing.
+        foreach ($grades as $grade) {
+            if (!$grade->get_is_current_failure() && $grade->status == saved_grade::GRADING_STATUS_PROCESSED) {
+                $event = event\grade_sent_success::create_from_saved_grade($grade);
+            } else {
+                $event = event\grade_sent_error::create_from_saved_grade($grade);
+            }
+            $event->trigger();
         }
 
         return;
     }
 
-    protected function set_grades_status($grades, $status, $failure = false) {
+    protected function set_grades_status($grades, $status, $failure = false, $message = false) {
         foreach ($grades as $grade) {
             $grade->status = $status;
             if ($failure) {
                 $grade->mark_failure();
+            }
+            if ($message !== false) {
+                $grade->add_status_message($message);
             }
             $grade->save_to_db();
         }

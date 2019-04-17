@@ -32,8 +32,11 @@ $string['privacy:metadata'] = 'The Banner grade export TODO Privacy.';
 $string['ilp_push:publish'] = 'Publish Banner grade export';
 $string['ilp_push:view'] = 'Use Banner grade export';
 
-$string['ilp_response_missing'] = 'No response received from banner.';
+$string['ilp_response_missing'] = 'No response message received from banner.';
 $string['reregister_failed_task'] = 'Resubmit temp failed submissions.';
+$string['ilp_connection_error'] = 'There was an error connecting to ILP.';
+$string['ilp_no_response'] = 'No responses received from ILP.';
+$string['ilp_unknown_status'] = 'ILP responded with an unknown status of "{$a}"';
 
 // Rule validation.
 $string['invalid_datelastattended_early'] = 'Date last attended cannot be before the start of the course.';
@@ -82,3 +85,10 @@ $string['exception_curl_failure'] = 'Curl execution failed. Error: {$a}.';
 $string['exception_bad_response'] = 'Bad response from ILP. {$a}';
 $string['exception_course_mismatch'] = 'Course submitted does match page course.';
 $string['exception_user_mismatch'] = 'Submitting user does not match data in form.';
+
+// Events.
+$string['eventgradeexported'] = 'Grade exported to Banner';
+$string['event_grade_modified'] = 'Banner export modified by teacher';
+$string['event_grades_viewed'] = 'Banner export grades viewed';
+$string['event_grade_sent_error'] = 'Grade failure when sent to banner';
+$string['event_grade_sent_success'] = 'Grade success when sent to banner';

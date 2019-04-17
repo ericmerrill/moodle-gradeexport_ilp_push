@@ -1,0 +1,97 @@
+<?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Event for XYZ.
+ *
+ * @package    gradeexport_ilp_push
+ * @author     Eric Merrill (merrill@oakland.edu)
+ * @copyright  2019 Oakland University (https://www.oakland.edu)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+namespace gradeexport_ilp_push\event;
+
+defined('MOODLE_INTERNAL') || die();
+
+use gradeexport_ilp_push\saved_grade;
+
+/**
+ * Event for XYZ.
+ *
+ * @package    gradeexport_ilp_push
+ * @author     Eric Merrill (merrill@oakland.edu)
+ * @copyright  2019 Oakland University (https://www.oakland.edu)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class grade_modified extends \core\event\base {
+
+    /** @var user_grade $grade */
+    protected $grade;
+
+    protected function init() {
+        $this->data['objecttable'] = saved_grade::TABLE;
+        $this->data['crud'] = 'u';
+        $this->data['edulevel'] = self::LEVEL_TEACHING;
+    }
+
+    public static function create_from_saved_grade(saved_grade $grade) {
+        $submitted = false;
+        if ($grade->status == saved_grade::GRADING_STATUS_SUBMITTED) {
+            $submitted = true;
+        }
+
+        $event = self::create([
+            'objectid'      => $grade->id,
+            'context'       => \context_course::instance($grade->courseid),
+            'relateduserid' => $grade->studentid,
+            'other'         => [
+                'courseilpid'   => $grade->courseilpid,
+                'grade'         => $grade->grade,
+                'submitted'     => $submitted],
+        ]);
+
+        $event->grade = $grade;
+        return $event;
+    }
+
+    /**
+     * Returns relevant URL.
+     *
+     * @return \moodle_url
+     */
+    public function get_url() {
+        $url = '/grade/export/ilp_push/export.php';
+        return new \moodle_url($url, array('id' => $this->courseid));
+    }
+
+    public static function get_name() {
+        return get_string('event_grade_modified', 'gradeexport_ilp_push');
+    }
+
+    public function get_description() {
+        $courseilpid = $this->other['courseilpid'];
+        if (!empty($this->other['submitted'])) {
+            $submitted = " Marked for submission to Banner.";
+        } else {
+            $submitted = " Only saved locally, not marked for submission to Banner.";
+        }
+
+        return "The user with id '$this->userid' modified the local banner grade for the user with " .
+            "id '$this->relateduserid' with grade id '$this->objectid', for ILP course '$courseilpid'.".
+            $submitted;
+    }
+}

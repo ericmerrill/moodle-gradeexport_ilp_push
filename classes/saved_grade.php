@@ -72,6 +72,10 @@ class saved_grade {
     /** @var bool Intentionally public key, this will not be saved, only used transiently. */
     public $confirmed = false;
 
+    protected $currentmessages = false;
+
+    protected $currentfailure = false;
+
     /**
      * The table name of this object.
      */
@@ -132,12 +136,33 @@ class saved_grade {
     }
 
     // ******* Use Specific Methods.
-    public function mark_failure() {
-        if ($this->__isset('failcount')) {
-            $this->failcount += 1;
-        } else {
-            $this->failcount = 1;
+    public function mark_failure($message = false) {
+        if (!$this->currentfailure) {
+            $this->currentfailure = true;
+            if ($this->__isset('failcount')) {
+                $this->failcount += 1;
+            } else {
+                $this->failcount = 1;
+            }
         }
+        if ($message !== false) {
+            $this->add_status_message($message);
+        }
+    }
+
+    public function add_status_message($message) {
+        if ($this->currentmessages === false) {
+            if (!empty($this->statusmessages)) {
+                $this->previousmessages = $this->statusmessages;
+            }
+        }
+        $this->currentmessages[] = $message;
+
+        $this->statusmessages = implode("\n", $this->currentmessages);
+    }
+
+    public function get_is_current_failure() {
+        return $this->currentfailure;
     }
 
     // ******* Database Interaction Methods.

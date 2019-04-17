@@ -350,6 +350,9 @@ class user_grade_row implements templatable {
             $grade->status = saved_grade::GRADING_STATUS_SUBMITTED;
             $grade->usersubmittime = time();
             $grade->save_to_db();
+
+            $event = event\grade_modified::create_from_saved_grade($grade);
+            $event->trigger();
         } else {
             if (!empty($validation['errors'])) {
                 $this->currenterrors = $validation['errors'];
@@ -357,7 +360,10 @@ class user_grade_row implements templatable {
 
             if ($savetodb) {
                 $grade->save_to_db();
+                $event = event\grade_modified::create_from_saved_grade($grade);
+                $event->trigger();
             }
+
         }
 
         if ($this->currentsavedgrade !== $grade) {

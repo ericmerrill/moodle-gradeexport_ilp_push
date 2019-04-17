@@ -108,6 +108,20 @@ function xmldb_gradeexport_ilp_push_upgrade($oldversion=0) {
         upgrade_plugin_savepoint(true, 2019040900, 'gradeexport', 'ilp_push');
     }
 
+    if ($oldversion < 2019041600) {
+
+        // Rename field additionaldata on table gradeexport_ilp_push_grades to additional.
+        $table = new xmldb_table('gradeexport_ilp_push_grades');
+        $field = new xmldb_field('additionaldata', XMLDB_TYPE_TEXT, null, null, null, null, null, 'resultstatus');
+
+        // Launch rename field additionaldata.
+        $dbman->rename_field($table, $field, 'additional');
+
+        // Ilp_push savepoint reached.
+        upgrade_plugin_savepoint(true, 2019041600, 'gradeexport', 'ilp_push');
+    }
+
+
     return true;
 
 }

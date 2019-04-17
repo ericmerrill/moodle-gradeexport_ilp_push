@@ -26,6 +26,7 @@
  */
 
 use gradeexport_ilp_push\grade_exporter;
+use gradeexport_ilp_push\event;
 
 require_once '../../../config.php';
 require_once $CFG->dirroot.'/grade/export/lib.php';
@@ -62,6 +63,10 @@ if ($results === true) {
     }
 
     echo $renderer->render_exporter($ilp);
+
+    $event = event\grades_viewed::create(['context' => $context]);
+    $event->trigger();
+
 } else {
     echo $renderer->render_error($results);
 }

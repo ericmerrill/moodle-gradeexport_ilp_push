@@ -21,7 +21,7 @@
         <FIELD NAME="incompletedeadline" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Date to complete a incomplete by."/>
         <FIELD NAME="datelastattended" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Date student last attended."/>
         <FIELD NAME="resultstatus" TYPE="int" LENGTH="2" NOTNULL="false" SEQUENCE="false" COMMENT="The status result from Banner."/>
-        <FIELD NAME="additionaldata" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Additional data stored in a json format."/>
+        <FIELD NAME="additional" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Additional data stored in a json format."/>
         <FIELD NAME="usersubmittime" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="The time the user submitted the grade."/>
         <FIELD NAME="ilpsendtime" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Time the message was submitted to ILP."/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
