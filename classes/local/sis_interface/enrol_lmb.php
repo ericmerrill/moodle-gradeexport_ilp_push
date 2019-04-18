@@ -42,6 +42,10 @@ class enrol_lmb extends base {
 
     protected $courseenrolids = [];
 
+    protected $userdisplayids = [];
+
+    protected $profileid = null;
+
 
     public function get_course_id_for_user($course, $user) {
 
@@ -60,6 +64,29 @@ class enrol_lmb extends base {
         }
 
         return $course->idnumber;
+    }
+
+    public function get_user_display_id($user) {
+        global $DB;
+
+        if (isset($user->gid)) {
+            return $user->gid;
+        }
+
+        if (is_null($this->profileid)) {
+            $this->profileid = $DB->get_field('user_info_field', 'id', ['shortname' => 'gid']);
+        }
+
+        if (!empty($this->profileid)) {
+            $field = $DB->get_field('user_info_data', 'data', ['fieldid' => $this->profileid, 'userid' => $user->id]);
+            $this->userdisplayids[$user->id] = $field;
+        }
+
+        if (!empty($this->userdisplayids[$user->id])) {
+            return $this->userdisplayids[$user->id];
+        }
+
+        return parent::get_user_display_id($user);
     }
 
     protected function load_course_user_mappings($course) {

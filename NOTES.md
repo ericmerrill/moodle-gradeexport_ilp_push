@@ -1,16 +1,15 @@
 * Improve submitter checks to also check for banner assignment local/sis\_interface/enrol\_lmb
 * Date/timezone issues
 * Notifications!
+* Checkbox style
 
 * Filtering
 * Course settings
 
 
+
 Test immediate:
-* GNumber Display
-* Test XLS
 * Submitter checks
-* Limit to courses with id number
 * Date/timezone issues
 
 
@@ -19,7 +18,6 @@ Things to be done:
 * Don't allow logged-in-as users to submit grades
 * Use overridable class for user-banner mapping and enrollment-course mapping
 * Use the Moodle date selector
-* Display that grade is changed from default (maybe with arrow pointing between them?)
 * Check wording for default incomplete date.
 * Add support for additional certs
 * Filterting

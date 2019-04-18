@@ -115,7 +115,9 @@ function xmldb_gradeexport_ilp_push_upgrade($oldversion=0) {
         $field = new xmldb_field('additionaldata', XMLDB_TYPE_TEXT, null, null, null, null, null, 'resultstatus');
 
         // Launch rename field additionaldata.
-        $dbman->rename_field($table, $field, 'additional');
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->rename_field($table, $field, 'additional');
+        }
 
         // Ilp_push savepoint reached.
         upgrade_plugin_savepoint(true, 2019041600, 'gradeexport', 'ilp_push');

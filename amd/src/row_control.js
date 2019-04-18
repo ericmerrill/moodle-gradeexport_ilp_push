@@ -109,6 +109,15 @@ define(['jquery', 'gradeexport_ilp_push/page_info', 'core/templates', 'core/str'
             var key = select.val();
             var confirm = row.find('.confirmcheckbox').eq(0);
 
+            var defaultGrade = row.find('.grade .letter').eq(0).data('grade-key');
+            var inequal = row.find('.grade .notequal').eq(0);
+
+            if (defaultGrade != key) {
+                inequal.show();
+            } else {
+                inequal.hide();
+            }
+
             var date = false,
                 disable = false;
 

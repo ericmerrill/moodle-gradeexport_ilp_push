@@ -133,7 +133,6 @@ class grade_exporter implements templatable {
 
             $userrows[] = $userrow;
 
-
         }
         $gui->close();
 

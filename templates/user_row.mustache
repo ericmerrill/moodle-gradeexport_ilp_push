@@ -54,7 +54,7 @@
     <td {{#statusmessage}}rowspan=2{{/statusmessage}} class="userinfo">
         {{{userimage}}}
         <div class="userdetails">
-            <div class="fullname">{{{fullnamelink}}}</div>
+            <div class="fullname">{{{fullnamelink}}}</div><div class="gradeline">{{{gradelink}}}</div>
             <div class="username">{{username}}</div>
             {{#userdisplayid}}<div class="userid">{{userdisplayid}}</div>{{/userdisplayid}}
             <div class="courseid">{{courseilpid}}</div>
@@ -65,7 +65,7 @@
         <div class="percent">{{gradepercent}}</div>
     </td>
     <td class="grade">
-        <div class="letter">{{gradeletter}}</div>
+        <div class="letter" data-grade-key="{{truegradekey}}">{{gradeletter}}</div><div title="{{# str }} grade_not_eqaul, gradeexport_ilp_push {{/ str }}" class="notequal {{#equal}}hide{{/equal}}">&#8800;</div>
     </td>
     <td class="bannergradeselect">
         {{{gradeselect}}}
@@ -88,14 +88,14 @@
             </div>
         </div>
     </td>
-    <td>
-        <input type="checkbox" class="confirmcheckbox form-control" name="confirm-{{{formid}}}"{{#locked}} disabled{{/locked}}>
+    <td class="">
+        <label class="checkbox">
+            <input type="checkbox" class="confirmcheckbox form-control" name="confirm-{{{formid}}}"{{#locked}} disabled{{/locked}}>
+            <span class="checkmark"></span>
+        </div>
     </td>
     <td class="status">
-        <div class="statuscontainer {{statusclasses}}">
-            {{{status}}}
-        </div>
-        </div>
+        {{{status}}}
     </td>
 </tr>
 {{#statusmessage}}
@@ -105,10 +105,8 @@
     </tr>
 
     <tr class="statusmessagerow" data-row-id="{{{formid}}}" data-user-id="{{{userid}}}">
-        <td colspan="5" class="statusmessage">
-            <div class="statusmessagebox {{messageclasses}}">
-                {{{statusmessage}}}
-            </div>
+        <td colspan="5" class="statusmessage">            
+            {{{statusmessage}}}
         </td>
     </tr>
     

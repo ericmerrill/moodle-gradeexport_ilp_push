@@ -125,8 +125,14 @@ class user_grade_row implements templatable {
         }
 
         if (is_null($letter)) {
-            $letter = $this->get_formatted_grade(GRADE_DISPLAY_TYPE_LETTER);
+            return $this->get_moodle_grade_key();
         }
+
+        return banner_grades::find_key_for_letter($letter);
+    }
+
+    public function get_moodle_grade_key() {
+        $letter = $this->get_formatted_grade(GRADE_DISPLAY_TYPE_LETTER);
 
         return banner_grades::find_key_for_letter($letter);
     }
@@ -171,11 +177,15 @@ class user_grade_row implements templatable {
         $item->grademax = $grademax;
         $item->grademin = $grademin;
 
+        if ($format == GRADE_DISPLAY_TYPE_REAL && $item->gradetype != GRADE_TYPE_SCALE) {
+            $formatted .= ' / '.format_float($grademax, $item->get_decimals(), true);
+        }
+
         return $formatted;
     }
 
     public function export_for_template(\renderer_base $renderer) {
-        global $OUTPUT, $COURSE;
+        global $OUTPUT;
 
         $grade = $this->currentsavedgrade;
 
@@ -188,13 +198,15 @@ class user_grade_row implements templatable {
         $output->userid = $this->user->id;
         $output->formid = $this->get_form_id();
 
+        $output->gradelink = $renderer->render_grade_link($fullname, $this->user->id, $this->course->id) ;
+
         $output->courseilpid = $grade->courseilpid;
 
         $output->userdisplayid = $this->sis->get_user_display_id($this->user);
 
         $output->locked = $this->should_prevent_editing();
 
-        $params = ['id' => $this->user->id, 'course' => $COURSE->id];
+        $params = ['id' => $this->user->id, 'course' => $this->course->id];
         $output->fullnamelink = html_writer::link(new moodle_url('/user/view.php', $params), $fullname);
 
         $lettergrade = $this->get_formatted_grade(GRADE_DISPLAY_TYPE_LETTER);
@@ -217,8 +229,9 @@ class user_grade_row implements templatable {
             $output->incompletedeadline = false;
         }
 
-        $output->status = $grade->status;
-$output->status = $this->get_status_contents();
+
+
+
 
         foreach ($this->currenterrors as $id => $string) {
             $key = $id.'error';
@@ -229,15 +242,15 @@ $output->status = $this->get_status_contents();
         $output->showincomplete = banner_grades::grade_key_is_incomplete($currentkey);
         $output->showfailing = banner_grades::grade_key_is_failing($currentkey);
 
-        $output->statusclasses = $this->get_display_status();
-
-        // Now for any current messages;
-        if (isset($grade->statusmessages)) {
-            $output->statusmessage = $grade->statusmessages;
-
-            $output->messageclasses = $output->statusclasses;
-            $output->statusclasses .= " combinedstatus";
+        $moodlekey = $this->get_moodle_grade_key();
+        $output->truegradekey = $moodlekey;
+        if ($moodlekey == $currentkey) {
+            $output->equal = true;
         }
+
+        $output->statusmessage = $renderer->render_status_messages($this);
+        $output->status = $renderer->render_status($this);
+
 
 
 
@@ -272,77 +285,15 @@ $output->status = $this->get_status_contents();
         }
     }
 
-    public function get_status_contents() {
 
-        $class = '';
-        $message = '';
 
-        switch ($this->currentsavedgrade->status) {
-            case (saved_grade::GRADING_STATUS_EDITING):
-                $class = 'fa-edit';
-                $message = get_string('status_editing', 'gradeexport_ilp_push');
-                break;
-            case (saved_grade::GRADING_STATUS_PROCESSING):
-            case (saved_grade::GRADING_STATUS_SUBMITTED):
-            case (saved_grade::GRADING_STATUS_RESUBMIT):
-                $class = 'fa-refresh';
-                $message = get_string('status_processing', 'gradeexport_ilp_push');
-                break;
-            case (saved_grade::GRADING_STATUS_PROCESSED):
-                $class = 'fa-check';
-                $message = get_string('status_success', 'gradeexport_ilp_push');
-                break;
-            case (saved_grade::GRADING_STATUS_FAILED):
-                $class = 'fa-times-circle';
-                $message = get_string('status_failed', 'gradeexport_ilp_push');
-                break;
-            case (saved_grade::GRADING_STATUS_LOCKED):
-                $class = 'fa-lock';
-                $message = get_string('status_locked', 'gradeexport_ilp_push');
-                break;
-            default:
-                return false;
-        }
-
-        // TODO - should use a proper renderer for all this...
-        $attr = ['class' => "fa {$class} fa-fw statusicon",
-                 'title' => $message,
-                 'aria-label' => $message];
-
-        $output = html_writer::tag('i', ' ', $attr);
-
-        $output .= html_writer::div($message, 'statustext');
-
-        //<i class="icon fa fa-pencil fa-fw " title="comething" aria-label="comething"></i>
-        return $output;
+    public function get_current_status() {
+        return $this->currentsavedgrade->status;
     }
 
-    public function get_display_status() {
-        $status = $this->currentsavedgrade->status;
-
-        switch ($this->currentsavedgrade->status) {
-            case (saved_grade::GRADING_STATUS_EDITING):
-                return '';
-                break;
-            case (saved_grade::GRADING_STATUS_PROCESSING):
-            case (saved_grade::GRADING_STATUS_SUBMITTED):
-            case (saved_grade::GRADING_STATUS_RESUBMIT):
-                return 'alert-info';
-                break;
-            case (saved_grade::GRADING_STATUS_PROCESSED):
-                return 'alert-success';
-                break;
-            case (saved_grade::GRADING_STATUS_FAILED):
-                return 'alert-danger';
-                break;
-            case (saved_grade::GRADING_STATUS_LOCKED):
-                return 'alert-info';
-                break;
-            default:
-                return false;
-        }
+    public function get_status_messages() {
+        return $this->currentsavedgrade->statusmessages;
     }
-
 
     public function process_data(stdClass $data) {
         global $USER;

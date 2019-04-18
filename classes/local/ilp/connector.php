@@ -84,7 +84,6 @@ class connector {
         // Set the URL endpoint.
         if (isset($this->endpoints[$endpoint])) {
             $url = settings::get_setting('ilpurl') . '/' . $this->endpoints[$endpoint];
-            error_log($url);
             $options[CURLOPT_URL] = $url;
         } else {
             throw new exception\connector_exception('exception_unknown_endpoint', $endpoint);

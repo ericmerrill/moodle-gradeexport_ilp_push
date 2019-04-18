@@ -5,8 +5,90 @@
         td {
             padding-top: 8px;
             padding-bottom: 8px;
+            
+            &.grade {
+                
+                .letter {
+                    padding-top: 8px;
+                    display: inline-block;
+                }
+                .notequal {
+                    padding-top: 2px;
+                    float: right;
+                    font-size: 150%;
+                    color: red;
+                }
+            }
         }
-        
+        .checkbox input {
+            width: 35px;
+            height: 35px;transform: scale(1.5);
+        }   
+/*        .checkbox {
+            display: inline-block;
+            position: relative;
+            padding-left: 10px;
+            padding-right: 10px;
+            min-width: 35px;
+
+            cursor: pointer;
+
+            
+            &.hidden {
+                display: none;
+            }
+ 
+            .checkmark {
+                position: absolute;
+                top: -11px;
+                left: 0;
+                height: 25px;
+                width: 25px;
+                background-color: #ffffff;
+                border: 1px solid #aaaaaa;
+                border-radius: 3px;
+                
+                &::after {
+                    content: "";
+                    position: absolute;
+                    display: none;
+                    
+                    left: 8px;
+                    top: 5px;
+                    width: 8px;
+                    height: 12px;
+                    border: solid white;
+                    border-width: 0 3px 3px 0;
+                    -webkit-transform: rotate(45deg);
+                    -ms-transform: rotate(45deg);
+                    transform: rotate(45deg);
+                }
+            }
+            
+            input {
+                position: absolute;
+                opacity: 0;
+                cursor: pointer;
+                height: 0;
+                width: 0;
+                
+                &:checked ~ .checkmark {
+                    background-color: #000000;
+                }
+                
+                &:checked ~ .checkmark:after {
+                    display: block;
+                }
+                
+                &:disabled ~ .checkmark {
+                    cursor: not-allowed;
+                    color: #868e96;
+                    background-color: #e9ecef;
+                }
+            }
+ 
+        }
+ */       
         .spacerrow {
             display:none;
         }
@@ -14,43 +96,45 @@
         .statusmessage {
             border-top: none;
         }
+/*        
+        .status {
+            position: relative;
+            
+            .statuscontainer {
+                border-radius: 10px;
+            }
+
+            .statuscontainer.combinedstatus {
+                padding: 10px 8px 0px 8px;
+                margin-bottom: 0px;
+                position: absolute;
+                top: 8px;
+                left: 0px;
+                height: 100%;
+                
+                border-radius: 10px 10px 0px 0px;
+            }
+            
+        }
+        .statusflex {
+            display: flex;
+            flex-flow: column;
+            height: 100%;
+            .statuscontainer {
+            
+            }
+            
+            .statuscontainer.combinedstatus {
+            
+            }
+            
+            .statusfiller {
+                flex-grow: 1;
+            }
+            
+        }
+*/
         
-//         .status {
-//             position: relative;
-//             
-//             .statuscontainer {
-//                 border-radius: 10px;
-//             }
-// 
-//             .statuscontainer.combinedstatus {
-//                 padding: 10px 8px 0px 8px;
-//                 margin-bottom: 0px;
-//                 position: absolute;
-//                 top: 8px;
-//                 left: 0px;
-//                 height: 100%;
-//                 
-//                 border-radius: 10px 10px 0px 0px;
-//             }
-//             
-//         }
-//         .statusflex {
-//             display: flex;
-//             flex-flow: column;
-//             height: 100%;
-//             .statuscontainer {
-//             
-//             }
-//             
-//             .statuscontainer.combinedstatus {
-//             
-//             }
-//             
-//             .statusfiller {
-//                 flex-grow: 1;
-//             }
-//             
-//         }
 
         .statuscontainer {
             padding: 10px;
@@ -80,11 +164,15 @@
                 display: inline-block;
         
                 .fullname {
-                    
+                    display: inline-block;
                 }
                 .username, .userid, .courseid {
                     font-size: 85%;
                     color: #555;
+                }
+                
+                .gradeline {
+                    float: right;
                 }
             }
         }
