@@ -32,6 +32,8 @@ $string['privacy:metadata'] = 'The Banner grade export TODO Privacy.';
 $string['ilp_push:publish'] = 'Publish Banner grade export';
 $string['ilp_push:view'] = 'Use Banner grade export';
 
+$string['export_page_header'] = 'Export Grades to Banner';
+
 $string['ilp_response_missing'] = 'No response message received from banner.';
 $string['reregister_failed_task'] = 'Resubmit temp failed submissions.';
 $string['ilp_connection_error'] = 'There was an error connecting to ILP.';
