@@ -22,8 +22,10 @@ Things to be done:
 * Add support for additional certs
 * Filterting
 * ClearFinalGradeExpirationDateFlag and ClearLastAttendanceDateFlag
-* Start/end date (if missing enddate in particular)
+* Start/end date (if missing enddate in particular) (Probably even ask sis_interface)
 * Additional grade history/error display
+* Paging
+* Chunking of submissions
 
 Things that need to be looked into:
 * Default incomplete grade, and should changing that be a setting? (SHAINCG)
