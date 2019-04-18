@@ -81,6 +81,8 @@ class process_user_course_task extends task\adhoc_task {
             return;
         }
 
+        // TODO - Try to check for existing tasks.
+
         log::instance()->log_line("Registering adhoc task for user {$userid}, course {$courseid}.");
 
         $data = new stdClass();
