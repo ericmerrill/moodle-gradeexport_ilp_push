@@ -57,7 +57,7 @@ if ($gradingallowed === true) {
     }
 }
 
-print_grade_page_head($COURSE->id, 'export', 'ilp_push', get_string('export_page_header', 'grades'));
+print_grade_page_head($COURSE->id, 'export', 'ilp_push', get_string('export_page_header', 'gradeeport/ilp_push'));
 
 if (!empty($CFG->gradepublishing)) {
     $CFG->gradepublishing = has_capability('gradeexport/txt:publish', $context);

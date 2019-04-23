@@ -6,6 +6,7 @@
 * Filtering
 * Course settings
 
+* Incomplete dates seem... problematic.
 
 
 Test immediate:
