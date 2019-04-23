@@ -172,7 +172,7 @@ class controller {
 
             if (is_null($currgrade)) {
                 log::instance()->log_line('Could not find grade to go with message.'.var_export($message, true), log::ERROR_WARN);
-                break;
+                continue;
             }
 
             if ($message->data->status === 'success') {

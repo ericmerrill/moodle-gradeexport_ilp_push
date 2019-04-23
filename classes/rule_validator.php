@@ -90,7 +90,7 @@ class rule_validator {
                 // If present, the incomplete date must be within a certain timeline (settings dependent).
                 // TODO better date ranges and error messages...
                 $results['errors']['incompletedeadline'] = get_string('invalid_incomplete_date_early', 'gradeexport_ilp_push');
-            } else if ($grade->incompletedeadline > ($course->enddate + (366 * 3600 * 24))) {
+            } else if ($grade->incompletedeadline > ($course->enddate + (380 * 3600 * 24))) {
                 $results['errors']['incompletedeadline'] = get_string('invalid_incomplete_date_late', 'gradeexport_ilp_push');
             }
         }

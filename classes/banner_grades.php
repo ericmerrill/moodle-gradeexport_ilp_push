@@ -201,7 +201,7 @@ class banner_grades {
 
         $dates->start = $courseend;
 
-        $dates->end = $courseend + (3600 * 24 * 365);
+        $dates->end = $courseend + (3600 * 24 * 380);
 
         if (!$format) {
             return $dates;
