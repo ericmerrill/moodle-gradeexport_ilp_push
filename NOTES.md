@@ -27,6 +27,7 @@ Things to be done:
 * Additional grade history/error display
 * Paging
 * Chunking of submissions
+* Auto lock grades. Will need to split locking status.
 
 Things that need to be looked into:
 * Default incomplete grade, and should changing that be a setting? (SHAINCG)

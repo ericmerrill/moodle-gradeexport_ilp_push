@@ -40,7 +40,7 @@ use stdClass;
  */
 class banner_grades {
 
-    protected static $failing = ['F', 'Fail'];
+    protected static $failing = ['F'];
     protected static $failingids = null;
 
     protected static $incomplete = ['I'];
@@ -59,9 +59,7 @@ class banner_grades {
                     9 => 'D+',
                     10 => 'D',
                     11 => 'F',
-                    12 => 'I',
-                    13 => 'Pass',
-                    14 => 'Fail'];
+                    12 => 'I'];
 
         return $options;
     }
@@ -180,8 +178,6 @@ class banner_grades {
         // Convert to a format.
         $dates->start = date_format_string($dates->start, $format, $tz);
         $dates->end = date_format_string($dates->end, $format, $tz);
-        // $dates->start = date('c', $dates->start);
-//         $dates->end = date('c', $dates->end);
 
         return $dates;
     }

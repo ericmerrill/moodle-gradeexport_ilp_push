@@ -64,7 +64,7 @@ class controller {
         }
 
         foreach ($ilpids as $courseilpid) {
-            log::instance()->start_message("Processing grades for ILP course {$courseilpid} and submitter {submitterilpid}.");
+            log::instance()->start_message("Processing grades for ILP course {$courseilpid} and submitter {$submitterilpid}.");
             // Grab a lock to make sure nobody else is working on this right now.
             if (!$lock = locks::get_course_lock($courseilpid)) {
                 log::instance()->end_message("Could not get course lock. Exiting.", log::ERROR_WARN);
@@ -123,9 +123,10 @@ class controller {
 
         $conn = new ilp\connector();
 
-        // TODO - Catch exceptions.
         try {
+            log::instance()->end_message("Request: ".var_export($request, true), log::ERROR_NONE);
             $response = $conn->send_request('grades', $request);
+            log::instance()->end_message("Response: ".var_export($response, true), log::ERROR_NONE);
         } catch (exception\connector_exception $e) {
             // In cases where we have a connection erorr, we probably just want to reset the grades back to the waiting state.
             $str = get_string('ilp_connection_error', 'gradeexport_ilp_push');

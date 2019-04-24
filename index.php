@@ -51,13 +51,14 @@ if ($gradingallowed === true) {
     $ilp = new grade_exporter($COURSE, 0, null);
 
     if ($formdata = data_submitted()) {
+        $ilp->process_options_form();
         $ilp->process_data($formdata);
         // We redirect to prevent the reprocessing for form data on reload.
         redirect($PAGE->url);
     }
 }
 
-print_grade_page_head($COURSE->id, 'export', 'ilp_push', get_string('export_page_header', 'gradeeport/ilp_push'));
+print_grade_page_head($COURSE->id, 'export', 'ilp_push', get_string('export_page_header', 'gradeexport_ilp_push'));
 
 if (!empty($CFG->gradepublishing)) {
     $CFG->gradepublishing = has_capability('gradeexport/txt:publish', $context);

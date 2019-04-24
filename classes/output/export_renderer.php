@@ -77,7 +77,9 @@ class export_renderer extends plugin_renderer_base {
 
         $data = $exporter->export_for_template($this);
 
-        $output = $this->render_from_template('gradeexport_ilp_push/exporter', $data);
+        $output = $this->render_options_form($exporter->get_options_form());
+
+        $output .= $this->render_from_template('gradeexport_ilp_push/exporter', $data);
 
         return $output;
     }
@@ -233,4 +235,15 @@ class export_renderer extends plugin_renderer_base {
                 return false;
         }
     }
+
+    public function render_options_form($form) {
+        global $PAGE;
+
+        $PAGE->requires->js_call_amd('gradeexport_ilp_push/options_form', 'init');
+
+        return $form->render();
+
+    }
+
+
 }

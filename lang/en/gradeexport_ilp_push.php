@@ -46,6 +46,14 @@ $string['status_success'] = 'Succeeded';
 $string['status_failed'] = 'Failed';
 $string['status_locked'] = 'Locked';
 
+// Settings Form.
+$string['status_filter'] = 'Status Filter';
+$string['filter_all'] = 'All';
+$string['filter_attention'] = 'Needs Action';
+$string['filter_in_progress'] = 'In Progress';
+$string['filter_error'] = 'Errored';
+$string['filter_done'] = 'Complete';
+
 // Rule validation.
 $string['invalid_datelastattended_early'] = 'Date last attended cannot be before the start of the course.';
 $string['invalid_datelastattended_late'] = 'Date last attended cannot be after the end of the course.';

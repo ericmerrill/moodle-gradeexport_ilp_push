@@ -288,7 +288,25 @@ class user_grade_row implements templatable {
 
 
     public function get_current_status() {
-        return $this->currentsavedgrade->status;
+        return (int)$this->currentsavedgrade->status;
+    }
+
+    public function is_in_progress() {
+        $status = $this->get_current_status();
+
+        if ($status === saved_grade::GRADING_STATUS_SUBMITTED || $status === saved_grade::GRADING_STATUS_RESUBMIT
+                || $status === saved_grade::GRADING_STATUS_PROCESSING) {
+            return true;
+        }
+
+        if ($status === saved_grade::GRADING_STATUS_EDITING) {
+            if ($this->currentsavedgrade->revision === 0 && empty($this->currentsavedgrade->id)) {
+                return false;
+            }
+            return true;
+        }
+
+        return false;
     }
 
     public function get_status_messages() {
