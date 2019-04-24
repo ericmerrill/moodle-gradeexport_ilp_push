@@ -62,8 +62,6 @@ class grade_exporter implements templatable {
     const FILTER_ERROR = 3;
     const FILTER_DONE = 4;
 
-    protected $decimalpoints = 2; // TODO - Setting?
-
     protected $onlyactive = true; // TODO - Setting.
 
     protected $gradeitems;
@@ -101,12 +99,9 @@ class grade_exporter implements templatable {
         $this->gradeitems = grade_item::fetch_all(array('courseid'=>$this->course->id));
         $this->coursegradeitem = grade_item::fetch_course_item($course->id);
 
-        $this->currentgradeitem = $this->coursegradeitem; // TODO.
-
         $this->statusfilter = get_user_preferences('gradeexport_ilp_push_status_filter', $this->statusfilter);
+        $this->set_grade_item(get_user_preferences('gradeexport_ilp_push_reference_grade-'.$this->course->id, $this->statusfilter));
 
-        // TODO - probably move to later, so we can do things before building everything...
-        //$this->build_user_data();
     }
 
     public function regrade_if_needed() {
@@ -122,6 +117,15 @@ class grade_exporter implements templatable {
 
     protected function get_grade_columns() {
         return [$this->currentgradeitem->id => $this->currentgradeitem];
+    }
+
+    protected function set_grade_item($itemid) {
+        if (empty($itemid) || empty($this->gradeitems[$itemid])) {
+            $this->currentgradeitem = $this->coursegradeitem;
+            return;
+        }
+
+        $this->currentgradeitem = $this->gradeitems[$itemid];
     }
 
     protected function build_user_data() {
@@ -165,12 +169,22 @@ class grade_exporter implements templatable {
         return $this->gradetype;
     }
 
+    /**
+     * Return all user grade rows, regardless of filter settings.
+     *
+     * @return user_grade_row[]
+     */
     public function get_user_data() {
         $this->build_user_data();
 
         return $this->userrows;
     }
 
+    /**
+     * Return user data rows, but filtered.
+     *
+     * @return user_grade_row[]
+     */
     public function get_filtered_user_data() {
         $output = [];
 
@@ -232,12 +246,24 @@ class grade_exporter implements templatable {
     }
 
     public function get_options_form() {
-        $params = ['id' => $this->course->id];
+
+
+
+        // Get all the grade items.
+        $seq = new \grade_seq($this->course->id, true, true);
+        $selectitems = [];
+        foreach ($seq->items as $itemid => $item) {
+            $selectitems[$itemid] = $item->get_name();
+        }
+
+        $params = ['id' => $this->course->id,
+                   'gradeoptions' => $selectitems];
         $class = ['class' => 'gradingoptions'];
 
         $form = new options_form(null, $params, 'post', '', $class);
 
-        $data = ['statusfilter' => $this->statusfilter];
+        $data = ['statusfilter' => $this->statusfilter,
+                 'referencegrade' => $this->currentgradeitem->id];
 
         $form->set_data($data);
 
@@ -251,6 +277,11 @@ class grade_exporter implements templatable {
             if (isset($data->statusfilter)) {
                 set_user_preference('gradeexport_ilp_push_status_filter', $data->statusfilter);
                 $this->statusfilter = $data->statusfilter;
+            }
+
+            if (isset($data->referencegrade)) {
+                $this->set_grade_item($data->referencegrade);
+                set_user_preference('gradeexport_ilp_push_reference_grade-'.$this->course->id, $this->currentgradeitem->id);
             }
         }
     }

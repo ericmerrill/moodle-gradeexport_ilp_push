@@ -52,21 +52,22 @@ class rule_validator {
             }
         }
 
-        // TODO - use banner_grades or SIS and settings to get dates and rules.
+        // TODO - setting rules.
 
         // If the grade is failing, there must be a date last attended.
         if (banner_grades::grade_key_is_failing($grade->gradekey)) {
+            $lastattenddates = banner_grades::get_allowed_last_attend_dates($course);
             if (is_null($grade->datelastattended)) {
                 $results['errors']['datelastattended'] = get_string('invalid_datelastattended_missing', 'gradeexport_ilp_push');
             } else if ($grade->datelastattended > time()) {
                 // Cannot be later than today.
                 // TODO do time/date check better.
                 $results['errors']['datelastattended'] = get_string('invalid_datelastattended_today', 'gradeexport_ilp_push');
-            } else if ($grade->datelastattended < $course->startdate) {
+            } else if ($grade->datelastattended < $lastattenddates->start) {
                 // The date last attended must be withing a certain date range.
                 // TODO better date ranges and error messages...
                 $results['errors']['datelastattended'] = get_string('invalid_datelastattended_early', 'gradeexport_ilp_push');
-            } else if ($grade->datelastattended > $course->enddate) {
+            } else if ($grade->datelastattended > $lastattenddates->end) {
                 $results['errors']['datelastattended'] = get_string('invalid_datelastattended_late', 'gradeexport_ilp_push');
             }
         }
@@ -82,27 +83,20 @@ class rule_validator {
                 $results['errors']['incompletegrade'] = get_string('invalid_incomplete_grade_wrong', 'gradeexport_ilp_push');
             }
 
+            $incompletedeadline = banner_grades::get_allowed_last_incomplete_deadline_dates($course);
+
             // If the grade is incomplete, there must be a deadline date.
             if (is_null($grade->incompletedeadline)) {
                 // TODO - this might not be required...
                 $results['errors']['incompletedeadline'] = get_string('invalid_incomplete_date_missing', 'gradeexport_ilp_push');
-            } else if ($grade->incompletedeadline < $course->enddate) {
+            } else if ($grade->incompletedeadline < $incompletedeadline->start) {
                 // If present, the incomplete date must be within a certain timeline (settings dependent).
                 // TODO better date ranges and error messages...
                 $results['errors']['incompletedeadline'] = get_string('invalid_incomplete_date_early', 'gradeexport_ilp_push');
-            } else if ($grade->incompletedeadline > ($course->enddate + (380 * 3600 * 24))) {
+            } else if ($grade->incompletedeadline > $incompletedeadline->end) {
                 $results['errors']['incompletedeadline'] = get_string('invalid_incomplete_date_late', 'gradeexport_ilp_push');
             }
         }
-
-        // TODO - more rules.
-
-
-
-
-
-
-
 
         return $results;
     }

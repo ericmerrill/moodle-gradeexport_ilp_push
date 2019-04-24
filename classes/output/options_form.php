@@ -47,18 +47,25 @@ class options_form extends moodleform {
         $data = $this->_customdata;
         $dirtyclass = ['class' => 'ignoredirty'];
 
-        $options = array(grade_exporter::FILTER_ALL => get_string('filter_all', 'gradeexport_ilp_push'),
-                         grade_exporter::FILTER_NEEDS_ATTENTION => get_string('filter_attention', 'gradeexport_ilp_push'),
-                         grade_exporter::FILTER_IN_PROGRESS => get_string('filter_in_progress', 'gradeexport_ilp_push'),
-                         grade_exporter::FILTER_ERROR => get_string('filter_error', 'gradeexport_ilp_push'),
-                         grade_exporter::FILTER_DONE => get_string('filter_done', 'gradeexport_ilp_push'));
-
-        $mform->addElement('select', 'statusfilter', get_string('status_filter', 'gradeexport_ilp_push'), $options, $dirtyclass);
-
         $mform->addElement('hidden', 'id', $data['id']);
         $mform->setType('id', PARAM_INT);
 
         $mform->addElement('hidden', 'optionsform', 1);
         $mform->setType('optionsform', PARAM_INT);
+
+        $options = [grade_exporter::FILTER_ALL => get_string('filter_all', 'gradeexport_ilp_push'),
+                    grade_exporter::FILTER_NEEDS_ATTENTION => get_string('filter_attention', 'gradeexport_ilp_push'),
+                    grade_exporter::FILTER_IN_PROGRESS => get_string('filter_in_progress', 'gradeexport_ilp_push'),
+                    grade_exporter::FILTER_ERROR => get_string('filter_error', 'gradeexport_ilp_push'),
+                    grade_exporter::FILTER_DONE => get_string('filter_done', 'gradeexport_ilp_push')];
+
+        $mform->addElement('select', 'statusfilter', get_string('status_filter', 'gradeexport_ilp_push'), $options, $dirtyclass);
+
+        $options = $data['gradeoptions'];
+
+        $mform->addElement('select', 'referencegrade', get_string('reference_grade', 'gradeexport_ilp_push'), $options, $dirtyclass);
+
+
+
     }
 }

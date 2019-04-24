@@ -2,16 +2,8 @@
 * Date/timezone issues
 * Notifications!
 * Checkbox style
-
-* Filtering
-* Course settings
-
 * Incomplete dates seem... problematic.
 
-
-Test immediate:
-* Submitter checks
-* Date/timezone issues
 
 
 Things to be done:
@@ -21,13 +13,17 @@ Things to be done:
 * Use the Moodle date selector
 * Check wording for default incomplete date.
 * Add support for additional certs
-* Filterting
+* Sorting
 * ClearFinalGradeExpirationDateFlag and ClearLastAttendanceDateFlag
-* Start/end date (if missing enddate in particular) (Probably even ask sis_interface)
+* Start/end date (if missing enddate in particular) (Probably even ask sis\_interface)
 * Additional grade history/error display
 * Paging
 * Chunking of submissions
 * Auto lock grades. Will need to split locking status.
+* grade\_export\_update\_buffer
+* Check if student is allowed (practice students shown...)
+* Help messages for filters
+* Additional grade submission, like midterms
 
 Things that need to be looked into:
 * Default incomplete grade, and should changing that be a setting? (SHAINCG)
