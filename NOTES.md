@@ -1,7 +1,6 @@
 * Improve submitter checks to also check for banner assignment local/sis\_interface/enrol\_lmb
 * Date/timezone issues
 * Notifications!
-* Checkbox style
 * Incomplete dates seem... problematic.
 
 

@@ -20,7 +20,23 @@
                 }
             }
         }
-        .checkbox input {
+        .checkbox {
+            display: block;
+            
+            input {
+                width: auto;
+            }
+            @supports (zoom:2) {
+                input[type=checkbox]{
+                zoom: 2;
+                }
+            }
+            @supports not (zoom:2) {
+                input[type=checkbox]{
+                    transform: scale(2);
+                    margin: 15px;
+                }
+            }
 /* 
             width: 35px;
             height: 35px;
