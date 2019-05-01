@@ -10,7 +10,7 @@ Things to be done:
 * Don't allow logged-in-as users to submit grades
 * Use overridable class for user-banner mapping and enrollment-course mapping
 * Use the Moodle date selector
-* Check wording for default incomplete date.
+* Check wording for default incomplete date. (Extension Date, Incomplete Final Grade)
 * Add support for additional certs
 * Sorting
 * ClearFinalGradeExpirationDateFlag and ClearLastAttendanceDateFlag
