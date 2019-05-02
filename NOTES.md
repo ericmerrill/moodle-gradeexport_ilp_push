@@ -23,6 +23,9 @@ Things to be done:
 * Check if student is allowed (practice students shown...)
 * Help messages for filters
 * Additional grade submission, like midterms
+* Error if log file not writable
+* Test curl connection error/connection reset (see logs on db4)
+* If I make an edit, it shows as in progress, is that right?
 
 Things that need to be looked into:
 * Default incomplete grade, and should changing that be a setting? (SHAINCG)
