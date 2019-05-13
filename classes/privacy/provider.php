@@ -17,19 +17,22 @@
 /**
  * Privacy Subsystem implementation for gradeexport_txt.
  *
- * @package    gradeexport_txt
- * @copyright  2018 Sara Arjona <sara@moodle.com>
+ * @package    gradeexport_ilp_push
+ * @author     Eric Merrill (merrill@oakland.edu)
+ * @copyright  2019 Oakland University (https://www.oakland.edu)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace gradeexport_ilp\privacy;
+namespace gradeexport_ilp_push\privacy;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
  * Privacy Subsystem for gradeexport_txt implementing null_provider.
  *
- * @copyright  2018 Sara Arjona <sara@moodle.com>
+ * @package    gradeexport_ilp_push
+ * @author     Eric Merrill (merrill@oakland.edu)
+ * @copyright  2019 Oakland University (https://www.oakland.edu)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class provider implements \core_privacy\local\metadata\null_provider {
