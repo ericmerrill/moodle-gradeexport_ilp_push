@@ -40,14 +40,14 @@ use stdClass;
  */
 class grade_mode_option extends base {
     /** @var array Array of keys that go in the database object */
-    protected $dbkeys = ['id', 'modeid', 'displayname', 'bannervalue', 'enabled', 'version', 'mostcurrent', 'additional',
-                         'timecreated', 'timemodified', 'usermodified'];
+    protected $dbkeys = ['id', 'modeid', 'displayname', 'bannervalue', 'enabled', 'sortorder', 'version', 'mostcurrent',
+                         'additional', 'timecreated', 'timemodified', 'usermodified'];
 
     /** @var array An array of default property->value pairs */
-    protected $defaults = ['enabled' => 1, 'version' => 0, 'mostcurrent' => 1, 'usermodified' => 0];
+    protected $defaults = ['enabled' => 1, 'version' => 0, 'mostcurrent' => 1, 'sortorder' => 0, 'usermodified' => 0];
 
     /** @var array Array of keys will be used to see if two objects are the same. */
-    protected $diffkeys = ['modeid', 'displayname', 'bannervalue', 'enabled', 'additional'];
+    protected $diffkeys = ['modeid', 'displayname', 'bannervalue', 'enabled', 'sortorder', 'additional'];
 
     /**
      * The table name of this object.

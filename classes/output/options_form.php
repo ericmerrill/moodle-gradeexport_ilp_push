@@ -31,6 +31,7 @@ require_once($CFG->libdir.'/formslib.php');
 
 use moodleform;
 use gradeexport_ilp_push\grade_exporter;
+use gradeexport_ilp_push\banner_grades;
 
 /**
  * A form for display options.
@@ -65,7 +66,8 @@ class options_form extends moodleform {
 
         $mform->addElement('select', 'referencegrade', get_string('reference_grade', 'gradeexport_ilp_push'), $options, $dirtyclass);
 
+        $options = banner_grades::get_grade_modes_menu();
 
-
+        $mform->addElement('select', 'grademode', get_string('grade_mode', 'gradeexport_ilp_push'), $options, $dirtyclass);
     }
 }

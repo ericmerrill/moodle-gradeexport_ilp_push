@@ -176,6 +176,31 @@ function xmldb_gradeexport_ilp_push_upgrade($oldversion=0) {
         upgrade_plugin_savepoint(true, 2019111800, 'gradeexport', 'ilp_push');
     }
 
+    if ($oldversion < 2019111801) {
+
+        // Define field sortorder to be added to gradeexport_ilp_push_modeopt.
+        $table = new xmldb_table('gradeexport_ilp_push_modeopt');
+        $field = new xmldb_field('sortorder', XMLDB_TYPE_INTEGER, '3', null, XMLDB_NOTNULL, null, '0', 'mostcurrent');
+
+        // Conditionally launch add field sortorder.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field sortorder to be added to gradeexport_ilp_push_grmodes.
+        $table = new xmldb_table('gradeexport_ilp_push_grmodes');
+        $field = new xmldb_field('sortorder', XMLDB_TYPE_INTEGER, '3', null, XMLDB_NOTNULL, null, '0', 'enabled');
+
+        // Conditionally launch add field sortorder.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Ilp_push savepoint reached.
+        upgrade_plugin_savepoint(true, 2019111801, 'gradeexport', 'ilp_push');
+    }
+
+
 
     return true;
 

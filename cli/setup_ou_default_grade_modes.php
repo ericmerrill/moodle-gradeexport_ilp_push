@@ -62,60 +62,68 @@ Example:
 
 if (isset($options['run'])) {
     $options = ['Standard Letter' =>
-                   [1 => 'A',
-                    2 => 'A-',
-                    3 => 'B+',
-                    4 => 'B',
-                    5 => 'B-',
-                    6 => 'C+',
-                    7 => 'C',
-                    8 => 'C-',
-                    9 => 'D+',
-                    10 => 'D',
-                    11 => 'F',
-                    12 => 'I'],
+                   ['A' => [],
+                    'A-' => [],
+                    'B+' => [],
+                    'B' => [],
+                    'B-' => [],
+                    'C+' => [],
+                    'C' => [],
+                    'C-' => [],
+                    'D+' => [],
+                    'D' => [],
+                    'F' => ['requirelastdate' => 1],
+                    'I' => ['isincomplete' => 1]],
                 'Standard Letter with Progress (R)' =>
-                   [1 => 'A',
-                    2 => 'A-',
-                    3 => 'B+',
-                    4 => 'B',
-                    5 => 'B-',
-                    6 => 'C+',
-                    7 => 'C',
-                    8 => 'C-',
-                    9 => 'D+',
-                    10 => 'D',
-                    11 => 'F',
-                    12 => 'I',
-                    13 => 'I.',
-                    14 => 'P'],
+                   ['A' => [],
+                    'A-' => [],
+                    'B+' => [],
+                    'B' => [],
+                    'B-' => [],
+                    'C+' => [],
+                    'C' => [],
+                    'C-' => [],
+                    'D+' => [],
+                    'D' => [],
+                    'F' => ['requirelastdate' => 1],
+                    'I' => ['isincomplete' => 1],
+                    'I.' => [],
+                    'P' => []],
                 'Satisfactory/Unsatisfactory (P)' =>
-                   [1 => 'S',
-                    2 => 'U',
-                    3 => 'I'],
+                   ['S' => [],
+                    'U' => [],
+                    'I' => ['isincomplete' => 1]],
                 'Satisfactory/Unsatisfactory with Progress(O))' =>
-                   [1 => 'S',
-                    2 => 'U',
-                    3 => 'I',
-                    4 => 'I.',
-                    5 => 'P'],
+                   ['S' => [],
+                    'U' => [],
+                    'I' => ['isincomplete' => 1],
+                    'I.' => [],
+                    'P' => []],
                 'Dissertation, Thesis Research (D)' =>
-                   [1 => 'S',
-                    2 => 'SP',
-                    3 => 'NP',
-                    4 => 'U']];
+                   ['S' => [],
+                    'SP' => [],
+                    'NP' => [],
+                    'U' => []]];
 
-
+    $modesort = 1;
     foreach ($options as $name => $opts) {
         $mode = new data\grade_mode();
         $mode->name = $name;
+        $mode->sortorder = $modesort++;
         $mode->save_to_db();
 
-        foreach ($opts as $value) {
+        $optsort = 1;
+        foreach ($opts as $value => $settings) {
             $opt = new data\grade_mode_option();
             $opt->modeid = $mode->id;
             $opt->displayname = $value;
             $opt->bannervalue = $value;
+            $opt->sortorder = $optsort++;
+            if (!empty($settings)) {
+                foreach ($settings as $key => $val) {
+                    $opt->$key = $val;
+                }
+            }
             $opt->save_to_db();
 
         }

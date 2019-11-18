@@ -55,6 +55,7 @@ $string['filter_error'] = 'Errored';
 $string['filter_done'] = 'Complete';
 
 $string['reference_grade'] = 'Reference Grade';
+$string['grade_mode'] = 'Grade Mode';
 
 // Rule validation.
 $string['invalid_datelastattended_early'] = 'Date last attended cannot be before the start of the course.';

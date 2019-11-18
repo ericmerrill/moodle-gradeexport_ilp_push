@@ -40,10 +40,10 @@ use stdClass;
  */
 class grade_mode extends base {
     /** @var array Array of keys that go in the database object */
-    protected $dbkeys = ['id', 'name', 'enabled', 'additional', 'timecreated', 'timemodified', 'usermodified'];
+    protected $dbkeys = ['id', 'name', 'enabled', 'sortorder', 'additional', 'timecreated', 'timemodified', 'usermodified'];
 
     /** @var array An array of default property->value pairs */
-    protected $defaults = ['enabled' => 1, 'usermodified' => 0];
+    protected $defaults = ['enabled' => 1, 'usermodified' => 0, 'sortorder' => 0, 'usermodified' => 0];
 
     /** @var array Array of keys will be used to see if two objects are the same. */
     protected $diffkeys = ['name', 'enabled', 'additional'];

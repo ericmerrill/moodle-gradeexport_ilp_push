@@ -29,6 +29,7 @@ namespace gradeexport_ilp_push;
 defined('MOODLE_INTERNAL') || die();
 
 use stdClass;
+use gradeexport_ilp_push\local\data\grade_mode;
 
 /**
  * Deals with the interaction of banner grading.
@@ -46,50 +47,20 @@ class banner_grades {
     protected static $incomplete = ['I'];
     protected static $incompleteids = null;
 
-    public static function get_possible_grade_groups($userrow = null) {
-        $options = ['Standard Letter' =>
-                       [1 => 'A',
-                        2 => 'A-',
-                        3 => 'B+',
-                        4 => 'B',
-                        5 => 'B-',
-                        6 => 'C+',
-                        7 => 'C',
-                        8 => 'C-',
-                        9 => 'D+',
-                        10 => 'D',
-                        11 => 'F',
-                        12 => 'I'],
-                    'Standard Letter with Progress (R)' =>
-                       [1 => 'A',
-                        2 => 'A-',
-                        3 => 'B+',
-                        4 => 'B',
-                        5 => 'B-',
-                        6 => 'C+',
-                        7 => 'C',
-                        8 => 'C-',
-                        9 => 'D+',
-                        10 => 'D',
-                        11 => 'F',
-                        12 => 'I',
-                        13 => 'I.',
-                        14 => 'P'],
-                    'Satisfactory/Unsatisfactory (P)' =>
-                       [1 => 'S',
-                        2 => 'U',
-                        3 => 'I'],
-                    'Satisfactory/Unsatisfactory with Progress(O))' =>
-                       [1 => 'S',
-                        2 => 'U',
-                        3 => 'I',
-                        4 => 'I.',
-                        5 => 'P'],
-                    'Dissertation, Thesis Research (D)' =>
-                       [1 => 'S',
-                        2 => 'SP',
-                        3 => 'NP',
-                        4 => 'U']];
+    public static function get_grade_modes_menu() {
+        $params = ['enabled' => 1];
+        $modes = grade_mode::get_for_params($params, 'sortorder ASC');
+
+        $output = [];
+        foreach ($modes as $mode) {
+            $output[$mode->id] = $mode->name;
+        }
+
+        return $output;
+    }
+
+    public static function get_possible_grade_modes() {
+
     }
 
     public static function get_possible_grades($userrow = null) {
