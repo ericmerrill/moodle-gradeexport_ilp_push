@@ -52,10 +52,12 @@ class rule_validator {
             }
         }
 
+        $grademode = $grade->get_grade_mode();
+
         // TODO - setting rules.
 
         // If the grade is failing, there must be a date last attended.
-        if (banner_grades::grade_key_is_failing($grade->gradekey)) {
+        if ($grademode->grade_id_is_failing($grade->gradeid)) {
             $lastattenddates = banner_grades::get_allowed_last_attend_dates($course);
             if (is_null($grade->datelastattended)) {
                 $results['errors']['datelastattended'] = get_string('invalid_datelastattended_missing', 'gradeexport_ilp_push');
@@ -73,11 +75,11 @@ class rule_validator {
         }
 
 
-        if (banner_grades::grade_key_is_incomplete($grade->gradekey)) {
+        if ($grademode->grade_id_is_incomplete($grade->gradeid)) {
             if (is_null($grade->incompletegrade)) {
                 // If the grade is incomplete, there must be an incomplete grade.
                 $results['errors']['incompletegrade'] = get_string('invalid_incomplete_grade_missing', 'gradeexport_ilp_push');
-            } else if ($grade->incompletegradekey != banner_grades::get_default_incomplete_grade()) {
+            } else if ($grade->incompletegradeid != banner_grades::get_default_incomplete_grade()) {
                 // If present, the incomplete grade must be the default (settings dependent).
                 // TODO make setting dependent. Probably move to overridable class.
                 $results['errors']['incompletegrade'] = get_string('invalid_incomplete_grade_wrong', 'gradeexport_ilp_push');

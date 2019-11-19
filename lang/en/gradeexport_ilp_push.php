@@ -106,6 +106,8 @@ $string['exception_curl_failure'] = 'Curl execution failed. Error: {$a}.';
 $string['exception_bad_response'] = 'Bad response from ILP. {$a}';
 $string['exception_course_mismatch'] = 'Course submitted does match page course.';
 $string['exception_user_mismatch'] = 'Submitting user does not match data in form.';
+$string['exception_grade_mode_mismatch'] = 'Grade value did not match it\'s the submitted grade mode.';
+$string['exception_grade_mode_missing'] = 'Grade mode could not be found.';
 
 // Events.
 $string['eventgradeexported'] = 'Grade exported to Banner';

@@ -103,7 +103,9 @@ class grade_exporter implements templatable {
 
         $this->statusfilter = get_user_preferences('gradeexport_ilp_push_status_filter', $this->statusfilter);
 
-        $this->grademode = get_user_preferences('gradeexport_ilp_push_grade_mode-'.$this->course->id);
+        $grademodeid = get_user_preferences('gradeexport_ilp_push_grade_mode-'.$this->course->id);
+
+        $this->grademode = banner_grades::get_grade_mode($grademodeid);
 
         $this->set_grade_item(get_user_preferences('gradeexport_ilp_push_reference_grade-'.$this->course->id));
 
@@ -155,7 +157,7 @@ class grade_exporter implements templatable {
             // We only use one grade item, so that is easy...
             $grade = reset($userdata->grades);
 
-            $userrow = new user_grade_row($user, $this, $grade, $this->currentgradeitem);
+            $userrow = new user_grade_row($user, $this, $grade, $this->currentgradeitem, $this->grademode);
 
             $userrows[] = $userrow;
 
@@ -265,7 +267,7 @@ class grade_exporter implements templatable {
         $form = new options_form(null, $params, 'post', '', $class);
 
         $data = ['statusfilter' => $this->statusfilter,
-                 'grademode' => $this->grademode,
+                 'grademode' => $this->grademode->id,
                  'referencegrade' => $this->currentgradeitem->id];
 
         $form->set_data($data);
@@ -288,7 +290,6 @@ class grade_exporter implements templatable {
             }
 
             if (isset($data->grademode)) {
-                $this->set_grade_item($data->grademode);
                 set_user_preference('gradeexport_ilp_push_grade_mode-'.$this->course->id, $data->grademode);
             }
         }

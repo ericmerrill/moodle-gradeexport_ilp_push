@@ -53,6 +53,77 @@ class grade_mode extends base {
      */
     const TABLE = 'gradeexport_ilp_push_grmodes';
 
+    /** @var grade_mode_option[] Array of grade mode options. */
+    protected $gradeoptions = null;
+
+    public function get_current_grade_options() {
+        $options = $this->get_all_grade_options();
+
+        $output = [];
+        foreach ($options as $option) {
+            if ($option->mostcurrent) {
+                $output[] = $option;
+            }
+        }
+
+        return $output;
+    }
+
+    public function get_all_grade_options() {
+        if (empty($this->gradeoptions)) {
+            $this->gradeoptions = grade_mode_option::get_for_params(['modeid' => $this->id], 'sortorder ASC');
+        }
+
+        return $this->gradeoptions;
+    }
+
+    public function get_grade($id) {
+        $options = $this->get_all_grade_options();
+
+        if (isset($options[$id])) {
+            return $options[$id];
+        }
+
+        return false;
+    }
+
+    public function grade_id_is_incomplete($id) {
+        $options = $this->get_all_grade_options();
+
+        if (isset($options[$id]) && !empty($options[$id]->isincomplete)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function grade_id_is_failing($id) {
+        $options = $this->get_all_grade_options();
+
+        if (isset($options[$id]) && !empty($options[$id]->requirelastdate)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function get_grade_for_string($value) {
+        $options = $this->get_all_grade_options();
+
+        foreach ($options as $option) {
+            if (isset($option->matchvalue)) {
+                $match = $option->matchvalue;
+            } else {
+                $match = $option->bannervalue;
+            }
+
+            if ($match === $value) {
+                return $option;
+            }
+        }
+
+        return false;
+    }
 }
 
 

@@ -41,30 +41,80 @@ use gradeexport_ilp_push\local\data\grade_mode;
  */
 class banner_grades {
 
-    protected static $failing = ['F'];
     protected static $failingids = null;
 
-    protected static $incomplete = ['I'];
     protected static $incompleteids = null;
 
+    protected static $grademodes = null;
+
+    protected static function load_grade_modes() {
+        if (!is_null(self::$grademodes)) {
+            return self::$grademodes;
+        }
+        self::$grademodes = grade_mode::get_for_params([], 'sortorder ASC');
+
+        self::$failingids = [];
+        self::$incompleteids = [];
+        foreach (self::$grademodes as $grademode) {
+            $options = $grademode->get_all_grade_options();
+            foreach ($options as $option) {
+                if (!empty($option->isincomplete)) {
+                    self::$incompleteids[$option->id] = $option->id;
+                }
+                if (!empty($option->requirelastdate)) {
+                    self::$failingids[$option->id] = $option->id;
+                }
+            }
+        }
+    }
+
     public static function get_grade_modes_menu() {
-        $params = ['enabled' => 1];
-        $modes = grade_mode::get_for_params($params, 'sortorder ASC');
+        self::load_grade_modes();
 
         $output = [];
-        foreach ($modes as $mode) {
+        foreach (self::$grademodes as $mode) {
+            if (empty($mode->enabled)) {
+                continue;
+            }
             $output[$mode->id] = $mode->name;
         }
 
         return $output;
     }
 
+    public static function get_grade_mode($grademodeid) {
+        self::load_grade_modes();
+
+        if (isset(self::$grademodes[$grademodeid])) {
+            return self::$grademodes[$grademodeid];
+        }
+
+        return reset(self::$grademodes);
+    }
+
     public static function get_possible_grade_modes() {
 
     }
 
-    public static function get_possible_grades($userrow = null) {
-        // TODO - Grade options.
+    public static function get_possible_grades($userrow) {
+        $grademode = $userrow->get_current_grade_mode();
+
+
+        $gradeoptions = $grademode->get_current_grade_options();
+
+        $options = [];
+        foreach ($gradeoptions as $option) {
+            if (isset($option->displayname)) {
+                $value = $option->displayname;
+            } else {
+                $value = $option->bannervalue;
+            }
+            $options[$option->id] = $value;
+        }
+
+        return $options;
+
+        // TODO - Fallback to these defaults for old submissions.
         $options = [1 => 'A',
                     2 => 'A-',
                     3 => 'B+',
@@ -82,6 +132,10 @@ class banner_grades {
     }
 
     public static function find_key_for_letter($letter) {
+        // TODO - Redo/remove.
+
+        return 0;
+
         $options = self::get_possible_grades();
         $key = array_search($letter, $options, true);
 
@@ -90,16 +144,6 @@ class banner_grades {
         }
 
         return $key;
-    }
-
-    public static function get_ilp_grade_for_key($key) {
-        $options = self::get_possible_grades();
-
-        if (!isset($options[$key])) {
-            return null;
-        }
-
-        return $options[$key];
     }
 
     public static function get_banner_equivilant_grade($userrow) {
@@ -111,61 +155,19 @@ class banner_grades {
     }
 
     public static function get_default_incomplete_grade() {
-        // TODO - need to find the logic behind this better.
-
+        // TODO - Redo.
+        return 0;
         return self::find_key_for_letter('F');
     }
 
-    public static function grade_key_is_failing($key) {
-        $keys = static::get_failing_grade_ids();
-
-        if (isset($keys[$key])) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public static function grade_key_is_incomplete($key) {
-        $keys = static::get_incomplete_grade_ids();
-
-        if (isset($keys[$key])) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
     public static function get_failing_grade_ids() {
-        // TODO - need to find the logic behind this better.
-        if (!is_null(self::$failingids)) {
-            return self::$failingids;
-        }
-
-        $ids = [];
-        foreach (self::$failing as $grade) {
-            $key = self::find_key_for_letter($grade);
-            $ids[$key] = $key;
-        }
-
-        self::$failingids = $ids;
+        self::load_grade_modes();
 
         return self::$failingids;
     }
 
     public static function get_incomplete_grade_ids() {
-        // TODO - need to find the logic behind this better.
-        if (!is_null(self::$incompleteids)) {
-            return self::$incompleteids;
-        }
-
-        $ids = [];
-        foreach (self::$incomplete as $grade) {
-            $key = self::find_key_for_letter($grade);
-            $ids[$key] = $key;
-        }
-
-        self::$incompleteids = $ids;
+        self::load_grade_modes();
 
         return self::$incompleteids;
     }

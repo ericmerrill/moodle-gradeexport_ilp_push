@@ -108,6 +108,10 @@ class saved_grade extends base {
         return $this->currentfailure;
     }
 
+    public function get_grade_mode() {
+        return banner_grades::get_grade_mode($this->grademodeid);
+    }
+
     /**
      * Return an array of saved_grade objects that go with provided user/course combo. Sorted oldest to newest, keyed by revision.
      *
@@ -150,6 +154,8 @@ class saved_grade extends base {
 
         return static::get_for_params($params);
     }
+
+
 
 }
 
