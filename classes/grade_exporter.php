@@ -140,7 +140,7 @@ class grade_exporter implements templatable {
             return;
         }
 
-        $profilefields = grade_helper::get_user_profile_fields($this->course->id, true);
+        //$profilefields = grade_helper::get_user_profile_fields($this->course->id, true);
         $this->displaytype = [GRADE_DISPLAY_TYPE_REAL, GRADE_DISPLAY_TYPE_PERCENTAGE, GRADE_DISPLAY_TYPE_LETTER];
 
         // $geub = new grade_export_update_buffer();$status = $geub->track($grade);$geub->close(); TODO.
