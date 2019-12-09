@@ -1,0 +1,103 @@
+
+
+.path-grade-export-ilp_push {
+    .gradingtable {
+        td {
+            padding-top: 8px;
+            padding-bottom: 8px;
+
+            &.grade {
+
+                .letter {
+                    padding-top: 8px;
+                    display: inline-block;
+                }
+                .notequal {
+                    padding-top: 2px;
+                    float: right;
+                    font-size: 150%;
+                    color: red;
+                }
+            }
+        }
+        .checkbox {
+            padding-top: 15px;
+            padding-left: 40px;
+            display: block;
+
+            input {
+                width: auto;
+            }
+            @supports (zoom:2) {
+                input[type=checkbox] {
+                    zoom: 2;
+                }
+            }
+            @supports not (zoom:2) {
+                input[type=checkbox] {
+                    transform: scale(2);
+                    margin: 15px;
+                }
+            }
+        }
+
+        .spacerrow {
+            display: none;
+        }
+
+        .statusmessage {
+            border-top: none;
+        }
+
+        .statuscontainer {
+            padding: 10px;
+            border-radius: 10px;
+
+            text-align: center;
+            .statusicon {
+                font-size: 150%;
+            }
+        }
+
+        .statusmessage {
+
+            .statusmessagebox {
+                padding: 10px;
+                border-radius: 10px;
+            }
+        }
+
+        .userinfo {
+            img.userpicture {
+                vertical-align: top;
+            }
+
+            .userdetails {
+                display: inline-block;
+
+                .fullname {
+                    display: inline-block;
+                }
+                .username,
+                .userid,
+                .courseid {
+                    font-size: 85%;
+                    color: #555;
+                }
+
+                .gradeline {
+                    float: right;
+                }
+            }
+        }
+
+        .bannergradeselect {
+            input[type=date] {
+                width: auto;
+            }
+        }
+    }
+
+
+}
+

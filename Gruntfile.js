@@ -68,17 +68,29 @@ module.exports = function (grunt) {
                 tasks: ["css", 'decache']
             }
         },
-        less: {
-            // Production config is also available.
-            development: {
-                options: {
-                    paths: ["less/"],
-                    compress: true
-                },
+        sass: {
+            dist: {
                 files: {
-                    "styles.css": "less/styles.less"
+                    "styles.css": "scss/styles.scss"
                 }
+            }
+        },
+        stylelint: {
+            scss: {
+                options: {syntax: 'scss'},
+                src: ['scss/styles.scss']
             },
+            css: {
+                src: ['styles.css'],
+                options: {
+                    configOverrides: {
+                        rules: {
+                            // These rules have to be disabled in .stylelintrc for scss compat.
+                            "at-rule-no-unknown": true,
+                        }
+                    }
+                }
+            }
         },
         uglify: {
             amd: {
@@ -102,7 +114,8 @@ module.exports = function (grunt) {
     grunt.registerTask('decache', ['exec:decache']);
 
     grunt.registerTask('amd', ['eslint:amd', 'uglify']);
-    grunt.registerTask('css', ['less']);
+    grunt.registerTask('css', ['sass']);
+    grunt.registerTask('csscheck', ['sass', 'stylelint:scss']);
 
     grunt.registerTask('default', ['watch']);
 };
