@@ -60,12 +60,12 @@ module.exports = function (grunt) {
             amd: {
                 // If any .js file changes in directory "amd/src" then run the "amd" task.
                 files: "amd/src/*.js",
-                tasks: ["amd"]
+                tasks: ["amd", 'decache']
             },
             less: {
                 // If any .less file changes in directory "less" then run the "less" task.
                 files: "less/*.less",
-                tasks: ["css"]
+                tasks: ["css", 'decache']
             }
         },
         less: {
@@ -101,8 +101,8 @@ module.exports = function (grunt) {
 
     grunt.registerTask('decache', ['exec:decache']);
 
-    grunt.registerTask('amd', ['eslint:amd', 'uglify', 'decache']);
-    grunt.registerTask('css', ['less', 'decache']);
+    grunt.registerTask('amd', ['eslint:amd', 'uglify']);
+    grunt.registerTask('css', ['less']);
 
     grunt.registerTask('default', ['watch']);
 };
