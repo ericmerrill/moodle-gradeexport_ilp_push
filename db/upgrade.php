@@ -16,6 +16,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once($CFG->dirroot.'/grade/export/ilp_push/upgradelib.php');
+
 /**
  * Upgrade file.
  *
@@ -198,6 +200,27 @@ function xmldb_gradeexport_ilp_push_upgrade($oldversion=0) {
 
         // Ilp_push savepoint reached.
         upgrade_plugin_savepoint(true, 2019111801, 'gradeexport', 'ilp_push');
+    }
+
+    if ($oldversion < 2019121000) {
+        // Define field gradeoptid to be added to gradeexport_ilp_push_grades.
+        $table = new xmldb_table('gradeexport_ilp_push_grades');
+        $field = new xmldb_field('gradeoptid', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'studentilpid');
+
+        // Conditionally launch add field gradeoptid.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define key gradeoptid (foreign) to be added to gradeexport_ilp_push_grades.
+        $table = new xmldb_table('gradeexport_ilp_push_grades');
+        $key = new xmldb_key('gradeoptid', XMLDB_KEY_FOREIGN, ['gradeoptid'], 'gradeexport_ilp_push_modeopt', ['id']);
+
+        // Launch add key gradeoptid.
+        $dbman->add_key($table, $key);
+
+        // Ilp_push savepoint reached.
+        upgrade_plugin_savepoint(true, 2019121000, 'gradeexport', 'ilp_push');
     }
 
 

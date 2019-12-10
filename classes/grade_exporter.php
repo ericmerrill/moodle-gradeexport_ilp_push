@@ -171,6 +171,10 @@ class grade_exporter implements templatable {
     public function get_course() {
         return $this->course;
     }
+    
+    public function get_grade_mode() {
+        return $this->grademode;
+    }
 
     public function get_grade_type() {
         return $this->gradetype;

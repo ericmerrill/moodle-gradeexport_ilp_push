@@ -16,7 +16,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Process records through to ILP.
+ * Create a bunch of default grade modes.
  *
  * @package    gradeexport
  * @subpackage ilp_push

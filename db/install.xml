@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="grade/export/ilp_push/db" VERSION="20191118" COMMENT="XMLDB file for Moodle grade/export/ilp_push"
+<XMLDB PATH="grade/export/ilp_push/db" VERSION="20191210" COMMENT="XMLDB file for Moodle grade/export/ilp_push"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../../lib/xmldb/xmldb.xsd"
 >
@@ -16,6 +16,7 @@
         <FIELD NAME="submitterilpid" TYPE="char" LENGTH="127" NOTNULL="true" SEQUENCE="false" COMMENT="The ILP ID of the user submitting."/>
         <FIELD NAME="studentid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The Moodle user ID of the student being submitted for."/>
         <FIELD NAME="studentilpid" TYPE="char" LENGTH="127" NOTNULL="true" SEQUENCE="false" COMMENT="The ILP ID of the student we are submitting for."/>
+        <FIELD NAME="gradeoptid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="grade" TYPE="char" LENGTH="127" NOTNULL="false" SEQUENCE="false" COMMENT="The grade string being submitted for the user."/>
         <FIELD NAME="incompletegrade" TYPE="char" LENGTH="127" NOTNULL="false" SEQUENCE="false" COMMENT="The grade to use if the incomplete grade isn't completed on time."/>
         <FIELD NAME="incompletedeadline" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Date to complete a incomplete by."/>
@@ -29,6 +30,7 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="gradeoptid" TYPE="foreign" FIELDS="gradeoptid" REFTABLE="gradeexport_ilp_push_modeopt" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="status" UNIQUE="false" FIELDS="status"/>

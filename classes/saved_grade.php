@@ -54,8 +54,9 @@ class saved_grade extends base {
 
     /** @var array Array of keys that go in the database object */
     protected $dbkeys = ['id', 'status', 'gradetype', 'revision', 'courseid', 'courseilpid', 'submitterid', 'submitterilpid',
-                         'studentid', 'studentilpid', 'grade', 'incompletegrade', 'incompletedeadline', 'datelastattended',
-                         'resultstatus', 'additional', 'usersubmittime', 'ilpsendtime', 'timecreated', 'timemodified'];
+                         'studentid', 'studentilpid', 'gradeoptid', 'grade', 'incompletegrade', 'incompletedeadline',
+                         'datelastattended', 'resultstatus', 'additional', 'usersubmittime', 'ilpsendtime', 'timecreated',
+                         'timemodified'];
 
     /** @var array An array of default property->value pairs */
     protected $defaults = ['status' => self::GRADING_STATUS_EDITING];
