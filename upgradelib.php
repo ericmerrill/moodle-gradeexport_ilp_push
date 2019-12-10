@@ -79,7 +79,7 @@ function gradeexport_ilp_push_upgrade_create_default_grade_mode() {
         $opt->displayname = $letter;
         $opt->bannervalue = $letter;
         $opt->sortorder = $sort;
-        $opt->additional = json_encode($additional, JSON_UNESCAPED_UNICODE);
+        $opt->additional = json_encode($additional, JSON_UNESCAPED_UNICODE | JSON_FORCE_OBJECT);
         $opt->timecreated = time();
         $opt->timemodified = time();
 
@@ -93,6 +93,7 @@ function gradeexport_ilp_push_upgrade_create_default_grade_mode() {
 
     $newrec = new stdClass();
     foreach ($rs as $record) {
+    echo "$record->id";
         $newrec->id = $record->id;
         if (isset($optids[$record->grade])) {
             $newrec->gradeoptid = $optids[$record->grade];
@@ -103,9 +104,11 @@ function gradeexport_ilp_push_upgrade_create_default_grade_mode() {
         $data = [];
         if (!empty($record->additional)) {
             $data = json_decode($record->additional);
-            $data['gradeoptidupgrade'] = 1;
+            $data->gradeoptidupgrade =  time();
         }
         $newrec->additional = json_encode($data, JSON_UNESCAPED_UNICODE);
+
+        $DB->update_record('gradeexport_ilp_push_grades', $newrec);
     }
 
     $rs->close();

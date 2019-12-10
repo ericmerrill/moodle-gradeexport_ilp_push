@@ -61,20 +61,7 @@ Example:
 }
 
 if (isset($options['run'])) {
-    $options = ['Standard Letter' =>
-                   ['A' => [],
-                    'A-' => [],
-                    'B+' => [],
-                    'B' => [],
-                    'B-' => [],
-                    'C+' => [],
-                    'C' => [],
-                    'C-' => [],
-                    'D+' => [],
-                    'D' => [],
-                    'F' => ['requirelastdate' => 1],
-                    'I' => ['isincomplete' => 1]],
-                'Standard Letter with Progress (R)' =>
+    $options = ['Standard Letter with Progress (R)' =>
                    ['A' => [],
                     'A-' => [],
                     'B+' => [],
@@ -105,7 +92,7 @@ if (isset($options['run'])) {
                     'NP' => [],
                     'U' => []]];
 
-    $modesort = 1;
+    $modesort = 2;
     foreach ($options as $name => $opts) {
         $mode = new data\grade_mode();
         $mode->name = $name;

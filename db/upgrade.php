@@ -223,6 +223,13 @@ function xmldb_gradeexport_ilp_push_upgrade($oldversion=0) {
         upgrade_plugin_savepoint(true, 2019121000, 'gradeexport', 'ilp_push');
     }
 
+    if ($oldversion < 2019121001) {
+        // Upgrade the base grade mode.
+        gradeexport_ilp_push_upgrade_create_default_grade_mode();
+
+        // Ilp_push savepoint reached.
+        upgrade_plugin_savepoint(true, 2019121001, 'gradeexport', 'ilp_push');
+    }
 
 
     return true;
