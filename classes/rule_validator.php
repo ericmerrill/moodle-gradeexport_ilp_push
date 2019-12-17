@@ -79,7 +79,7 @@ class rule_validator {
             if (is_null($grade->incompletegrade)) {
                 // If the grade is incomplete, there must be an incomplete grade.
                 $results['errors']['incompletegrade'] = get_string('invalid_incomplete_grade_missing', 'gradeexport_ilp_push');
-            } else if ($grade->incompletegradeid != banner_grades::get_default_incomplete_grade()) {
+            } else if (banner_grades::grade_key_is_incomplete($grade->incompletegradekey)) {
                 // If present, the incomplete grade must be the default (settings dependent).
                 // TODO make setting dependent. Probably move to overridable class.
                 $results['errors']['incompletegrade'] = get_string('invalid_incomplete_grade_wrong', 'gradeexport_ilp_push');

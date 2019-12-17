@@ -63,11 +63,11 @@ define([], function() {
         },
 
         isAllowedIncompleteGrade: function(key) {
-            if (key == this.defaultIncomplete) {
-                return true;
+            if (!key || this.gradeIsIncomplete(key)) {
+                return false;
             }
 
-            return false;
+            return true;
         },
 
         isAllowedIncompleteDeadline: function(value) {

@@ -508,12 +508,27 @@ class user_grade_row implements templatable {
 
         $date = trim($data->$datakey);
 
-        // HTML5 date field is always expected to return YYYY-MM-DD format data.
-        if (!preg_match('|^(\d{2,4})[-\/](\d{1,2})[-\/](\d{1,2})$|', $date, $matches)) {
+        // Users may enter MM/DD/YYYY format...
+        if (preg_match('|^(\d{1,2})[-\/](\d{1,2})[-\/](\d{2,4})$|', $date, $matches)
+                && (1 <= $matches[1]) && ($matches[1] <= 12)
+                && (1 <= $matches[2]) && ($matches[2] <= 31)) {
+            $year = $matches[3];
+            $month = $matches[1];
+            $day = $matches[2];
+        } else if (preg_match('|^(\d{2,4})[-\/](\d{1,2})[-\/](\d{1,2})$|', $date, $matches)) {
+            // HTML5 date field is always expected to return YYYY-MM-DD format data.
+            $year = $matches[1];
+            $month = $matches[2];
+            $day = $matches[3];
+        } else {
             return null;
         }
 
-        $timestamp = make_timestamp($matches[1], $matches[2], $matches[3], 0, 0, 0, 99, true);
+        if (strlen($year) == 2) {
+            $year += 2000;
+        }
+
+        $timestamp = make_timestamp($year, $month, $day, 0, 0, 0, 99, true);
 
         if ($timestamp === false) {
             return null;

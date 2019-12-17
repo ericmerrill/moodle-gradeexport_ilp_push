@@ -145,9 +145,13 @@ define(['jquery', 'gradeexport_ilp_push/page_info', 'core/templates', 'core/str'
 
                 var incompleteSelect = row.find('.incompletegradeselect').eq(0);
                 errorCode = '';
-                if (!pageInfo.isAllowedIncompleteGrade(incompleteSelect.val())) {
+
+                if (!incompleteSelect.val()) {
                     disable = true;
-                    errorCode = 'invalid_incomplete_grade';
+                    errorCode = 'invalid_incomplete_grade_missing';
+                } else if (!pageInfo.isAllowedIncompleteGrade(incompleteSelect.val())) {
+                    disable = true;
+                    errorCode = 'invalid_incomplete_grade_wrong';
                 }
 
                 RowController.updateFormWarning(row, '.incompletegradeerror', errorCode, pageInfo.getIncompleteGrade());
