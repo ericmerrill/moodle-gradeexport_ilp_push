@@ -92,8 +92,10 @@ class banner_grades {
         return reset(self::$grademodes);
     }
 
-    public static function get_possible_grade_modes() {
+    public static function get_all_grade_modes() {
+        self::load_grade_modes();
 
+        return self::$grademodes;
     }
 
     public static function get_possible_grades($userrow) {

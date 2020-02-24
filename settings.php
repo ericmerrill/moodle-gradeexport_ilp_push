@@ -53,5 +53,20 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configselect('gradeexport_ilp_push/logginglevel',
             get_string('logginglevel', 'gradeexport_ilp_push'),
             get_string('logginglevel_help', 'gradeexport_ilp_push'), log::ERROR_NOTICE, $loggingoptions));
+
+    $settings->add(new \gradeexport_ilp_push\output\admin_setting_grademodes());
+
+    //$grademodes = banner_grades::get_all_grade_modes();
+//     foreach ($grademodes as $grademode) {
+//         $page = new \admin_settingpage('gradeexport_ilp_push_mode_'.$grademode->id, 'TODO: '.$grademode->id, 'moodle/site:config', true);
+//
+//         $page
+//
+//         $setting->add($page);
+//     }
+
 }
 
+$ADMIN->add('gradeexports', new admin_externalpage('gradeexport_ilp_push_grademode',
+        'TODO Grademode Page',
+        new moodle_url('/grade/export/ilp_push/settings_grademode.php'), 'moodle/site:config', true));
