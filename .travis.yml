@@ -18,14 +18,14 @@ env:
 
 jobs:
   include:
-      # Moodle Master
+      # Moodle Master (Requires PHP 7.2 and up)
     - php: 7.3
       env: MOODLE_BRANCH=master DB=pgsql  COVERALLS=TRUE
       addons:
         postgresql: "10"
     - php: 7.3
       env: MOODLE_BRANCH=master DB=mysqli
-    - php: 7.1
+    - php: 7.2
       env: MOODLE_BRANCH=master DB=pgsql
     - php: 7.2
       env: MOODLE_BRANCH=master DB=mysqli
