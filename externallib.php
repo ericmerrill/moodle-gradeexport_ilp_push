@@ -115,7 +115,7 @@ class gradeexport_ilp_push_external extends external_api {
         }
 
         return array('item' => s($detail),
-                     'itemid' => $assignmentid,
+                     'itemid' => $rowid,
                      'warningcode' => $warningcode,
                      'message' => $message);
     }
