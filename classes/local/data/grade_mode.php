@@ -61,7 +61,7 @@ class grade_mode extends base {
 
         $output = [];
         foreach ($options as $option) {
-            if ($option->mostcurrent) {
+            if ($option->mostcurrent && $option->enabled) {
                 $output[] = $option;
             }
         }
@@ -123,6 +123,22 @@ class grade_mode extends base {
         }
 
         return false;
+    }
+
+    public function get_grade_menu_options() {
+        $gradeoptions = $this->get_current_grade_options();
+
+        $options = [];
+        foreach ($gradeoptions as $option) {
+            if (isset($option->displayname)) {
+                $value = $option->displayname;
+            } else {
+                $value = $option->bannervalue;
+            }
+            $options[$option->id] = $value;
+        }
+
+        return $options;
     }
 }
 

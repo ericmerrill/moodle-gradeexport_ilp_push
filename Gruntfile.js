@@ -64,7 +64,7 @@ module.exports = function (grunt) {
             },
             less: {
                 // If any .less file changes in directory "less" then run the "less" task.
-                files: "less/*.less",
+                files: "scss/*.scss",
                 tasks: ["css", 'decache']
             }
         },

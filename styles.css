@@ -9,6 +9,11 @@
     float: right;
     font-size: 150%;
     color: red; }
+  .path-grade-export-ilp_push .gradingtable td.grademode .currentgrademode {
+    filter: brightness(150%);
+    border-bottom-style: dashed;
+    border-bottom-width: 1px;
+    cursor: pointer; }
 
 .path-grade-export-ilp_push .gradingtable .checkbox {
   padding-top: 15px;

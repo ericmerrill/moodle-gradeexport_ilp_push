@@ -68,7 +68,7 @@ class banner_grades {
         }
     }
 
-    public static function get_grade_modes_menu() {
+    public static function get_grade_modes() {
         self::load_grade_modes();
 
         $output = [];
@@ -76,20 +76,36 @@ class banner_grades {
             if (empty($mode->enabled)) {
                 continue;
             }
+            $output[$mode->id] = $mode;
+        }
+
+        return $output;
+    }
+
+    public static function get_grade_modes_menu() {
+        $modes = self::get_grade_modes();
+
+        $output = [];
+        foreach (self::$grademodes as $mode) {
             $output[$mode->id] = $mode->name;
         }
 
         return $output;
     }
 
-    public static function get_grade_mode($grademodeid) {
+    public static function get_grade_mode($grademodeid, $default = true) {
         self::load_grade_modes();
 
         if (isset(self::$grademodes[$grademodeid])) {
             return self::$grademodes[$grademodeid];
         }
 
-        return reset(self::$grademodes);
+        // TODO - this should return null, not the top GM.
+        if ($default) {
+            return reset(self::$grademodes);
+        } else {
+            return null;
+        }
     }
 
     public static function get_all_grade_modes() {
@@ -98,40 +114,40 @@ class banner_grades {
         return self::$grademodes;
     }
 
-    public static function get_possible_grades($userrow) {
-        $grademode = $userrow->get_current_grade_mode();
-
-
-        $gradeoptions = $grademode->get_current_grade_options();
-
-        $options = [];
-        foreach ($gradeoptions as $option) {
-            if (isset($option->displayname)) {
-                $value = $option->displayname;
-            } else {
-                $value = $option->bannervalue;
-            }
-            $options[$option->id] = $value;
-        }
-
-        return $options;
-
-        // TODO - Fallback to these defaults for old submissions.
-        $options = [1 => 'A',
-                    2 => 'A-',
-                    3 => 'B+',
-                    4 => 'B',
-                    5 => 'B-',
-                    6 => 'C+',
-                    7 => 'C',
-                    8 => 'C-',
-                    9 => 'D+',
-                    10 => 'D',
-                    11 => 'F',
-                    12 => 'I'];
-
-        return $options;
-    }
+//     public static function get_possible_grades($userrow) {
+//         $grademode = $userrow->get_current_grade_mode();
+//
+//
+//         $gradeoptions = $grademode->get_current_grade_options();
+//
+//         $options = [];
+//         foreach ($gradeoptions as $option) {
+//             if (isset($option->displayname)) {
+//                 $value = $option->displayname;
+//             } else {
+//                 $value = $option->bannervalue;
+//             }
+//             $options[$option->id] = $value;
+//         }
+//
+//         return $options;
+//
+//         // TODO - Fallback to these defaults for old submissions.
+//         $options = [1 => 'A',
+//                     2 => 'A-',
+//                     3 => 'B+',
+//                     4 => 'B',
+//                     5 => 'B-',
+//                     6 => 'C+',
+//                     7 => 'C',
+//                     8 => 'C-',
+//                     9 => 'D+',
+//                     10 => 'D',
+//                     11 => 'F',
+//                     12 => 'I'];
+//
+//         return $options;
+//     }
 
     public static function find_key_for_letter($letter) {
         // TODO - Redo/remove.

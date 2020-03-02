@@ -48,6 +48,8 @@ use moodle_url;
  */
 class export_renderer extends plugin_renderer_base {
 
+    private $grademodes;
+
     public function render_exporter(grade_exporter $exporter) {
         global $PAGE;
 
@@ -85,7 +87,7 @@ class export_renderer extends plugin_renderer_base {
     }
 
     public function render_select_menu(user_grade_row $userrow) {
-        $options = banner_grades::get_possible_grades($userrow);
+        $options = $userrow->get_current_grade_mode()->get_grade_menu_options();
         $selected = $userrow->get_current_grade_key();
 
         $attributes = ['class' => 'gradeselect'];
@@ -101,9 +103,24 @@ class export_renderer extends plugin_renderer_base {
         return $output;
     }
 
+    public function render_row_grade_mode_select(user_grade_row $userrow) {
+        $mode = $userrow->get_current_grade_mode();
+
+        if (is_null($this->grademodes)) {
+            $grademodes = banner_grades::get_grade_modes_menu();
+            $this->grademodes = $grademodes;
+        } else {
+            $grademodes = $this->grademodes;
+        }
+
+        $output = html_writer::select($grademodes, $userrow->get_form_id('grademode'), $mode->id, false);
+
+        return $output;
+    }
+
     public function render_incomplete_select_menu(user_grade_row $userrow) {
         // TODO - need to make it so if a different one is already selected, that is returned.
-        $options = banner_grades::get_possible_grades($userrow);
+        $options = $userrow->get_current_grade_mode()->get_grade_menu_options();
         $selected = $userrow->get_current_incomplete_grade_key();
 
         $attributes = ['class' => 'incompletegradeselect'];

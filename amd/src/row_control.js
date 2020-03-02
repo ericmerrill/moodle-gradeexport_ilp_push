@@ -16,15 +16,15 @@
 /**
  * Javascript dealing with each grading row.
  *
- * @module     gradeexport_push_ilp/row_control
- * @package    gradeexport_push_ilp
+ * @module     gradeexport_ilp_push/row_control
+ * @package    gradeexport_ilp_push
  * @author     Eric Merrill (merrill@oakland.edu)
  * @copyright  2019 Oakland University (https://www.oakland.edu)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['jquery', 'gradeexport_ilp_push/page_info', 'core/templates', 'core/str', 'core/log'],
-        function($, pageInfo, templates, str, log) {
+define(['jquery', 'gradeexport_ilp_push/page_info', 'core/ajax', 'core/notification', 'core/templates', 'core/str', 'core/log'],
+        function($, pageInfo, ajax, notification, templates, str, log) {
 
     var RowController = {
         failGrades: false,
@@ -68,6 +68,13 @@ define(['jquery', 'gradeexport_ilp_push/page_info', 'core/templates', 'core/str'
                 RowController.updateVerification(row);
             });
 
+            row.find('.grademode .currentgrademode').eq(0).click(function() {
+                RowController.showGradeModeSelector(row);
+            });
+
+            row.find('.grademode .grademodeselect').eq(0).change(function() {
+                RowController.changeGradeMode(row);
+            });
 
             RowController.updateVerification(row);
         },
@@ -176,6 +183,52 @@ define(['jquery', 'gradeexport_ilp_push/page_info', 'core/templates', 'core/str'
                 confirm.prop("disabled", false);
             }
             return;
+        },
+
+        showGradeModeSelector: function(row) {
+            var currentGradeMode = row.find('.grademode .currentgrademode');
+            var selector = row.find('.grademode .grademodeselect');
+
+            currentGradeMode.hide();
+            selector.show();
+        },
+
+        changeGradeMode: function(row) {
+            var currentGradeMode = row.find('.grademode .currentgrademode');
+            var selector = row.find('.grademode .grademodeselect');
+
+            var newGradeModeId = selector.find('select').eq(0).val();
+            var studentId = row.data('user-id');
+            var rowId = row.data('row-id');
+            var courseId = row.closest('form').find('input[name="courseid"]').val();
+
+            ajax.call([{
+                methodname: 'gradeexport_ilp_push_update_row_grade_mode',
+                args: {rowid: rowId, grademodeid: newGradeModeId, studentid: studentId, courseid: courseId},
+                done: function(response) {
+                    log.debug(response);
+
+                    if (response.warnings.length > 0) {
+                        notification.alert(
+                            response.warnings[0].message,
+                            response.warnings[0].item
+                        );
+
+                        currentGradeMode.show();
+                        selector.hide();
+
+                        return;
+                    }
+
+                    row.replaceWith(response.rowhtml);
+
+                    row = $('.gradingtable .usergraderow[data-row-id="' + rowId + '"]').eq(0);
+                    RowController.initRow(row);
+
+                },
+                fail: notification.exception
+            }]);
+
         }
     };
 

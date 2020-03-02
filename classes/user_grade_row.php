@@ -115,6 +115,19 @@ class user_grade_row implements templatable {
         $this->grademode = banner_grades::get_grade_mode($grademodeid);
     }
 
+    /**
+     * Get the user object for the user this row represents.
+     *
+     * @return object
+     */
+    public function get_user() {
+        return $this->user;
+    }
+
+    public function set_grade_mode($grademode) {
+        $this->grademode = $grademode;
+    }
+
     public function get_form_id($prefix = false) {
         global $COURSE;
 
@@ -221,6 +234,9 @@ class user_grade_row implements templatable {
         $output->gradeletter = $lettergrade;
         $output->gradereal = $this->get_formatted_grade(GRADE_DISPLAY_TYPE_REAL);
         $output->gradepercent = $this->get_formatted_grade(GRADE_DISPLAY_TYPE_PERCENTAGE);
+
+        $output->grademodename = $this->get_current_grade_mode()->name;
+        $output->grademodeselect = $renderer->render_row_grade_mode_select($this);
 
         $output->gradeselect = $renderer->render_select_menu($this);
 

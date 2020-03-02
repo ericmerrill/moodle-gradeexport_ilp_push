@@ -135,13 +135,26 @@ class grade_exporter implements templatable {
         $this->currentgradeitem = $this->gradeitems[$itemid];
     }
 
+    public function get_user_grade_row($userid) {
+        // TODO - Probably a more efficient way to do this. Currently load all grades.
+        $this->build_user_data();
+
+        foreach ($this->userrows as $userrow) {
+            if ($userrow->get_user()->id == $userid) {
+                return $userrow;
+            }
+        }
+
+        return false;
+    }
+
     protected function build_user_data() {
         if (!is_null($this->userrows)) {
             return;
         }
 
         //$profilefields = grade_helper::get_user_profile_fields($this->course->id, true);
-        $this->displaytype = [GRADE_DISPLAY_TYPE_REAL, GRADE_DISPLAY_TYPE_PERCENTAGE, GRADE_DISPLAY_TYPE_LETTER];
+        //$this->displaytype = [GRADE_DISPLAY_TYPE_REAL, GRADE_DISPLAY_TYPE_PERCENTAGE, GRADE_DISPLAY_TYPE_LETTER];
 
         // $geub = new grade_export_update_buffer();$status = $geub->track($grade);$geub->close(); TODO.
         $gui = new graded_users_iterator($this->course, $this->get_grade_columns(), $this->groupid);
@@ -164,14 +177,13 @@ class grade_exporter implements templatable {
         }
         $gui->close();
 
-
         $this->userrows = $userrows;
     }
 
     public function get_course() {
         return $this->course;
     }
-    
+
     public function get_grade_mode() {
         return $this->grademode;
     }

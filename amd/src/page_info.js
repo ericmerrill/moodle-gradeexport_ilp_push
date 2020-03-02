@@ -16,8 +16,8 @@
 /**
  * Javascript dealing with each grading row.
  *
- * @module     gradeexport_push_ilp/row_control
- * @package    gradeexport_push_ilp
+ * @module     gradeexport_ilp_push/row_control
+ * @package    gradeexport_ilp_push
  * @author     Eric Merrill (merrill@oakland.edu)
  * @copyright  2019 Oakland University (https://www.oakland.edu)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -31,6 +31,7 @@ define([], function() {
         defaultIncomplete: false,
         lastAttendDates: false,
         incompleteDeadlineDates: false,
+        gradeModes: false,
 
         init: function(failGrades, incompleteGrades, defaultIncomplete, deadlineDates, lastAttendDates) {
             this.failGrades = failGrades;
