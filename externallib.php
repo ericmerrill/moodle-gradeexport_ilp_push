@@ -87,9 +87,7 @@ class gradeexport_ilp_push_external extends external_api {
 
         $data = $graderow->export_for_template($renderer);
 
-        $output['rowhtml'] = $renderer->render_from_template('gradeexport_ilp_push/user_row', $data);
-
-        error_log(var_export($output, true));
+        $output['rowdata'] = json_encode($data);
 
         return $output;
     }
@@ -97,7 +95,7 @@ class gradeexport_ilp_push_external extends external_api {
     public static function update_row_grade_mode_returns() {
         return new external_single_structure(
             [
-                'rowhtml' => new external_value(PARAM_RAW, 'Raw HTML to replace the row with'),
+                'rowdata' => new external_value(PARAM_RAW, 'Row JSON data to render with'),
                 'warnings' => new external_warnings()
             ]
         );

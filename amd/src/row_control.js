@@ -206,8 +206,6 @@ define(['jquery', 'gradeexport_ilp_push/page_info', 'core/ajax', 'core/notificat
                 methodname: 'gradeexport_ilp_push_update_row_grade_mode',
                 args: {rowid: rowId, grademodeid: newGradeModeId, studentid: studentId, courseid: courseId},
                 done: function(response) {
-                    log.debug(response);
-
                     if (response.warnings.length > 0) {
                         notification.alert(
                             response.warnings[0].message,
@@ -219,11 +217,17 @@ define(['jquery', 'gradeexport_ilp_push/page_info', 'core/ajax', 'core/notificat
 
                         return;
                     }
-
-                    row.replaceWith(response.rowhtml);
-
-                    row = $('.gradingtable .usergraderow[data-row-id="' + rowId + '"]').eq(0);
-                    RowController.initRow(row);
+                    templates.render('gradeexport_ilp_push/user_row', JSON.parse(response.rowdata))
+                        .then(function(html, js) {
+                            // Find any neighboring status rows and remove them.
+                            row.siblings('tr[data-row-id="' + rowId + '"]').remove();
+                            templates.replaceNode(row, html, js);
+                            row = $('.gradingtable .usergraderow[data-row-id="' + rowId + '"]').eq(0);
+                            RowController.initRow(row);
+                            return null;
+                        }).fail(function(ex) {
+                            notification.exception(ex);
+                        });
 
                 },
                 fail: notification.exception
