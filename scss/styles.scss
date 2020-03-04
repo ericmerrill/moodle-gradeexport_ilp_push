@@ -17,14 +17,13 @@
                     color: red;
                 }
             }
-            &.grademode {
-                .currentgrademode {
-                    filter: brightness(150%);
-                    border-bottom-style: dashed;
-                    border-bottom-width: 1px;
-                    cursor: pointer;
-                }
-            }
+        }
+        .grademode .currentgrademode {
+            filter: brightness(150%);
+            border-bottom-style: dashed;
+            border-bottom-width: 1px;
+            cursor: pointer;
+            font-size: 80%;
         }
         .checkbox {
             padding-top: 15px;

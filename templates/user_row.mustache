@@ -67,13 +67,23 @@
     <td class="grade">
         <div class="letter" data-grade-key="{{truegradekey}}">{{gradeletter}}</div><div title="{{# str }} grade_not_eqaul, gradeexport_ilp_push {{/ str }}" class="notequal {{#equal}}hide{{/equal}}">&#8800;</div>
     </td>
+<!-- 
     <td class="grademode">
         <span class="currentgrademode">{{grademodename}}</span>
         <div class="grademodeselect hide">
         {{{grademodeselect}}}
         </div>
     </td>
+ -->
     <td class="bannergradeselect">
+        <div class="grademode">
+            <div>
+                <span class="currentgrademode">{{grademodename}}</span>
+            </div>
+            <div class="grademodeselect hide">
+                {{{grademodeselect}}}
+            </div>
+        </div>
         {{{gradeselect}}}
         <input type="hidden" name="grademodeid-{{{formid}}}" value="{{{grademodeid}}}">
         <span class="gradeerror">{{{gradeerror}}}</span>
@@ -102,7 +112,7 @@
             <span class="checkmark"></span>
         </div>
     </td>
-    <td class="status" {{#statusmessage}}rowspan=2{{/statusmessage}}>
+    <td class="status">
         {{{status}}}
     </td>
 </tr>
@@ -117,6 +127,4 @@
             {{{statusmessage}}}
         </td>
     </tr>
-    
-
 {{/statusmessage}}
