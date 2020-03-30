@@ -51,21 +51,38 @@ module.exports = function (grunt) {
 
                     // Just add one to confirm success.
                     if (!error) {
+                        grunt.log.writeln("All Moodle caches reset.");
+                    }
+                }
+            },
+            decachetheme: {
+                cmd: 'php "../../../admin/cli/purge_caches.php" --theme',
+                callback: function(error) {
+                    if (!error) {
                         grunt.log.writeln("Moodle theme cache reset.");
                     }
                 }
+            },
+            decachejs: {
+                cmd: 'php "../../../admin/cli/purge_caches.php" --js',
+                callback: function(error) {
+                    if (!error) {
+                        grunt.log.writeln("Moodle JS cache reset.");
+                    }
+                }
             }
+
         },
         watch: {
             amd: {
                 // If any .js file changes in directory "amd/src" then run the "amd" task.
-                files: "amd/src/*.js",
-                tasks: ["amd", 'decache']
+                files: ["amd/src/*.js"],
+                tasks: ["amd", "decachejs"]
             },
             less: {
                 // If any .less file changes in directory "less" then run the "less" task.
-                files: "scss/*.scss",
-                tasks: ["css", 'decache']
+                files: ["scss/*.scss"],
+                tasks: ["css", "decachetheme"]
             }
         },
         sass: {
@@ -112,6 +129,8 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks("grunt-exec");
 
     grunt.registerTask('decache', ['exec:decache']);
+    grunt.registerTask('decachetheme', ['exec:decachetheme']);
+    grunt.registerTask('decachejs', ['exec:decachejs']);
 
     grunt.registerTask('amd', ['eslint:amd', 'uglify']);
     grunt.registerTask('css', ['sass']);
