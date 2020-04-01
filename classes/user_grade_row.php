@@ -141,8 +141,8 @@ class user_grade_row implements templatable {
     }
 
     public function get_current_grade_key() {
-        if ($this->currentsavedgrade && isset($this->currentsavedgrade->gradeid)) {
-            return $this->currentsavedgrade->gradeid;
+        if ($this->currentsavedgrade && isset($this->currentsavedgrade->gradeoptid)) {
+            return $this->currentsavedgrade->gradeoptid;
         }
 
         return $this->get_moodle_grade_key();
@@ -377,10 +377,10 @@ class user_grade_row implements templatable {
             $key = $this->get_form_id('grade');
             $data->$key = null;
             $grade->grade = null;
-            $grade->gradeid = null;
+            $grade->gradeoptid = null;
         } else {
             $grade->grade = $gradeobj->bannervalue;
-            $grade->gradeid = $gradeobj->id;
+            $grade->gradeoptid = $gradeobj->id;
         }
 
         // Check if the grade changed, so we know if we should unconditionally store it.
@@ -389,8 +389,8 @@ class user_grade_row implements templatable {
         }
 
         // Stuff only for incomplete grades.
-        if ($grademode->grade_id_is_incomplete($grade->gradeid)) {
-            $gradeobj->$this->get_ilp_grade_from_data($data, 'incompletegrade');
+        if ($grademode->grade_id_is_incomplete($grade->gradeoptid)) {
+            $gradeobj = $this->get_ilp_grade_from_data($data, 'incompletegrade');
             if (is_null($gradeobj)) {
                 // If the grade resolved to null (not a valid banner grade), we are also going to null the data, for latter use.
                 $key = $this->get_form_id('incompletegrade');
@@ -415,7 +415,7 @@ class user_grade_row implements templatable {
         }
 
         // Stuff only for failing grades.
-        if ($grademode->grade_id_is_failing($grade->gradeid)) {
+        if ($grademode->grade_id_is_failing($grade->gradeoptid)) {
             $lastattended = $this->get_timestamp_from_data($data, 'datelastattended');
             $currentvalue = $this->currentsavedgrade->datelastattended;
             $grade->datelastattended = $lastattended;

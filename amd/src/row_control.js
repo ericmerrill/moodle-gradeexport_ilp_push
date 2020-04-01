@@ -76,6 +76,10 @@ define(['jquery', 'gradeexport_ilp_push/page_info', 'core/ajax', 'core/notificat
                 RowController.changeGradeMode(row);
             });
 
+            row.find('.grademode .grademodeselect').eq(0).focusout(function() {
+                RowController.hideGradeModeSelector(row);
+            });
+
             RowController.updateVerification(row);
         },
 
@@ -191,6 +195,14 @@ define(['jquery', 'gradeexport_ilp_push/page_info', 'core/ajax', 'core/notificat
 
             currentGradeMode.hide();
             selector.show();
+        },
+
+        hideGradeModeSelector: function(row) {
+            var currentGradeMode = row.find('.grademode .currentgrademode');
+            var selector = row.find('.grademode .grademodeselect');
+
+            currentGradeMode.show();
+            selector.hide();
         },
 
         changeGradeMode: function(row) {
