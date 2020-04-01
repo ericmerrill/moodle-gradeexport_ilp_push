@@ -70,19 +70,35 @@ module.exports = function (grunt) {
                         grunt.log.writeln("Moodle JS cache reset.");
                     }
                 }
+            },
+            decachelang: {
+                cmd: 'php "../../../admin/cli/purge_caches.php" --lang',
+                callback: function(error) {
+                    if (!error) {
+                        grunt.log.writeln("Moodle JS cache reset.");
+                    }
+                }
             }
 
         },
         watch: {
+            options: {
+                nospawn: true // We need not to spawn so config can be changed dynamically.
+            },
             amd: {
                 // If any .js file changes in directory "amd/src" then run the "amd" task.
-                files: ["amd/src/*.js"],
+                files: ["**/amd/src/*.js"],
                 tasks: ["amd", "decachejs"]
             },
             less: {
                 // If any .less file changes in directory "less" then run the "less" task.
-                files: ["scss/*.scss"],
+                files: ["**/scss/*.scss"],
                 tasks: ["css", "decachetheme"]
+            },
+            lang: {
+                // If any .less file changes in directory "less" then run the "less" task.
+                files: ["**/lang/en/*.php"],
+                tasks: ["decachelang"]
             }
         },
         sass: {
@@ -131,6 +147,7 @@ module.exports = function (grunt) {
     grunt.registerTask('decache', ['exec:decache']);
     grunt.registerTask('decachetheme', ['exec:decachetheme']);
     grunt.registerTask('decachejs', ['exec:decachejs']);
+    grunt.registerTask('decachelang', ['exec:decachelang']);
 
     grunt.registerTask('amd', ['eslint:amd', 'uglify']);
     grunt.registerTask('css', ['sass']);
