@@ -110,7 +110,7 @@ class grade_exporter implements templatable {
         $this->gradeitems = grade_item::fetch_all(array('courseid'=>$this->course->id));
         $this->coursegradeitem = grade_item::fetch_course_item($course->id);
 
-        $this->statusfilter = get_user_preferences('gradeexport_ilp_push_status_filter', $this->statusfilter);
+        $this->statusfilter = get_user_preferences('gradeexport_ilp_push_status_filter-'.$this->course->id, $this->statusfilter);
 
         $this->groupid = get_user_preferences('gradeexport_ilp_push_group_filter-'.$this->course->id);
 
@@ -316,7 +316,7 @@ class grade_exporter implements templatable {
 
         if ($data = $form->get_data()) {
             if (isset($data->statusfilter)) {
-                set_user_preference('gradeexport_ilp_push_status_filter', $data->statusfilter);
+                set_user_preference('gradeexport_ilp_push_status_filter-'.$this->course->id, $data->statusfilter);
                 $this->statusfilter = $data->statusfilter;
             }
 
