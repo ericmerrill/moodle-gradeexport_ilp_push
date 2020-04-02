@@ -32,6 +32,7 @@ require_once($CFG->libdir.'/formslib.php');
 use moodleform;
 use gradeexport_ilp_push\grade_exporter;
 use gradeexport_ilp_push\banner_grades;
+use gradeexport_ilp_push\local\sis_interface;
 
 /**
  * A form for display options.
@@ -44,16 +45,21 @@ use gradeexport_ilp_push\banner_grades;
 class options_form extends moodleform {
 
     public function definition() {
+        global $DB;
+
         $mform = $this->_form;
         $data = $this->_customdata;
+        $courseid = $data['id'];
+
         $dirtyclass = ['class' => 'ignoredirty'];
 
-        $mform->addElement('hidden', 'id', $data['id']);
+        $mform->addElement('hidden', 'id', $courseid);
         $mform->setType('id', PARAM_INT);
 
         $mform->addElement('hidden', 'optionsform', 1);
         $mform->setType('optionsform', PARAM_INT);
 
+        // Status filters.
         $options = [grade_exporter::FILTER_ALL => get_string('filter_all', 'gradeexport_ilp_push'),
                     grade_exporter::FILTER_NEEDS_ATTENTION => get_string('filter_attention', 'gradeexport_ilp_push'),
                     grade_exporter::FILTER_IN_PROGRESS => get_string('filter_in_progress', 'gradeexport_ilp_push'),
@@ -62,12 +68,43 @@ class options_form extends moodleform {
 
         $mform->addElement('select', 'statusfilter', get_string('status_filter', 'gradeexport_ilp_push'), $options, $dirtyclass);
 
+        // Groups filter.
+        $groups = $DB->get_records('groups', ['courseid' => $courseid], 'name ASC');
+        if ($groups) {
+            $options = [grade_exporter::FILTER_ALL => get_string('filter_all', 'gradeexport_ilp_push')];
+            foreach ($groups as $group) {
+                $options[$group->id] = $group->name;
+            }
+
+            $mform->addElement('select', 'groupfilter', get_string('group_filter', 'gradeexport_ilp_push'),
+                    $options, $dirtyclass);
+        }
+
+        // Course section filter.
+        $sections = sis_interface\factory::instance()->get_section_filters_for_course($data['course']);
+        if ($sections) {
+            $options = [grade_exporter::FILTER_ALL => get_string('filter_all', 'gradeexport_ilp_push')];
+
+            foreach ($sections as $id => $section) {
+                $options[$id] = $section;
+            }
+
+            $mform->addElement('select', 'sectionfilter', get_string('section_filter', 'gradeexport_ilp_push'),
+                    $options, $dirtyclass);
+        }
+
+        // TODO - heading.
+
+        // Reference grade selection.
         $options = $data['gradeoptions'];
 
-        $mform->addElement('select', 'referencegrade', get_string('reference_grade', 'gradeexport_ilp_push'), $options, $dirtyclass);
+        $mform->addElement('select', 'referencegrade', get_string('reference_grade', 'gradeexport_ilp_push'),
+                $options, $dirtyclass);
 
+        // Grade mode selection.
         $options = banner_grades::get_grade_modes_menu();
 
         $mform->addElement('select', 'grademode', get_string('grade_mode', 'gradeexport_ilp_push'), $options, $dirtyclass);
+
     }
 }

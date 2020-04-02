@@ -57,6 +57,10 @@ $string['filter_done'] = 'Complete';
 $string['reference_grade'] = 'Reference Grade';
 $string['grade_mode'] = 'Grade Mode';
 
+$string['group_filter'] = 'Group Filter';
+
+$string['section_filter'] = 'Section Filter';
+
 // Rule validation.
 $string['invalid_datelastattended_early'] = 'Date last attended cannot be before the start of the course.';
 $string['invalid_datelastattended_late'] = 'Date last attended cannot be after the end of the course.';

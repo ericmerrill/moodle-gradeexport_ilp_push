@@ -75,7 +75,7 @@ module.exports = function (grunt) {
                 cmd: 'php "../../../admin/cli/purge_caches.php" --lang',
                 callback: function(error) {
                     if (!error) {
-                        grunt.log.writeln("Moodle JS cache reset.");
+                        grunt.log.writeln("Moodle lang cache reset.");
                     }
                 }
             }

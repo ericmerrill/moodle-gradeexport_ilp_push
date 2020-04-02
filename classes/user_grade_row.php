@@ -124,6 +124,15 @@ class user_grade_row implements templatable {
         return $this->user;
     }
 
+    /**
+     * Get the course object that goes with this row.
+     *
+     * @return object
+     */
+    public function get_course() {
+        return $this->course;
+    }
+
     public function set_grade_mode($grademode) {
         $this->grademode = $grademode;
     }
