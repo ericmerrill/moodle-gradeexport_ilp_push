@@ -23,6 +23,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
+
 $functions = array(
 
         'gradeexport_ilp_push_update_row_grade_mode' => array(

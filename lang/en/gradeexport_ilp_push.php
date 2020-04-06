@@ -61,6 +61,22 @@ $string['group_filter'] = 'Group Filter';
 
 $string['section_filter'] = 'Section Filter';
 
+// Messages.
+$string['messageprovider:publish_success'] = 'Notification on grade publish success';
+$string['messageprovider:publish_error'] = 'Notification on grade publish error';
+
+$string['message_url_text'] = 'View course export';
+$string['message_success_subject'] = 'Grades for {$a->crn} successfully submitted to Banner';
+$string['message_success_body'] = 'The grades for {$a->count} student(s) in {$a->crn} were successfully submitted to Banner.';
+$string['message_success_short'] = 'The grades for {$a->count} student(s) in {$a->crn} were successfully submitted to Banner.';
+
+$string['message_error_subject'] = 'Error while submitting grades for {$a->crn} to Banner';
+$string['message_error_body'] = 'There were {$a->errorcount} error(s) while attempting to submit grades for the course {$a->crn} to Banner.
+{$a->successcount} grade(s) were submitted successfully.
+
+For more information, return the the course export screen, or follow this link {$a->urlstr}.';
+$string['message_error_short'] = 'There were {$a->errorcount} error(s) while attempting to submit grades for the course {$a->crn} to Banner.';
+
 // Rule validation.
 $string['invalid_datelastattended_early'] = 'Date last attended cannot be before the start of the course.';
 $string['invalid_datelastattended_late'] = 'Date last attended cannot be after the end of the course.';
