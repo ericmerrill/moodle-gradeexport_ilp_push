@@ -114,25 +114,16 @@
     </td>
 </tr>
 {{#statusmessage}}
-    <!-- This is just a space row used to keep the even/off rows correct. -->
-    <tr class="spacerrow" style="visibility:hidden" aria-hidden="true" data-row-id="{{{formid}}}" data-user-id="{{{userid}}}">
-        <td colspan="6" class="spacerrow">&nbsp;</td>
-    </tr>
-
     <tr class="statusmessagerow" data-row-id="{{{formid}}}" data-user-id="{{{userid}}}">
-        <td colspan="5" class="statusmessage">            
+        <td colspan="5" class="statusmessage hidetopborder">
             {{{statusmessage}}}
         </td>
     </tr>
 {{/statusmessage}}
 
 {{#historycount}}
-    <!-- This is just a space row used to keep the even/off rows correct. -->
-    <tr class="spacerrow" style="visibility:hidden" aria-hidden="true" data-row-id="{{{formid}}}" data-user-id="{{{userid}}}">
-        <td colspan="6" class="spacerrow">&nbsp;</td>
-    </tr>
     <tr class="historyrow" id="historyrow-{{{formid}}}">
-        <td colspan="5" class="historycell hide">
+        <td colspan="5" class="historycell hidetopborder hide">
             <div class="historydiv hide">
             {{> gradeexport_ilp_push/user_row_history }}
             </div>

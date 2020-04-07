@@ -53,19 +53,23 @@
     <input type="hidden" name="groupid" value="{{groupid}}">
     <input type="hidden" name="graderid" value="{{graderid}}">
     <input type="hidden" name="sesskey" value="{{sesskey}}">
-    <table class="gradingtable generaltable">
-        <tr>
-            <th>User Name</th>
-            <th>Grade</th>
-            <th>Letter</th>
-            <!-- <th>Grade Mode</th> -->
-            <th>Banner Grade</th>
-            <th>Confirm</th>
-            <th>Status</th>
-        </tr>
+    <table class="gradingtable table">
+        <thead>
+            <tr>
+                <th>User Name</th>
+                <th>Grade</th>
+                <th>Letter</th>
+                <!-- <th>Grade Mode</th> -->
+                <th>Banner Grade</th>
+                <th>Confirm</th>
+                <th>Status</th>
+            </tr>
+        </thead>
     
         {{#userrows}}
+        <tbody>
             {{> gradeexport_ilp_push/user_row }}
+        </tbody>
         {{/userrows}}
 
     </table>

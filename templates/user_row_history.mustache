@@ -49,7 +49,7 @@
 }}
 
 
-<table class="historytable" data-history-count="{{historycount}}">
+<table class="historytable table table-striped" data-history-count="{{historycount}}">
 {{#historyrows}}
     <tr class="usergraderow {{{classes}}}">
         <td class="date">
@@ -61,28 +61,24 @@
                     <span class="currentgrademode">{{grademodename}}</span>
                 </div>
             </div>
-            <div class="grade">
+            <div class="labelvalue grade">
                 <label>{{# str }} grade {{/ str }}</label>
-                <span class="gradestr">{{grade}}</span>
-            <div>
+                <span class="value gradestr">{{grade}}</span>
+            </div>
             {{#datelastattended}}
-                <div class="fail">
-                    <div class="datelastattended">
-                        <label>{{# str }} date_last_attended, gradeexport_ilp_push {{/ str }}</label>
-                        <span class="datestr">{{datelastattended}}</span>
-                    </div>
+                <div class="labelvalue datelastattended">
+                    <label>{{# str }} date_last_attended, gradeexport_ilp_push {{/ str }}</label>
+                    <span class="value datestr">{{datelastattended}}</span>
                 </div>
             {{/datelastattended}}
             {{#incompletedeadline}}
-                <div class="incomplete">
-                    <div class="incompletedeadline">
-                        <label>{{# str }} incomplete_deadline, gradeexport_ilp_push {{/ str }}</label>
-                        <span class="datestr">{{incompletedeadline}}</span>
-                    </div>
-                    <div class="incompletegrade">
-                        <label>{{# str }} incomplete_default_grade, gradeexport_ilp_push {{/ str }}</label>
-                        <span class="gradestr">{{incompletegrade}}</span>
-                    </div>
+                <div class="labelvalue incompletedeadline">
+                    <label>{{# str }} incomplete_deadline, gradeexport_ilp_push {{/ str }}</label>
+                    <span class="value datestr">{{incompletedeadline}}</span>
+                </div>
+                <div class="labelvalue incompletegrade">
+                    <label>{{# str }} incomplete_default_grade, gradeexport_ilp_push {{/ str }}</label>
+                    <span class="value gradestr">{{incompletegrade}}</span>
                 </div>
             {{/incompletedeadline}}
         </td>

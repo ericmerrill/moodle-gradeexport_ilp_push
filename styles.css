@@ -1,3 +1,9 @@
+.path-grade-export-ilp_push .gradingtable > thead, .path-grade-export-ilp_push .gradingtable > tbody:nth-child(odd) {
+  background-color: rgba(0, 0, 0, 0.03); }
+
+.path-grade-export-ilp_push .gradingtable > tbody:hover {
+  background-color: rgba(0, 0, 0, 0.06); }
+
 .path-grade-export-ilp_push .gradingtable td {
   padding-top: 8px;
   padding-bottom: 8px; }
@@ -41,7 +47,7 @@
 
 .path-grade-export-ilp_push .gradingtable .checkbox {
   padding-top: 15px;
-  padding-left: 40px;
+  padding-left: 20px;
   display: block; }
   .path-grade-export-ilp_push .gradingtable .checkbox input {
     width: auto; }
@@ -53,10 +59,7 @@
       transform: scale(2);
       margin: 15px; } }
 
-.path-grade-export-ilp_push .gradingtable .spacerrow {
-  display: none; }
-
-.path-grade-export-ilp_push .gradingtable .statusmessage {
+.path-grade-export-ilp_push .gradingtable .hidetopborder {
   border-top: none; }
 
 .path-grade-export-ilp_push .gradingtable .statuscontainer {
@@ -77,7 +80,18 @@
   overflow: hidden; }
 
 .path-grade-export-ilp_push .gradingtable .historyrow .historycell .historytable {
-  width: 100%; }
+  width: 100%;
+  margin-bottom: 0.5rem; }
+  .path-grade-export-ilp_push .gradingtable .historyrow .historycell .historytable .labelvalue:not(:last-child) {
+    margin-bottom: .3rem; }
+  .path-grade-export-ilp_push .gradingtable .historyrow .historycell .historytable .labelvalue label {
+    font-weight: bold;
+    margin-bottom: 0; }
+  .path-grade-export-ilp_push .gradingtable .historyrow .historycell .historytable .labelvalue label::after {
+    content: ":";
+    padding-right: 5px; }
+  .path-grade-export-ilp_push .gradingtable .historyrow .historycell .historytable .labelvalue .value {
+    white-space: nowrap; }
   .path-grade-export-ilp_push .gradingtable .historyrow .historycell .historytable .statuscontainer {
     padding: 5px;
     border-radius: 5px; }
