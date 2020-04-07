@@ -130,12 +130,7 @@ class grade_mode extends base {
 
         $options = [];
         foreach ($gradeoptions as $option) {
-            if (isset($option->displayname)) {
-                $value = $option->displayname;
-            } else {
-                $value = $option->bannervalue;
-            }
-            $options[$option->id] = $value;
+            $options[$option->id] = $option->get_display_name();
         }
 
         return $options;

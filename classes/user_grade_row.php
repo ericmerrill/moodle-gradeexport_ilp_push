@@ -214,6 +214,61 @@ class user_grade_row implements templatable {
         return $formatted;
     }
 
+    public function export_history_for_template(\renderer_base $renderer) {
+        $rows = [];
+
+        if (!empty($this->pastsavedgrades)) {
+            foreach ($this->pastsavedgrades as $savedgrade) {
+                $row = new stdClass();
+                if (empty($savedgrade->id)) {
+                    // Not saved to DB, so ignoring for purposes of history.
+                    continue;
+                }
+                if (isset($savedgrade->usersubmittime)) {
+                    $date = $savedgrade->usersubmittime;
+                } else {
+                    $date = $savedgrade->timecreated;
+                }
+                $row->date = userdate($date);
+                $row->grademodename = $savedgrade->get_grade_mode()->name;
+                $grade = $savedgrade->get_grade();
+                if ($grade) {
+                    $row->grade = $grade->get_display_name();
+                } else {
+                    $row->grade = '-';
+                }
+
+                if (isset($savedgrade->datelastattended)) {
+                    $row->datelastattended = userdate($savedgrade->datelastattended, get_string('strftimedate', 'langconfig'));
+                } else {
+                    $row->datelastattended = false;
+                }
+
+                if (isset($savedgrade->incompletedeadline)) {
+                    $row->incompletedeadline = userdate($savedgrade->incompletedeadline, get_string('strftimedate', 'langconfig'));
+                    if (isset($savedgrade->incompletegradeid)) {
+                        $grade = $savedgrade->get_grade_mode()->get_grade($savedgrade->incompletegradeid);
+                        $row->incompletegrade = $grade->get_display_name();
+                    } else {
+                        $row->incompletegrade = '-';
+                    }
+                } else {
+                    $row->incompletedeadline = false;
+                }
+
+                $row->statusmessage = $renderer->render_status_messages($savedgrade);
+                $row->status = $renderer->render_status($savedgrade);
+
+                $rows[] = $row;
+            }
+        }
+
+        $output = new stdClass();
+        $output->historyrows = array_reverse($rows);
+
+        return $output;
+    }
+
     public function export_for_template(\renderer_base $renderer) {
         global $OUTPUT;
 
@@ -227,6 +282,7 @@ class user_grade_row implements templatable {
         $output->username = $this->user->username;
         $output->userid = $this->user->id;
         $output->formid = $this->get_form_id();
+        $output->userrowspan = 1;
 
         $output->gradelink = $renderer->render_grade_link($fullname, $this->user->id, $this->course->id) ;
 
@@ -264,6 +320,13 @@ class user_grade_row implements templatable {
 
         $output->grademodeid = $this->grademode->id;
 
+        // Get the history with this grade row.
+        $history = $this->export_history_for_template($renderer);
+        $output->historycount = count($history->historyrows);
+        if (!empty($history->historyrows)) {
+            $output->historyrows = $history->historyrows;
+            $output->userrowspan++;
+        }
 
 
         foreach ($this->currenterrors as $id => $string) {
@@ -281,10 +344,12 @@ class user_grade_row implements templatable {
             $output->equal = true;
         }
 
-        $output->statusmessage = $renderer->render_status_messages($this);
-        $output->status = $renderer->render_status($this);
+        $output->statusmessage = $renderer->render_status_messages($grade);
+        $output->status = $renderer->render_status($grade);
 
-
+        if ($output->statusmessage) {
+            $output->userrowspan++;
+        }
 
 
         return $output;

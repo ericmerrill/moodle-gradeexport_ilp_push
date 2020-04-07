@@ -56,7 +56,7 @@ module.exports = function (grunt) {
                 }
             },
             decachetheme: {
-                cmd: 'php "../../../admin/cli/purge_caches.php" --theme',
+                cmd: 'php "../../../admin/cli/purge_caches.php" --theme && php "../../../admin/cli/build_theme_css.php" --themes=boost --direction=ltr',
                 callback: function(error) {
                     if (!error) {
                         grunt.log.writeln("Moodle theme cache reset.");

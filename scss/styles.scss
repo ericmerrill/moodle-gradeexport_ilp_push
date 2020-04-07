@@ -18,12 +18,46 @@
                 }
             }
         }
+
+        .userinfo {
+            width: 1%;
+            white-space: nowrap;
+            img.userpicture {
+                vertical-align: top;
+            }
+
+            .userdetails {
+                display: inline-block;
+                padding-right: 15px;
+
+                .fullname {
+                    display: inline-block;
+                }
+                .username,
+                .userid,
+                .courseid {
+                    font-size: 85%;
+                    color: #555;
+                }
+
+                .gradeline {
+                    float: right;
+                }
+            }
+
+
+        }
+
         .grademode .currentgrademode {
             filter: brightness(150%);
             border-bottom-style: dashed;
             border-bottom-width: 1px;
             cursor: pointer;
             font-size: 80%;
+        }
+        .historytable .grademode .currentgrademode {
+            cursor: auto;
+            border-bottom-width: 0px;
         }
         .checkbox {
             padding-top: 15px;
@@ -65,33 +99,40 @@
         }
 
         .statusmessage {
-
             .statusmessagebox {
                 padding: 10px;
                 border-radius: 10px;
             }
         }
 
-        .userinfo {
-            img.userpicture {
-                vertical-align: top;
+        .historyrow .historycell {
+            &.hide {
+                display: none;
             }
+            .historydiv {
+                overflow: hidden;
+            }
+            .historytable {
+                width: 100%;
 
-            .userdetails {
-                display: inline-block;
+                .statuscontainer {
+                    padding: 5px;
+                    border-radius: 5px;
 
-                .fullname {
-                    display: inline-block;
+                    .statusicon {
+                        font-size: 100%;
+                    }
+
+                    .statustext {
+                        display: inline;
+                    }
                 }
-                .username,
-                .userid,
-                .courseid {
-                    font-size: 85%;
-                    color: #555;
-                }
 
-                .gradeline {
-                    float: right;
+                .statusmessage {
+                    .statusmessagebox {
+                        padding: 5px;
+                        border-radius: 5px;
+                    }
                 }
             }
         }

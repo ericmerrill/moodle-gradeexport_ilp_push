@@ -113,6 +113,10 @@ class saved_grade extends base {
         return banner_grades::get_grade_mode($this->grademodeid);
     }
 
+    public function get_grade() {
+        return banner_grades::get_grade_mode($this->grademodeid)->get_grade($this->gradeoptid);
+    }
+
     /**
      * Return an array of saved_grade objects that go with provided user/course combo. Sorted oldest to newest, keyed by revision.
      *

@@ -147,26 +147,26 @@ class export_renderer extends plugin_renderer_base {
         return html_writer::div($message, 'alert alert-warning');
     }
 
-    public function render_status(user_grade_row $userrow) {
+    public function render_status(saved_grade $savedgrade) {
         $class = 'statuscontainer';
-        if ($statclass = $this->get_status_class($userrow)) {
+        if ($statclass = $this->get_status_class($savedgrade)) {
             $class .= " {$statclass}";
         }
 
-        $contents = $this->render_status_contents($userrow);
+        $contents = $this->render_status_contents($savedgrade);
 
         $output = html_writer::div($contents, $class);
 
         return $output;
     }
 
-    public function render_status_messages(user_grade_row $userrow) {
-        if (!$message = $userrow->get_status_messages()) {
+    public function render_status_messages(saved_grade $savedgrade) {
+        if (!$message = $savedgrade->statusmessages) {
             return false;
         }
 
         $class = 'statusmessagebox';
-        if ($statclass = $this->get_status_class($userrow)) {
+        if ($statclass = $this->get_status_class($savedgrade)) {
             $class .= " {$statclass}";
         }
 
@@ -187,11 +187,11 @@ class export_renderer extends plugin_renderer_base {
         return $text;
     }
 
-    protected function render_status_contents(user_grade_row $userrow) {
+    protected function render_status_contents(saved_grade $savedgrade) {
         $class = '';
         $message = '';
 
-        switch ($userrow->get_current_status()) {
+        switch ((int)$savedgrade->status) {
             case (saved_grade::GRADING_STATUS_EDITING):
                 return false;
                 break;
@@ -229,8 +229,8 @@ class export_renderer extends plugin_renderer_base {
         return $output;
     }
 
-    protected function get_status_class(user_grade_row $userrow) {
-        switch ($userrow->get_current_status()) {
+    protected function get_status_class(saved_grade $savedgrade) {
+        switch ((int)$savedgrade->status) {
             case (saved_grade::GRADING_STATUS_EDITING):
                 return '';
                 break;

@@ -80,6 +80,11 @@ define(['jquery', 'gradeexport_ilp_push/page_info', 'core/ajax', 'core/notificat
                 RowController.hideGradeModeSelector(row);
             });
 
+            row.find('.togglehistory a').eq(0).click(function(event) {
+                event.preventDefault();
+                RowController.toggleHistory(row);
+            });
+
             RowController.updateVerification(row);
         },
 
@@ -245,6 +250,22 @@ define(['jquery', 'gradeexport_ilp_push/page_info', 'core/ajax', 'core/notificat
                 fail: notification.exception
             }]);
 
+        },
+
+        toggleHistory: function(row) {
+            var historyTd = $('#historyrow-' + row.data('row-id') + ' td.historycell');
+            var historyDiv = historyTd.find('.historydiv');
+
+            if (historyTd.is(":hidden")) {
+                historyTd.slideDown(100);
+                historyDiv.slideDown(400);
+            } else {
+                historyDiv.animate({height: 0}, 400, function() {
+                    historyDiv.hide();
+                    historyDiv.height('auto');
+                });
+                historyTd.hide(400);
+            }
         }
     };
 

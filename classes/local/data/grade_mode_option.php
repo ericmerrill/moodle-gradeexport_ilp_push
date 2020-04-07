@@ -54,6 +54,18 @@ class grade_mode_option extends base {
      */
     const TABLE = 'gradeexport_ilp_push_modeopt';
 
+    public function get_display_name() {
+        if (isset($this->displayname)) {
+            $value = $this->displayname;
+        } else {
+            $value = $this->bannervalue;
+        }
+
+        return $value;
+    }
+
+
+
 }
 
 

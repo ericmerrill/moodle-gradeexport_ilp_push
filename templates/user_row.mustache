@@ -51,14 +51,20 @@
 
 
 <tr class="usergraderow {{#locked}}locked{{/locked}}{{{classes}}}" data-row-id="{{{formid}}}" data-user-id="{{{userid}}}">
-    <td {{#statusmessage}}rowspan=2{{/statusmessage}} class="userinfo">
+    <td rowspan={{userrowspan}} class="userinfo">
         {{{userimage}}}
         <div class="userdetails">
             <div class="fullname">{{{fullnamelink}}}</div><div class="gradeline">{{{gradelink}}}</div>
             <div class="username">{{username}}</div>
             {{#userdisplayid}}<div class="userid">{{userdisplayid}}</div>{{/userdisplayid}}
             <div class="courseid">{{courseilpid}}</div>
+            {{#historycount}}
+            <div class=togglehistory>
+                <a href="#">{{# str }} show_history, gradeexport_ilp_push, {{historycount}} {{/ str }}</a>
+            </div>
+            {{/historycount}}
         </div>
+
     </td>
     <td class="grade">
         <div class="real">{{gradereal}}</div>
@@ -67,14 +73,6 @@
     <td class="grade">
         <div class="letter" data-grade-key="{{truegradekey}}">{{gradeletter}}</div><div title="{{# str }} grade_not_eqaul, gradeexport_ilp_push {{/ str }}" class="notequal {{#equal}}hide{{/equal}}">&#8800;</div>
     </td>
-<!-- 
-    <td class="grademode">
-        <span class="currentgrademode">{{grademodename}}</span>
-        <div class="grademodeselect hide">
-        {{{grademodeselect}}}
-        </div>
-    </td>
- -->
     <td class="bannergradeselect">
         <div class="grademode">
             <div>
@@ -88,20 +86,19 @@
         <input type="hidden" name="grademodeid-{{{formid}}}" value="{{{grademodeid}}}">
         <span class="gradeerror">{{{gradeerror}}}</span>
 
-        <!-- <span class="gradeerror {{^gradeerror}}hide{{/gradeerror}}">{{# pix }} i/warning, core, {{# str }} invalid_grade, gradeexport_ilp_push {{/ str }}{{/ pix }}</span> -->
         <div class="fail {{^showfailing}}hide{{/showfailing}}">
             <div class="datelastattended">
-                <label>Date Last Attended</label><input type="date" name="datelastattended-{{{formid}}}" value="{{{datelastattended}}}"{{#locked}} disabled{{/locked}}>
+                <label>{{# str }} date_last_attended, gradeexport_ilp_push {{/ str }}</label><input type="date" name="datelastattended-{{{formid}}}" value="{{{datelastattended}}}"{{#locked}} disabled{{/locked}}>
                 <span class="datelastattendederror">{{{datelastattendederror}}}</span>
             </div>
         </div>
         <div class="incomplete {{^showincomplete}}hide{{/showincomplete}}">
             <div class="incompletedeadline">
-                <label>Incomplete Deadline</label><input type="date" name="incompletedeadline-{{{formid}}}" value="{{{incompletedeadline}}}"{{#locked}} disabled{{/locked}}>
+                <label>{{# str }} incomplete_deadline, gradeexport_ilp_push {{/ str }}</label><input type="date" name="incompletedeadline-{{{formid}}}" value="{{{incompletedeadline}}}"{{#locked}} disabled{{/locked}}>
                 <span class="incompletedateerror">{{{incompletedeadlineerror}}}</span>
             </div>
             <div class="incompletegrade">
-                <label>Incomplete Default Grade</label>{{{incompletegradeselect}}}
+                <label>{{# str }} incomplete_default_grade, gradeexport_ilp_push {{/ str }}</label>{{{incompletegradeselect}}}
                 <span class="incompletegradeerror">{{{incompletegradeerror}}}</span>
             </div>
         </div>
@@ -128,3 +125,17 @@
         </td>
     </tr>
 {{/statusmessage}}
+
+{{#historycount}}
+    <!-- This is just a space row used to keep the even/off rows correct. -->
+    <tr class="spacerrow" style="visibility:hidden" aria-hidden="true" data-row-id="{{{formid}}}" data-user-id="{{{userid}}}">
+        <td colspan="6" class="spacerrow">&nbsp;</td>
+    </tr>
+    <tr class="historyrow" id="historyrow-{{{formid}}}">
+        <td colspan="5" class="historycell hide">
+            <div class="historydiv hide">
+            {{> gradeexport_ilp_push/user_row_history }}
+            </div>
+        </td>
+    </tr>
+{{/historycount}}

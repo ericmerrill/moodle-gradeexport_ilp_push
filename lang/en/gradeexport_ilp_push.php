@@ -46,6 +46,13 @@ $string['status_success'] = 'Succeeded';
 $string['status_failed'] = 'Failed';
 $string['status_locked'] = 'Locked';
 
+$string['date_last_attended'] = 'Date last attended';
+$string['incomplete_deadline'] = 'Incomplete deadline';
+$string['incomplete_default_grade'] = 'Incomplete default grade';
+
+$string['show_history'] = 'Show history ({$a})';
+$string['hide_history'] = 'Hide history';
+
 // Settings Form.
 $string['status_filter'] = 'Status Filter';
 $string['filter_all'] = 'All';
