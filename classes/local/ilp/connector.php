@@ -41,6 +41,10 @@ use gradeexport_ilp_push\local\exception;
  */
 class connector {
 
+    const CURL_SSL_VERIFY = 1;
+
+    const CURL_SSL_DONT_VERIFY = 2;
+
     protected $endpoints = ['grades' => 'api/coursesection/grades'];
 
     /**
@@ -80,6 +84,11 @@ class connector {
                     CURLOPT_RETURNTRANSFER => true,
                     CURLOPT_SSL_VERIFYHOST => 2,
                     CURLOPT_HTTPHEADER => $this->get_connection_headers()];
+
+        if ((int)settings::get_setting('curl_ssl_verify') === static::CURL_SSL_DONT_VERIFY) {
+            $options[CURLOPT_SSL_VERIFYHOST] = 0;
+            $options[CURLOPT_SSL_VERIFYPEER] = false;
+        }
 
         // Set the URL endpoint.
         if (isset($this->endpoints[$endpoint])) {

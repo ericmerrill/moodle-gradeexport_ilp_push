@@ -27,6 +27,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 use gradeexport_ilp_push\settings;
+use gradeexport_ilp_push\local\ilp\connector;
 use gradeexport_ilp_push\log;
 
 if ($ADMIN->fulltree) {
@@ -41,6 +42,13 @@ if ($ADMIN->fulltree) {
     $setting = new admin_setting_configpasswordunmask('gradeexport_ilp_push/ilppassword', new lang_string('ilppassword', 'gradeexport_ilp_push'),
             new lang_string('ilppassword_help', 'gradeexport_ilp_push'), '', PARAM_URL);
     $settings->add($setting);
+
+    $options = [connector::CURL_SSL_VERIFY => get_string('verify', 'gradeexport_ilp_push'),
+                connector::CURL_SSL_DONT_VERIFY => get_string('dont_verify', 'gradeexport_ilp_push')];
+
+    $settings->add(new admin_setting_configselect('gradeexport_ilp_push/curl_ssl_verify',
+            get_string('curl_ssl_verify', 'gradeexport_ilp_push'),
+            get_string('curl_ssl_verify_help', 'gradeexport_ilp_push'), connector::CURL_SSL_VERIFY, $options));
 
     $settings->add(new admin_setting_configfile('gradeexport_ilp_push/logpath', get_string('logpath', 'gradeexport_ilp_push'),
             get_string('logpath_help', 'gradeexport_ilp_push'), ''));

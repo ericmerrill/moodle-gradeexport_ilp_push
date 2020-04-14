@@ -116,6 +116,12 @@ $string['ilppassword_help'] = 'The connection password setup in the ILP admin.';
 $string['ilpurl'] = 'ILP URL';
 $string['ilpurl_help'] = 'The base URL of the ILP server being used';
 
+$string['verify'] = 'Verify SSL Certificate';
+$string['dont_verify'] = 'Do not verify certificate';
+$string['curl_ssl_verify'] = 'Verify remote peer SSL cert';
+$string['curl_ssl_verify_help'] = 'Option to disable cURL\'s certificate verification of the remote peer (ILP).<br>
+Potentially useful in data-centers with self-signed certs, but opens up the possibility of man-in-the-middle attacks.';
+
 $string['logginglevel'] = 'Error logging';
 $string['logginglevel_help'] = 'Log messages at this level or higher will be logged. TODO.';
 $string['error_all'] = 'All';

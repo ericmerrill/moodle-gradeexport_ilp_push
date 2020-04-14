@@ -80,7 +80,7 @@ if (isset($options['run'])) {
                    ['S' => [],
                     'U' => [],
                     'I' => ['isincomplete' => 1]],
-                'Satisfactory/Unsatisfactory with Progress(O))' =>
+                'Satisfactory/Unsatisfactory with Progress(O)' =>
                    ['S' => [],
                     'U' => [],
                     'I' => ['isincomplete' => 1],
