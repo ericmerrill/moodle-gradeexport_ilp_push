@@ -119,8 +119,7 @@ class export_renderer extends plugin_renderer_base {
     }
 
     public function render_incomplete_select_menu(user_grade_row $userrow) {
-        // TODO - need to make it so if a different one is already selected, that is returned.
-        $options = $userrow->get_current_grade_mode()->get_grade_menu_options();
+        $options = $userrow->get_current_grade_mode()->get_grade_menu_options(true);
         $selected = $userrow->get_current_incomplete_grade_key();
 
         $attributes = ['class' => 'incompletegradeselect'];

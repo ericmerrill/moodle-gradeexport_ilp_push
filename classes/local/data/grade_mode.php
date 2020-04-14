@@ -125,11 +125,14 @@ class grade_mode extends base {
         return false;
     }
 
-    public function get_grade_menu_options() {
+    public function get_grade_menu_options($excludeincomplete = false) {
         $gradeoptions = $this->get_current_grade_options();
 
         $options = [];
         foreach ($gradeoptions as $option) {
+            if ($excludeincomplete && $option->isincomplete) {
+                continue;
+            }
             $options[$option->id] = $option->get_display_name();
         }
 
