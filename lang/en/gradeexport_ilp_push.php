@@ -100,6 +100,10 @@ $string['invalid_incomplete_grade_wrong'] = 'Default incomplete grade cannot be 
 
 $string['invalid_incomplete_grade'] = 'Default incomplete grade must be set to "{$a}".';
 $string['invalid_incomplete_date'] = 'Incomplete deadline must be between {$a->start} and {$a->end}. Please use MM/DD/YYYY or YYYY-MM-DD format.';
+$string['invalid_incomplete_date_range'] = 'Incomplete deadline must be between {$a->start} and {$a->end}. Please use MM/DD/YYYY or YYYY-MM-DD format.';
+$string['invalid_incomplete_date_start'] = 'Incomplete deadline must be on or after {$a->start}. Please use MM/DD/YYYY or YYYY-MM-DD format.';
+$string['invalid_incomplete_date_end'] = 'Incomplete deadline must be on or before {$a->end}. Please use MM/DD/YYYY or YYYY-MM-DD format.';
+$string['invalid_incomplete_date_single'] = 'Incomplete deadline must be on {$a->start}. Please use MM/DD/YYYY or YYYY-MM-DD format.';
 $string['invalid_datelastattended'] = 'Date last attended must be between {$a->start} and {$a->end}. Please use MM/DD/YYYY or YYYY-MM-DD format.';
 
 $string['grader_no_id'] = 'The current user has no SIS ID, and so cannot export grades to Banner.';

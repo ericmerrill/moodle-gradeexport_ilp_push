@@ -117,6 +117,20 @@ abstract class base {
         return true;
     }
 
+    /**
+     * A function that allows the SIS to override the allowed incomplete dates for a course.
+     *
+     * Override to implement.
+     *
+     * @param object $course The course object to reference.
+     * @return object The return object with keys of 'start' and 'end' timestamps.
+     *                Start set to 'false' will indicate before end (inclusive)
+     *                End set to 'false' will indicate after start (inclusive)
+     */
+    public function get_allowed_last_incomplete_deadline_dates($course) {
+        return false;
+    }
+
 }
 
 

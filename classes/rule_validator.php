@@ -91,13 +91,14 @@ class rule_validator {
             if (is_null($grade->incompletedeadline)) {
                 // TODO - this might not be required...
                 $results['errors']['incompletedeadline'] = get_string('invalid_incomplete_date_missing', 'gradeexport_ilp_push');
-            } else if ($grade->incompletedeadline < $incompletedeadline->start) {
+            } else if (($incompletedeadline->start !== false) && ($grade->incompletedeadline < $incompletedeadline->start)) {
                 // If present, the incomplete date must be within a certain timeline (settings dependent).
                 // TODO better date ranges and error messages...
                 $results['errors']['incompletedeadline'] = get_string('invalid_incomplete_date_early', 'gradeexport_ilp_push');
-            } else if ($grade->incompletedeadline > $incompletedeadline->end) {
+            } else if (($incompletedeadline->end !== false) && ($grade->incompletedeadline > $incompletedeadline->end)) {
                 $results['errors']['incompletedeadline'] = get_string('invalid_incomplete_date_late', 'gradeexport_ilp_push');
             }
+
         }
 
         return $results;

@@ -157,6 +157,9 @@ define(['jquery', 'gradeexport_ilp_push/page_info', 'core/ajax', 'core/notificat
                     errorCode = 'invalid_incomplete_date';
                 }
 
+                if (errorCode != '') {
+                    errorCode = pageInfo.getIncompleteDeadlineStringName();
+                }
                 RowController.updateFormWarning(row, '.incompletedateerror', errorCode, pageInfo.getStringIncompleteDeadline());
 
                 var incompleteSelect = row.find('.incompletegradeselect').eq(0);

@@ -30,6 +30,7 @@ defined('MOODLE_INTERNAL') || die();
 
 use stdClass;
 use gradeexport_ilp_push\local\data\grade_mode;
+use gradeexport_ilp_push\local\sis_interface;
 
 /**
  * Deals with the interaction of banner grading.
@@ -219,30 +220,61 @@ class banner_grades {
         return $dates;
     }
 
+    /**
+     * Return the earliest and latest valid incomplete dates for the provided course.
+     *
+     * @param object $course The course object to reference.
+     * @param string $format The strftime format string to use.
+     * @param int $tz The timezone number to use.
+     * @return object The return object with keys of 'start' and 'end' timestamps.
+     *                Start set to 'false' will indicate before end (inclusive)
+     *                End set to 'false' will indicate after start (inclusive)
+     */
     public static function get_allowed_last_incomplete_deadline_dates($course, $format = false, $tz = 99) {
-        $dates = new stdClass();
+        $sis = sis_interface\factory::instance();
 
-        if (empty($course->enddate)) {
-            // We just have to guess. TODO better.
-            $courseend = $course->startdate + (3600 * 24 * 7 * 16);
-        } else {
-            $courseend = $course->enddate;
+        // First see if there are SIS dates.
+        $dates = $sis->get_allowed_last_incomplete_deadline_dates($course);
+
+        // If that didn't return anything, then get settings date.
+        if ($dates === false) {
+            $dates = new stdClass();
+
+            // Temp placeholder for 4/27/2020.
+            $dates->start = 1587988800;
+            $dates->end = 1587988800;
         }
 
-        // The day after the end of the course is the first allowed date (I think TODO).
-        $courseend += 3600 * 24;
+        // If we still don't have dates, we are going to make them up.
+        if ($dates === false) {
+            $dates = new stdClass();
 
-        $dates->start = $courseend;
+            if (empty($course->enddate)) {
+                // We just have to guess. TODO better.
+                $courseend = $course->startdate + (3600 * 24 * 7 * 16);
+            } else {
+                $courseend = $course->enddate;
+            }
 
-        $dates->end = $courseend + (3600 * 24 * 380);
+            // The day after the end of the course is the first allowed date (I think TODO).
+            $courseend += 3600 * 24;
+
+            $dates->start = $courseend;
+
+            $dates->end = $courseend + (3600 * 24 * 380);
+        }
 
         if (!$format) {
             return $dates;
         }
 
         // Convert to a format.
-        $dates->start = date_format_string($dates->start, $format, $tz);
-        $dates->end = date_format_string($dates->end, $format, $tz);
+        if ($dates->start !== false) {
+            $dates->start = date_format_string($dates->start, $format, $tz);
+        }
+        if ($dates->end !== false) {
+            $dates->end = date_format_string($dates->end, $format, $tz);
+        }
 
         return $dates;
     }
