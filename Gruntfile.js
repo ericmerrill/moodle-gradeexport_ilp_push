@@ -32,6 +32,7 @@ module.exports = function (grunt) {
     // We need to include the core Moodle grunt file too, otherwise we can't run tasks like "amd".
     require("grunt-load-gruntfile")(grunt);
     grunt.loadGruntfile("../../../Gruntfile.js");
+    grunt.loadNpmTasks("grunt-contrib-less");
 
     var uglifyRename = function(destPath, srcPath) {
         destPath = srcPath.replace('src', 'build');
