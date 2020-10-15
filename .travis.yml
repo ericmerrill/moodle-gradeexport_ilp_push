@@ -17,6 +17,7 @@ env:
  global:
   - PHPUNIT_IGNORE_PATHS=cli,db,settings.php,version.php,ws_endpoint.php
   - COVERALLS=FALSE
+  - SKIPAMD=FALSE
 
 jobs:
   include:
@@ -33,24 +34,24 @@ jobs:
       env: MOODLE_BRANCH=master DB=mysqli
       # Moodle 3.8
     - php: 7.1
-      env: MOODLE_BRANCH=MOODLE_38_STABLE DB=mysqli
+      env: MOODLE_BRANCH=MOODLE_38_STABLE DB=mysqli SKIPAMD=TRUE
     - php: 7.3
-      env: MOODLE_BRANCH=MOODLE_38_STABLE DB=pgsql
+      env: MOODLE_BRANCH=MOODLE_38_STABLE DB=pgsql SKIPAMD=TRUE
       addons:
         postgresql: "10"
       # Moodle 3.7
     - php: 7.1
-      env: MOODLE_BRANCH=MOODLE_37_STABLE DB=mysqli
+      env: MOODLE_BRANCH=MOODLE_37_STABLE DB=mysqli SKIPAMD=TRUE
       # Moodle 3.6
     - php: 7.2
-      env: MOODLE_BRANCH=MOODLE_36_STABLE DB=pgsql
+      env: MOODLE_BRANCH=MOODLE_36_STABLE DB=pgsql SKIPAMD=TRUE
       addons:
         postgresql: "9.5"
       # Moodle 3.5 LTS
     - php: 7.0
-      env: MOODLE_BRANCH=MOODLE_35_STABLE DB=mysqli
+      env: MOODLE_BRANCH=MOODLE_35_STABLE DB=mysqli SKIPAMD=TRUE
     - php: 7.1
-      env: MOODLE_BRANCH=MOODLE_35_STABLE DB=pgsql
+      env: MOODLE_BRANCH=MOODLE_35_STABLE DB=pgsql SKIPAMD=TRUE
       addons:
         postgresql: "9.4"
 
@@ -73,7 +74,11 @@ script:
   - moodle-plugin-ci phpmd
   - moodle-plugin-ci validate
   - moodle-plugin-ci savepoints
-  - moodle-plugin-ci grunt -t amd -t css
+  - if [[ "$SKIPAMD" == "TRUE" ]]; then
+      moodle-plugin-ci grunt -t css;
+    else
+      moodle-plugin-ci grunt -t amd -t css;
+    fi
   - if [[ "$COVERALLS" == "TRUE" ]]; then
       moodle-plugin-ci phpunit --coverage-clover;
     else
