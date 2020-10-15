@@ -1,6 +1,9 @@
 language: php
 
-sudo: false
+services:
+  - mysql
+  - postgresql
+  - docker
 
 cache:
   directories:
@@ -15,40 +18,51 @@ env:
   - PHPUNIT_IGNORE_PATHS=cli,db,settings.php,version.php,ws_endpoint.php
   - COVERALLS=FALSE
 
- matrix:
-    # Moodle 3.5
-  - PHPVER=7.0 DB=mysqli                MOODLE_BRANCH=MOODLE_35_STABLE
-  - PHPVER=7.1 DB=pgsql     PGVER=9.3   MOODLE_BRANCH=MOODLE_35_STABLE
-
-    # Moodle 3.4
-  - PHPVER=7.0 DB=mysqli                MOODLE_BRANCH=MOODLE_34_STABLE
-  - PHPVER=7.1 DB=pgsql     PGVER=9.5   MOODLE_BRANCH=MOODLE_34_STABLE COVERALLS=TRUE
-
-    # Moodle 3.3
-  - PHPVER=5.6 DB=mysqli                MOODLE_BRANCH=MOODLE_33_STABLE
-  - PHPVER=7.0 DB=pgsql     PGVER=9.4   MOODLE_BRANCH=MOODLE_33_STABLE
-  - PHPVER=7.1 DB=mysqli                MOODLE_BRANCH=MOODLE_33_STABLE
-
-    # Moodle 3.2
-  - PHPVER=5.6 DB=pgsql     PGVER=9.3   MOODLE_BRANCH=MOODLE_32_STABLE
-
-    # Moodle Master
-  - PHPVER=7.0 DB=pgsql     PGVER=9.6   MOODLE_BRANCH=master
-  - PHPVER=7.0 DB=mysqli                MOODLE_BRANCH=master
-  - PHPVER=7.1 DB=pgsql     PGVER=9.6   MOODLE_BRANCH=master
-  - PHPVER=7.1 DB=mysqli                MOODLE_BRANCH=master
+jobs:
+  include:
+      # Moodle Master (Requires PHP 7.2 and up)
+    - php: 7.3
+      env: MOODLE_BRANCH=master DB=pgsql  COVERALLS=TRUE
+      addons:
+        postgresql: "10"
+    - php: 7.3
+      env: MOODLE_BRANCH=master DB=mysqli
+    - php: 7.2
+      env: MOODLE_BRANCH=master DB=pgsql
+    - php: 7.2
+      env: MOODLE_BRANCH=master DB=mysqli
+      # Moodle 3.8
+    - php: 7.1
+      env: MOODLE_BRANCH=MOODLE_38_STABLE DB=mysqli
+    - php: 7.3
+      env: MOODLE_BRANCH=MOODLE_38_STABLE DB=pgsql
+      addons:
+        postgresql: "10"
+      # Moodle 3.7
+    - php: 7.1
+      env: MOODLE_BRANCH=MOODLE_37_STABLE DB=mysqli
+      # Moodle 3.6
+    - php: 7.2
+      env: MOODLE_BRANCH=MOODLE_36_STABLE DB=pgsql
+      addons:
+        postgresql: "9.5"
+      # Moodle 3.5 LTS
+    - php: 7.0
+      env: MOODLE_BRANCH=MOODLE_35_STABLE DB=mysqli
+    - php: 7.1
+      env: MOODLE_BRANCH=MOODLE_35_STABLE DB=pgsql
+      addons:
+        postgresql: "9.4"
 
 
 before_install:
   - phpenv config-rm xdebug.ini
-  - nvm install 8.9
-  - nvm use 8.9
   - if [ -n "$PGVER" ]; then
       sudo /etc/init.d/postgresql stop;
       sudo /etc/init.d/postgresql start $PGVER;
     fi
   - cd ../..
-  - composer create-project -n --no-dev --prefer-dist moodlerooms/moodle-plugin-ci ci ^2
+  - composer create-project -n --no-dev --prefer-dist moodlehq/moodle-plugin-ci ci ^3
   - export PATH="$(cd ci/bin; pwd):$(cd ci/vendor/bin; pwd):$PATH"
 
 install:
