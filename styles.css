@@ -1,1 +1,60 @@
-.path-grade-export-ilp_push .gradingtable td{padding-top:8px;padding-bottom:8px}.path-grade-export-ilp_push .gradingtable td.grade .letter{padding-top:8px;display:inline-block}.path-grade-export-ilp_push .gradingtable td.grade .notequal{padding-top:2px;float:right;font-size:150%;color:red}.path-grade-export-ilp_push .gradingtable .checkbox{padding-top:15px;padding-left:40px;display:block}.path-grade-export-ilp_push .gradingtable .checkbox input{width:auto}@supports (zoom:2){.path-grade-export-ilp_push .gradingtable .checkbox input[type=checkbox]{zoom:2}}@supports not (zoom:2){.path-grade-export-ilp_push .gradingtable .checkbox input[type=checkbox]{transform:scale(2);margin:15px}}.path-grade-export-ilp_push .gradingtable .spacerrow{display:none}.path-grade-export-ilp_push .gradingtable .statusmessage{border-top:none}.path-grade-export-ilp_push .gradingtable .statuscontainer{padding:10px;border-radius:10px;text-align:center}.path-grade-export-ilp_push .gradingtable .statuscontainer .statusicon{font-size:150%}.path-grade-export-ilp_push .gradingtable .statusmessage .statusmessagebox{padding:10px;border-radius:10px}.path-grade-export-ilp_push .gradingtable .userinfo img.userpicture{vertical-align:top}.path-grade-export-ilp_push .gradingtable .userinfo .userdetails{display:inline-block}.path-grade-export-ilp_push .gradingtable .userinfo .userdetails .fullname{display:inline-block}.path-grade-export-ilp_push .gradingtable .userinfo .userdetails .username,.path-grade-export-ilp_push .gradingtable .userinfo .userdetails .userid,.path-grade-export-ilp_push .gradingtable .userinfo .userdetails .courseid{font-size:85%;color:#555}.path-grade-export-ilp_push .gradingtable .userinfo .userdetails .gradeline{float:right}.path-grade-export-ilp_push .gradingtable .bannergradeselect input[type=date]{width:auto}
+.path-grade-export-ilp_push .gradingtable td {
+  padding-top: 8px;
+  padding-bottom: 8px; }
+  .path-grade-export-ilp_push .gradingtable td.grade .letter {
+    padding-top: 8px;
+    display: inline-block; }
+  .path-grade-export-ilp_push .gradingtable td.grade .notequal {
+    padding-top: 2px;
+    float: right;
+    font-size: 150%;
+    color: red; }
+
+.path-grade-export-ilp_push .gradingtable .checkbox {
+  padding-top: 15px;
+  padding-left: 40px;
+  display: block; }
+  .path-grade-export-ilp_push .gradingtable .checkbox input {
+    width: auto; }
+  @supports (zoom: 2) {
+    .path-grade-export-ilp_push .gradingtable .checkbox input[type=checkbox] {
+      zoom: 2; } }
+  @supports not (zoom: 2) {
+    .path-grade-export-ilp_push .gradingtable .checkbox input[type=checkbox] {
+      transform: scale(2);
+      margin: 15px; } }
+
+.path-grade-export-ilp_push .gradingtable .spacerrow {
+  display: none; }
+
+.path-grade-export-ilp_push .gradingtable .statusmessage {
+  border-top: none; }
+
+.path-grade-export-ilp_push .gradingtable .statuscontainer {
+  padding: 10px;
+  border-radius: 10px;
+  text-align: center; }
+  .path-grade-export-ilp_push .gradingtable .statuscontainer .statusicon {
+    font-size: 150%; }
+
+.path-grade-export-ilp_push .gradingtable .statusmessage .statusmessagebox {
+  padding: 10px;
+  border-radius: 10px; }
+
+.path-grade-export-ilp_push .gradingtable .userinfo img.userpicture {
+  vertical-align: top; }
+
+.path-grade-export-ilp_push .gradingtable .userinfo .userdetails {
+  display: inline-block; }
+  .path-grade-export-ilp_push .gradingtable .userinfo .userdetails .fullname {
+    display: inline-block; }
+  .path-grade-export-ilp_push .gradingtable .userinfo .userdetails .username,
+  .path-grade-export-ilp_push .gradingtable .userinfo .userdetails .userid,
+  .path-grade-export-ilp_push .gradingtable .userinfo .userdetails .courseid {
+    font-size: 85%;
+    color: #555; }
+  .path-grade-export-ilp_push .gradingtable .userinfo .userdetails .gradeline {
+    float: right; }
+
+.path-grade-export-ilp_push .gradingtable .bannergradeselect input[type=date] {
+  width: auto; }

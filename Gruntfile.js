@@ -32,7 +32,8 @@ module.exports = function (grunt) {
     // We need to include the core Moodle grunt file too, otherwise we can't run tasks like "amd".
     require("grunt-load-gruntfile")(grunt);
     grunt.loadGruntfile("../../../Gruntfile.js");
-    grunt.loadNpmTasks("grunt-contrib-less");
+
+    const sass = require('node-sass');
 
     var uglifyRename = function(destPath, srcPath) {
         destPath = srcPath.replace('src', 'build');
@@ -63,23 +64,17 @@ module.exports = function (grunt) {
                 files: "amd/src/*.js",
                 tasks: ["amd"]
             },
-            less: {
-                // If any .less file changes in directory "less" then run the "less" task.
-                files: "less/*.less",
-                tasks: ["css"]
+            scss: {
+                // If any .scss file changes in directory "scss" then run the "cssignore" task.
+                files: "scss/*.scss",
+                tasks: ["cssignore"]
             }
         },
-        less: {
-            // Production config is also available.
-            development: {
-                options: {
-                    paths: ["less/"],
-                    compress: true
-                },
-                files: {
-                    "styles.css": "less/styles.less"
-                }
-            },
+        stylelint: {
+            scss: {
+                options: {syntax: 'scss'},
+                src: ['scss/**/*.scss']
+            }
         },
         uglify: {
             amd: {
@@ -96,6 +91,17 @@ module.exports = function (grunt) {
             amd: {src: 'amd/src/*.js'},
             options: {report: 'none'}
         },
+        sass: {
+            dist: {
+                files: {
+                    "styles.css": "scss/styles.scss"
+                }
+            },
+            options: {
+                implementation: sass
+            }
+        },
+
     });
 
     grunt.loadNpmTasks("grunt-exec");
@@ -103,7 +109,9 @@ module.exports = function (grunt) {
     grunt.registerTask('decache', ['exec:decache']);
 
     grunt.registerTask('amd', ['eslint:amd', 'uglify']);
-    grunt.registerTask('css', ['less']);
+    grunt.registerTask('css', ['stylelint:scss', 'sass']);
+
+    grunt.registerTask('cssignore', ['sass', 'buildcss']);
 
     grunt.registerTask('default', ['watch']);
 };
