@@ -101,8 +101,8 @@ module.exports = function (grunt) {
 
     grunt.registerTask('decache', ['exec:decache']);
 
-    grunt.registerTask('amd', ['eslint:amd', 'uglify', 'decache']);
-    grunt.registerTask('css', ['less', 'decache']);
+    grunt.registerTask('amd', ['eslint:amd', 'uglify']);
+    grunt.registerTask('css', ['less']);
 
     grunt.registerTask('default', ['watch']);
 };
