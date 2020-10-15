@@ -73,7 +73,6 @@ script:
   - moodle-plugin-ci phpmd
   - moodle-plugin-ci validate
   - moodle-plugin-ci savepoints
-  - moodle-plugin-ci mustache
   - moodle-plugin-ci grunt -t amd -t css
   - if [[ "$COVERALLS" == "TRUE" ]]; then
       moodle-plugin-ci phpunit --coverage-clover;
@@ -85,4 +84,5 @@ script:
 after_script:
   - moodle-plugin-ci phpcpd
   - moodle-plugin-ci codechecker
+  - moodle-plugin-ci mustache
   - moodle-plugin-ci coveralls-upload
