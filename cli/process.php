@@ -29,7 +29,7 @@ use gradeexport_ilp_push\local\controller;
 
 define('CLI_SCRIPT', true);
 
-require_once '../../../config.php';
+require(__DIR__ . '/../../../../config.php');
 require_once($CFG->libdir.'/clilib.php');
 
 list($options, $unrecognized) = cli_get_params(array('submitter' => false,
