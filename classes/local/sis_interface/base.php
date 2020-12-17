@@ -92,6 +92,25 @@ abstract class base {
         return true;
     }
 
+    /**
+     * Check if a particular user is a gradable user in the course.
+     *
+     * @param object $user The student user to check
+     * @param object $course The course to check the student in
+     * @return true|string True if allowed, or an error string if not.
+     */
+    public function is_gradable_user_in_course($user, $course) {
+        if (empty($this->get_user_id($user))) {
+            return false;
+        }
+
+        if (empty($this->get_course_id_for_user($course, $user))) {
+            return false;
+        }
+
+        return true;
+    }
+
 }
 
 

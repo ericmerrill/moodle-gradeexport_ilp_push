@@ -133,6 +133,8 @@ class grade_exporter implements templatable {
             return;
         }
 
+        $sis = sis_interface\factory::instance();
+
         $profilefields = grade_helper::get_user_profile_fields($this->course->id, true);
         $this->displaytype = [GRADE_DISPLAY_TYPE_REAL, GRADE_DISPLAY_TYPE_PERCENTAGE, GRADE_DISPLAY_TYPE_LETTER];
 
@@ -146,6 +148,10 @@ class grade_exporter implements templatable {
 
         while ($userdata = $gui->next_user()) {
             $user = $userdata->user;
+
+            if (empty($sis->is_gradable_user_in_course($user, $this->course))) {
+                continue;
+            }
 
             // We only use one grade item, so that is easy...
             $grade = reset($userdata->grades);
