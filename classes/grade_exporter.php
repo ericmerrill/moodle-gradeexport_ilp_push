@@ -168,9 +168,6 @@ class grade_exporter implements templatable {
 
         $sis = sis_interface\factory::instance();
 
-        $profilefields = grade_helper::get_user_profile_fields($this->course->id, true);
-        $this->displaytype = [GRADE_DISPLAY_TYPE_REAL, GRADE_DISPLAY_TYPE_PERCENTAGE, GRADE_DISPLAY_TYPE_LETTER];
-
         $gui = new graded_users_iterator($this->course, $this->get_grade_columns(), $this->groupid);
         $gui->require_active_enrolment($this->onlyactive);
         $gui->allow_user_custom_fields(true);
