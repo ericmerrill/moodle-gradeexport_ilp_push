@@ -48,6 +48,8 @@ use moodle_url;
  */
 class export_renderer extends plugin_renderer_base {
 
+    private $grademodes;
+
     public function render_exporter(grade_exporter $exporter) {
         global $PAGE;
 
@@ -85,7 +87,7 @@ class export_renderer extends plugin_renderer_base {
     }
 
     public function render_select_menu(user_grade_row $userrow) {
-        $options = banner_grades::get_possible_grades($userrow);
+        $options = $userrow->get_current_grade_mode()->get_grade_menu_options();
         $selected = $userrow->get_current_grade_key();
 
         $attributes = ['class' => 'gradeselect'];
@@ -101,9 +103,23 @@ class export_renderer extends plugin_renderer_base {
         return $output;
     }
 
+    public function render_row_grade_mode_select(user_grade_row $userrow) {
+        $mode = $userrow->get_current_grade_mode();
+
+        if (is_null($this->grademodes)) {
+            $grademodes = banner_grades::get_grade_modes_menu();
+            $this->grademodes = $grademodes;
+        } else {
+            $grademodes = $this->grademodes;
+        }
+
+        $output = html_writer::select($grademodes, $userrow->get_form_id('grademode'), $mode->id, false);
+
+        return $output;
+    }
+
     public function render_incomplete_select_menu(user_grade_row $userrow) {
-        // TODO - need to make it so if a different one is already selected, that is returned.
-        $options = banner_grades::get_possible_grades();
+        $options = $userrow->get_current_grade_mode()->get_grade_menu_options(true);
         $selected = $userrow->get_current_incomplete_grade_key();
 
         $attributes = ['class' => 'incompletegradeselect'];
@@ -130,26 +146,26 @@ class export_renderer extends plugin_renderer_base {
         return html_writer::div($message, 'alert alert-warning');
     }
 
-    public function render_status(user_grade_row $userrow) {
+    public function render_status(saved_grade $savedgrade) {
         $class = 'statuscontainer';
-        if ($statclass = $this->get_status_class($userrow)) {
+        if ($statclass = $this->get_status_class($savedgrade)) {
             $class .= " {$statclass}";
         }
 
-        $contents = $this->render_status_contents($userrow);
+        $contents = $this->render_status_contents($savedgrade);
 
         $output = html_writer::div($contents, $class);
 
         return $output;
     }
 
-    public function render_status_messages(user_grade_row $userrow) {
-        if (!$message = $userrow->get_status_messages()) {
+    public function render_status_messages(saved_grade $savedgrade) {
+        if (!$message = $savedgrade->statusmessages) {
             return false;
         }
 
         $class = 'statusmessagebox';
-        if ($statclass = $this->get_status_class($userrow)) {
+        if ($statclass = $this->get_status_class($savedgrade)) {
             $class .= " {$statclass}";
         }
 
@@ -170,11 +186,11 @@ class export_renderer extends plugin_renderer_base {
         return $text;
     }
 
-    protected function render_status_contents(user_grade_row $userrow) {
+    protected function render_status_contents(saved_grade $savedgrade) {
         $class = '';
         $message = '';
 
-        switch ($userrow->get_current_status()) {
+        switch ((int)$savedgrade->status) {
             case (saved_grade::GRADING_STATUS_EDITING):
                 return false;
                 break;
@@ -212,8 +228,8 @@ class export_renderer extends plugin_renderer_base {
         return $output;
     }
 
-    protected function get_status_class(user_grade_row $userrow) {
-        switch ($userrow->get_current_status()) {
+    protected function get_status_class(saved_grade $savedgrade) {
+        switch ((int)$savedgrade->status) {
             case (saved_grade::GRADING_STATUS_EDITING):
                 return '';
                 break;

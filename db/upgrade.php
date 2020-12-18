@@ -16,6 +16,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once($CFG->dirroot.'/grade/export/ilp_push/upgradelib.php');
+
 /**
  * Upgrade file.
  *
@@ -121,6 +123,112 @@ function xmldb_gradeexport_ilp_push_upgrade($oldversion=0) {
 
         // Ilp_push savepoint reached.
         upgrade_plugin_savepoint(true, 2019041600, 'gradeexport', 'ilp_push');
+    }
+
+    if ($oldversion < 2019111800) {
+
+        // Define table gradeexport_ilp_push_grmodes to be created.
+        $table = new xmldb_table('gradeexport_ilp_push_grmodes');
+
+        // Adding fields to table gradeexport_ilp_push_grmodes.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('name', XMLDB_TYPE_CHAR, '1333', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('enabled', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '1');
+        $table->add_field('additional', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('usermodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+
+        // Adding keys to table gradeexport_ilp_push_grmodes.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('usermodified', XMLDB_KEY_FOREIGN, ['usermodified'], 'user', ['id']);
+
+        // Conditionally launch create table for gradeexport_ilp_push_grmodes.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Define table gradeexport_ilp_push_modeopt to be created.
+        $table = new xmldb_table('gradeexport_ilp_push_modeopt');
+
+        // Adding fields to table gradeexport_ilp_push_modeopt.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('modeid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('displayname', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('bannervalue', XMLDB_TYPE_CHAR, '1333', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('enabled', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '1');
+        $table->add_field('version', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('mostcurrent', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '1');
+        $table->add_field('additional', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('usermodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+
+        // Adding keys to table gradeexport_ilp_push_modeopt.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('usermodified', XMLDB_KEY_FOREIGN, ['usermodified'], 'user', ['id']);
+        $table->add_key('modeid', XMLDB_KEY_FOREIGN, ['modeid'], 'gradeexport_ilp_push_grmodes', ['id']);
+
+        // Conditionally launch create table for gradeexport_ilp_push_modeopt.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Ilp_push savepoint reached.
+        upgrade_plugin_savepoint(true, 2019111800, 'gradeexport', 'ilp_push');
+    }
+
+    if ($oldversion < 2019111801) {
+
+        // Define field sortorder to be added to gradeexport_ilp_push_modeopt.
+        $table = new xmldb_table('gradeexport_ilp_push_modeopt');
+        $field = new xmldb_field('sortorder', XMLDB_TYPE_INTEGER, '3', null, XMLDB_NOTNULL, null, '0', 'mostcurrent');
+
+        // Conditionally launch add field sortorder.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field sortorder to be added to gradeexport_ilp_push_grmodes.
+        $table = new xmldb_table('gradeexport_ilp_push_grmodes');
+        $field = new xmldb_field('sortorder', XMLDB_TYPE_INTEGER, '3', null, XMLDB_NOTNULL, null, '0', 'enabled');
+
+        // Conditionally launch add field sortorder.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Ilp_push savepoint reached.
+        upgrade_plugin_savepoint(true, 2019111801, 'gradeexport', 'ilp_push');
+    }
+
+    if ($oldversion < 2019121000) {
+        // Define field gradeoptid to be added to gradeexport_ilp_push_grades.
+        $table = new xmldb_table('gradeexport_ilp_push_grades');
+        $field = new xmldb_field('gradeoptid', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'studentilpid');
+
+        // Conditionally launch add field gradeoptid.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define key gradeoptid (foreign) to be added to gradeexport_ilp_push_grades.
+        $table = new xmldb_table('gradeexport_ilp_push_grades');
+        $key = new xmldb_key('gradeoptid', XMLDB_KEY_FOREIGN, ['gradeoptid'], 'gradeexport_ilp_push_modeopt', ['id']);
+
+        // Launch add key gradeoptid.
+        $dbman->add_key($table, $key);
+
+        // Ilp_push savepoint reached.
+        upgrade_plugin_savepoint(true, 2019121000, 'gradeexport', 'ilp_push');
+    }
+
+    if ($oldversion < 2019121001) {
+        // Upgrade the base grade mode.
+        gradeexport_ilp_push_upgrade_create_default_grade_mode();
+
+        // Ilp_push savepoint reached.
+        upgrade_plugin_savepoint(true, 2019121001, 'gradeexport', 'ilp_push');
     }
 
 

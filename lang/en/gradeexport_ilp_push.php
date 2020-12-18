@@ -46,6 +46,13 @@ $string['status_success'] = 'Succeeded';
 $string['status_failed'] = 'Failed';
 $string['status_locked'] = 'Locked';
 
+$string['date_last_attended'] = 'Date last attended';
+$string['incomplete_deadline'] = 'Incomplete deadline';
+$string['incomplete_default_grade'] = 'Incomplete default grade';
+
+$string['show_history'] = 'Show history ({$a})';
+$string['hide_history'] = 'Hide history';
+
 // Settings Form.
 $string['status_filter'] = 'Status Filter';
 $string['filter_all'] = 'All';
@@ -55,6 +62,27 @@ $string['filter_error'] = 'Errored';
 $string['filter_done'] = 'Complete';
 
 $string['reference_grade'] = 'Reference Grade';
+$string['grade_mode'] = 'Grade Mode';
+
+$string['group_filter'] = 'Group Filter';
+
+$string['section_filter'] = 'Section Filter';
+
+// Messages.
+$string['messageprovider:publish_success'] = 'Notification on grade publish success';
+$string['messageprovider:publish_error'] = 'Notification on grade publish error';
+
+$string['message_url_text'] = 'View course export';
+$string['message_success_subject'] = 'Grades for {$a->crn} successfully submitted to Banner';
+$string['message_success_body'] = 'The grades for {$a->count} student(s) in {$a->crn} were successfully submitted to Banner.';
+$string['message_success_short'] = 'The grades for {$a->count} student(s) in {$a->crn} were successfully submitted to Banner.';
+
+$string['message_error_subject'] = 'Error while submitting grades for {$a->crn} to Banner';
+$string['message_error_body'] = 'There were {$a->errorcount} error(s) while attempting to submit grades for the course {$a->crn} to Banner.
+{$a->successcount} grade(s) were submitted successfully.
+
+For more information, return the the course export screen, or follow this link {$a->urlstr}.';
+$string['message_error_short'] = 'There were {$a->errorcount} error(s) while attempting to submit grades for the course {$a->crn} to Banner.';
 
 // Rule validation.
 $string['invalid_datelastattended_early'] = 'Date last attended cannot be before the start of the course.';
@@ -72,6 +100,10 @@ $string['invalid_incomplete_grade_wrong'] = 'Default incomplete grade cannot be 
 
 $string['invalid_incomplete_grade'] = 'Default incomplete grade must be set to "{$a}".';
 $string['invalid_incomplete_date'] = 'Incomplete deadline must be between {$a->start} and {$a->end}. Please use MM/DD/YYYY or YYYY-MM-DD format.';
+$string['invalid_incomplete_date_range'] = 'Incomplete deadline must be between {$a->start} and {$a->end}. Please use MM/DD/YYYY or YYYY-MM-DD format.';
+$string['invalid_incomplete_date_start'] = 'Incomplete deadline must be on or after {$a->start}. Please use MM/DD/YYYY or YYYY-MM-DD format.';
+$string['invalid_incomplete_date_end'] = 'Incomplete deadline must be on or before {$a->end}. Please use MM/DD/YYYY or YYYY-MM-DD format.';
+$string['invalid_incomplete_date_single'] = 'Incomplete deadline must be on {$a->start}. Please use MM/DD/YYYY or YYYY-MM-DD format.';
 $string['invalid_datelastattended'] = 'Date last attended must be between {$a->start} and {$a->end}. Please use MM/DD/YYYY or YYYY-MM-DD format.';
 
 $string['grader_no_id'] = 'The current user has no SIS ID, and so cannot export grades to Banner.';
@@ -87,6 +119,12 @@ $string['ilppassword'] = 'ILP Connection Password';
 $string['ilppassword_help'] = 'The connection password setup in the ILP admin.';
 $string['ilpurl'] = 'ILP URL';
 $string['ilpurl_help'] = 'The base URL of the ILP server being used';
+
+$string['verify'] = 'Verify SSL Certificate';
+$string['dont_verify'] = 'Do not verify certificate';
+$string['curl_ssl_verify'] = 'Verify remote peer SSL cert';
+$string['curl_ssl_verify_help'] = 'Option to disable cURL\'s certificate verification of the remote peer (ILP).<br>
+Potentially useful in data-centers with self-signed certs, but opens up the possibility of man-in-the-middle attacks.';
 
 $string['logginglevel'] = 'Error logging';
 $string['logginglevel_help'] = 'Log messages at this level or higher will be logged. TODO.';
@@ -105,6 +143,8 @@ $string['exception_curl_failure'] = 'Curl execution failed. Error: {$a}.';
 $string['exception_bad_response'] = 'Bad response from ILP. {$a}';
 $string['exception_course_mismatch'] = 'Course submitted does match page course.';
 $string['exception_user_mismatch'] = 'Submitting user does not match data in form.';
+$string['exception_grade_mode_mismatch'] = 'Grade value did not match it\'s the submitted grade mode.';
+$string['exception_grade_mode_missing'] = 'Grade mode could not be found.';
 
 // Events.
 $string['eventgradeexported'] = 'Grade exported to Banner';

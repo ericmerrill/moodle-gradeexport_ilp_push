@@ -64,24 +64,35 @@ class grade_exporter implements templatable {
 
     protected $onlyactive = true; // TODO - Setting.
 
+    /** @var grade_item[] Grade items in this course. */
     protected $gradeitems;
 
+    /** @var grade_item The course grade item in this course. */
     protected $coursegradeitem;
 
+    /** @var grade_item The selected 'reference' grade item for this course. */
     protected $currentgradeitem;
 
-    protected $groupid;
-
+    /** @var object The course object. */
     protected $course;
 
+    /** @var user_grade_row[] The grade rows that we are using. */
     protected $userrows = null;
 
-    protected $alluserrows = null;
-
+    /** @var int Grade type of this export (final/midterm). */
     protected $gradetype = self::GRADE_TYPE_FINAL;
 
+    /** @var grade_mode The default grade mode object for this export. */
+    protected $grademode = null;
+
+    /** @var int The status filter to apply. */
     protected $statusfilter = self::FILTER_NEEDS_ATTENTION;
 
+    /** @var int Filter by this group id. */
+    protected $groupid;
+
+    /** @var string|int The section id to filter to. */
+    protected $sectionid;
 
     /**
      * Constructor to set everything up.
@@ -91,7 +102,7 @@ class grade_exporter implements templatable {
      */
     public function __construct($course, $groupid = null) {
         $this->course = $course;
-        $this->groupid = $groupid;
+        //$this->groupid = $groupid;
 
         $this->regrade_if_needed();
 
@@ -99,8 +110,17 @@ class grade_exporter implements templatable {
         $this->gradeitems = grade_item::fetch_all(array('courseid'=>$this->course->id));
         $this->coursegradeitem = grade_item::fetch_course_item($course->id);
 
-        $this->statusfilter = get_user_preferences('gradeexport_ilp_push_status_filter', $this->statusfilter);
-        $this->set_grade_item(get_user_preferences('gradeexport_ilp_push_reference_grade-'.$this->course->id, $this->statusfilter));
+        $this->statusfilter = get_user_preferences('gradeexport_ilp_push_status_filter-'.$this->course->id, $this->statusfilter);
+
+        $this->groupid = get_user_preferences('gradeexport_ilp_push_group_filter-'.$this->course->id);
+
+        $this->sectionid = get_user_preferences('gradeexport_ilp_push_section_filter-'.$this->course->id);
+
+        $grademodeid = get_user_preferences('gradeexport_ilp_push_grade_mode-'.$this->course->id);
+
+        $this->grademode = banner_grades::get_grade_mode($grademodeid);
+
+        $this->set_grade_item(get_user_preferences('gradeexport_ilp_push_reference_grade-'.$this->course->id));
 
     }
 
@@ -128,6 +148,19 @@ class grade_exporter implements templatable {
         $this->currentgradeitem = $this->gradeitems[$itemid];
     }
 
+    public function get_user_grade_row($userid) {
+        // TODO - Probably a more efficient way to do this. Currently load all grades.
+        $this->build_user_data();
+
+        foreach ($this->userrows as $userrow) {
+            if ($userrow->get_user()->id == $userid) {
+                return $userrow;
+            }
+        }
+
+        return false;
+    }
+
     protected function build_user_data() {
         if (!is_null($this->userrows)) {
             return;
@@ -138,7 +171,6 @@ class grade_exporter implements templatable {
         $profilefields = grade_helper::get_user_profile_fields($this->course->id, true);
         $this->displaytype = [GRADE_DISPLAY_TYPE_REAL, GRADE_DISPLAY_TYPE_PERCENTAGE, GRADE_DISPLAY_TYPE_LETTER];
 
-        // $geub = new grade_export_update_buffer();$status = $geub->track($grade);$geub->close(); TODO.
         $gui = new graded_users_iterator($this->course, $this->get_grade_columns(), $this->groupid);
         $gui->require_active_enrolment($this->onlyactive);
         $gui->allow_user_custom_fields(true);
@@ -156,19 +188,22 @@ class grade_exporter implements templatable {
             // We only use one grade item, so that is easy...
             $grade = reset($userdata->grades);
 
-            $userrow = new user_grade_row($user, $this, $grade, $this->currentgradeitem);
+            $userrow = new user_grade_row($user, $this, $grade, $this->currentgradeitem, $this->grademode);
 
             $userrows[] = $userrow;
 
         }
         $gui->close();
 
-
         $this->userrows = $userrows;
     }
 
     public function get_course() {
         return $this->course;
+    }
+
+    public function get_grade_mode() {
+        return $this->grademode;
     }
 
     public function get_grade_type() {
@@ -251,10 +286,12 @@ class grade_exporter implements templatable {
         task\process_user_course_task::register_task_for_user_course($USER->id, $this->course->id);
     }
 
+    /**
+     * Build and return the options form.
+     *
+     * @return options_form
+     */
     public function get_options_form() {
-
-
-
         // Get all the grade items.
         $seq = new \grade_seq($this->course->id, true, true);
         $selectitems = [];
@@ -263,12 +300,16 @@ class grade_exporter implements templatable {
         }
 
         $params = ['id' => $this->course->id,
-                   'gradeoptions' => $selectitems];
+                   'gradeoptions' => $selectitems,
+                   'course' => $this->course];
         $class = ['class' => 'gradingoptions'];
 
         $form = new options_form(null, $params, 'post', '', $class);
 
         $data = ['statusfilter' => $this->statusfilter,
+                 'groupfilter' => $this->groupid,
+                 'sectionfilter' => $this->sectionid,
+                 'grademode' => $this->grademode->id,
                  'referencegrade' => $this->currentgradeitem->id];
 
         $form->set_data($data);
@@ -276,18 +317,35 @@ class grade_exporter implements templatable {
         return $form;
     }
 
+    /**
+     * Process data out of the options form.
+     */
     public function process_options_form() {
         $form = $this->get_options_form();
 
         if ($data = $form->get_data()) {
             if (isset($data->statusfilter)) {
-                set_user_preference('gradeexport_ilp_push_status_filter', $data->statusfilter);
+                set_user_preference('gradeexport_ilp_push_status_filter-'.$this->course->id, $data->statusfilter);
                 $this->statusfilter = $data->statusfilter;
+            }
+
+            if (isset($data->groupfilter)) {
+                $this->groupid = $data->groupfilter;
+                set_user_preference('gradeexport_ilp_push_group_filter-'.$this->course->id, $data->groupfilter);
+            }
+
+            if (isset($data->sectionfilter)) {
+                $this->sectionid = $data->sectionfilter;
+                set_user_preference('gradeexport_ilp_push_section_filter-'.$this->course->id, $data->sectionfilter);
             }
 
             if (isset($data->referencegrade)) {
                 $this->set_grade_item($data->referencegrade);
                 set_user_preference('gradeexport_ilp_push_reference_grade-'.$this->course->id, $this->currentgradeitem->id);
+            }
+
+            if (isset($data->grademode)) {
+                set_user_preference('gradeexport_ilp_push_grade_mode-'.$this->course->id, $data->grademode);
             }
         }
     }
@@ -303,40 +361,48 @@ class grade_exporter implements templatable {
     protected function filters_allow_row(user_grade_row $row) {
         $status = $row->get_current_status();
 
+        $allowed = false;
         switch ($this->statusfilter) {
             case (static::FILTER_ALL):
-                return true;
+                $allowed = true;
                 break;
             case (static::FILTER_NEEDS_ATTENTION):
                 // For this status, we show grades that need editing or showed an error.
                 if ($status === saved_grade::GRADING_STATUS_EDITING
                         || $status === saved_grade::GRADING_STATUS_FAILED
                         || $status === saved_grade::GRADING_STATUS_LOCKED) {
-                    return true;
+                    $allowed = true;
                 }
                 break;
             case (static::FILTER_IN_PROGRESS):
                 if ($row->is_in_progress()) {
-                    return true;
+                    $allowed = true;
                 }
                 break;
             case (static::FILTER_ERROR):
                 // For this status, we show grades that show an error, including locked error.
                 // TODO - split internal locked vs error lock.
                 if ($status === saved_grade::GRADING_STATUS_FAILED || $status === saved_grade::GRADING_STATUS_LOCKED) {
-                    return true;
+                    $allowed = true;
                 }
                 break;
             case (static::FILTER_DONE):
                 // For this status, we show grades that show an error, including locked error.
                 // TODO - split internal locked vs error lock.
                 if ($status === saved_grade::GRADING_STATUS_PROCESSED) {
-                    return true;
+                    $allowed = true;
                 }
                 break;
         }
 
-        return false;
+        if ($allowed && !empty($this->sectionid) && $this->sectionid != static::FILTER_ALL) {
+            if (!sis_interface\factory::instance()->user_in_filter_section_id($row->get_course(),
+                    $row->get_user(), $this->sectionid)) {
+                $allowed = false;
+            }
+        }
+
+        return $allowed;
     }
 
 }

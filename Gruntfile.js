@@ -53,16 +53,44 @@ module.exports = function (grunt) {
 
                     // Just add one to confirm success.
                     if (!error) {
+                        grunt.log.writeln("All Moodle caches reset.");
+                    }
+                }
+            },
+            decachetheme: {
+                cmd: 'php "../../../admin/cli/purge_caches.php" --theme && php "../../../admin/cli/build_theme_css.php" --themes=boost --direction=ltr',
+                callback: function(error) {
+                    if (!error) {
                         grunt.log.writeln("Moodle theme cache reset.");
                     }
                 }
+            },
+            decachejs: {
+                cmd: 'php "../../../admin/cli/purge_caches.php" --js',
+                callback: function(error) {
+                    if (!error) {
+                        grunt.log.writeln("Moodle JS cache reset.");
+                    }
+                }
+            },
+            decachelang: {
+                cmd: 'php "../../../admin/cli/purge_caches.php" --lang',
+                callback: function(error) {
+                    if (!error) {
+                        grunt.log.writeln("Moodle lang cache reset.");
+                    }
+                }
             }
+
         },
         watch: {
+            options: {
+                nospawn: true // We need not to spawn so config can be changed dynamically.
+            },
             amd: {
                 // If any .js file changes in directory "amd/src" then run the "amd" task.
-                files: "amd/src/*.js",
-                tasks: ["amd"]
+                files: ["**/amd/src/*.js"],
+                tasks: ["amd", "decachejs"]
             },
             scss: {
                 // If any .scss file changes in directory "scss" then run the "cssignore" task.
@@ -107,6 +135,9 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks("grunt-exec");
 
     grunt.registerTask('decache', ['exec:decache']);
+    grunt.registerTask('decachetheme', ['exec:decachetheme']);
+    grunt.registerTask('decachejs', ['exec:decachejs']);
+    grunt.registerTask('decachelang', ['exec:decachelang']);
 
     grunt.registerTask('amd', ['eslint:amd', 'uglify']);
     grunt.registerTask('css', ['stylelint:scss', 'sass']);

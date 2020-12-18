@@ -1,7 +1,12 @@
-
-
 .path-grade-export-ilp_push {
     .gradingtable {
+        > thead,
+        > tbody:nth-child(odd) {
+            background-color: rgba(0, 0, 0, 0.03);
+        }
+        > tbody:hover {
+            background-color: rgba(0, 0, 0, 0.06);
+        }
         td {
             padding-top: 8px;
             padding-bottom: 8px;
@@ -20,9 +25,49 @@
                 }
             }
         }
+
+        .userinfo {
+            width: 1%;
+            white-space: nowrap;
+            img.userpicture {
+                vertical-align: top;
+            }
+
+            .userdetails {
+                display: inline-block;
+                padding-right: 15px;
+
+                .fullname {
+                    display: inline-block;
+                }
+                .username,
+                .userid,
+                .courseid {
+                    font-size: 85%;
+                    color: #555;
+                }
+
+                .gradeline {
+                    float: right;
+                }
+            }
+
+        }
+
+        .grademode .currentgrademode {
+            filter: brightness(150%);
+            border-bottom-style: dashed;
+            border-bottom-width: 1px;
+            cursor: pointer;
+            font-size: 80%;
+        }
+        .historytable .grademode .currentgrademode {
+            cursor: auto;
+            border-bottom-width: 0;
+        }
         .checkbox {
             padding-top: 15px;
-            padding-left: 40px;
+            padding-left: 20px;
             display: block;
 
             input {
@@ -39,14 +84,9 @@
                     margin: 15px;
                 }
             }
-
         }
 
-        .spacerrow {
-            display: none;
-        }
-
-        .statusmessage {
+        .hidetopborder {
             border-top: none;
         }
 
@@ -61,34 +101,59 @@
         }
 
         .statusmessage {
-
             .statusmessagebox {
                 padding: 10px;
-
                 border-radius: 10px;
             }
         }
 
-        .userinfo {
-            img.userpicture {
-                vertical-align: top;
+        .historyrow .historycell {
+            &.hide {
+                display: none;
             }
+            .historydiv {
+                overflow: hidden;
+            }
+            .historytable {
+                width: 100%;
+                margin-bottom: 0.5rem;
 
-            .userdetails {
-                display: inline-block;
+                .labelvalue {
+                    &:not(:last-child) {
+                        margin-bottom: .3rem;
+                    }
 
-                .fullname {
-                    display: inline-block;
+                    label {
+                        font-weight: bold;
+                        margin-bottom: 0;
+                    }
+                    label::after {
+                        content: ":";
+                        padding-right: 5px;
+                    }
+                    .value {
+                        white-space: nowrap;
+                    }
                 }
-                .username,
-                .userid,
-                .courseid {
-                    font-size: 85%;
-                    color: #555;
+
+                .statuscontainer {
+                    padding: 5px;
+                    border-radius: 5px;
+
+                    .statusicon {
+                        font-size: 100%;
+                    }
+
+                    .statustext {
+                        display: inline;
+                    }
                 }
 
-                .gradeline {
-                    float: right;
+                .statusmessage {
+                    .statusmessagebox {
+                        padding: 5px;
+                        border-radius: 5px;
+                    }
                 }
             }
         }
@@ -100,5 +165,5 @@
         }
     }
 
-}
 
+}

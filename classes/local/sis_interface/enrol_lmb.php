@@ -42,14 +42,14 @@ class enrol_lmb extends base {
 
     protected $courseenrolids = [];
 
+    protected $courseidmappings = [];
+
     protected $userdisplayids = [];
 
     protected $profileid = null;
 
 
     public function get_course_id_for_user($course, $user) {
-
-
 
         if (!isset($this->courseenrolids[$course->id])) {
             $this->load_course_user_mappings($course);
@@ -87,6 +87,44 @@ class enrol_lmb extends base {
         }
 
         return parent::get_user_display_id($user);
+    }
+
+    public function get_section_filters_for_course($course) {
+        global $DB;
+
+        if (isset($this->courseidmappings[$course->id])) {
+            return $this->courseidmappings[$course->id];
+        }
+
+        $sql = "SELECT xlsmem.id, xlsmem.sdid FROM {enrol_lmb_crosslists} xls
+                  JOIN {enrol_lmb_crosslist_members} xlsmem
+                        ON xls.id = xlsmem.crosslistid
+                        AND status = 1
+                 WHERE xls.sdid = ?
+              ORDER BY xlsmem.sdid ASC";
+
+        $records = $DB->get_records_sql($sql, [$course->idnumber]);
+
+        if (empty($records)) {
+            $this->courseidmappings[$course->id] = [];
+            return [];
+        }
+
+        $output = [];
+        foreach ($records as $record) {
+            $output[$record->sdid] = $record->sdid;
+        }
+
+        $this->courseidmappings[$course->id] = $output;
+        return $output;
+    }
+
+    public function user_in_filter_section_id($course, $user, $sectionid) {
+        if ($this->get_course_id_for_user($course, $user) === $sectionid) {
+            return true;
+        }
+
+        return false;
     }
 
     protected function load_course_user_mappings($course) {

@@ -1,0 +1,98 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template gradeexport_ilp_push/user_row
+
+    The transcript course table.
+
+    Example context (json):
+    {
+        "actionurl": "https://example.com/mod/forum/search.php",
+        "courseid": "2",
+        "words": "apples",
+        "phrase": "Lorem ipsum dolor",
+        "notwords": "Not these words",
+        "showfullwords": [
+            {
+                "fullwords": "Exactly"
+            }
+        ],
+        "datefromchecked": 1,
+        "datetochecked": "",
+        "forumoptions": [
+            {
+                "name": "Forum One",
+                "value": "23"
+            },
+            {
+                "name": "Forum Two",
+                "value": "34"
+            }
+        ],
+        "subject": "Help me please",
+        "user": "Helpy McUser"
+    }
+}}
+
+
+<table class="historytable table table-striped" data-history-count="{{historycount}}">
+{{#historyrows}}
+    <tr class="usergraderow {{{classes}}}">
+        <td class="date">
+            <div>{{date}}</div>
+        </td>
+        <td class="bannergrade">
+            <div class="grademode">
+                <div>
+                    <span class="currentgrademode">{{grademodename}}</span>
+                </div>
+            </div>
+            <div class="labelvalue grade">
+                <label>{{# str }} grade {{/ str }}</label>
+                <span class="value gradestr">{{grade}}</span>
+            </div>
+            {{#datelastattended}}
+                <div class="labelvalue datelastattended">
+                    <label>{{# str }} date_last_attended, gradeexport_ilp_push {{/ str }}</label>
+                    <span class="value datestr">{{datelastattended}}</span>
+                </div>
+            {{/datelastattended}}
+            {{#incompletedeadline}}
+                <div class="labelvalue incompletedeadline">
+                    <label>{{# str }} incomplete_deadline, gradeexport_ilp_push {{/ str }}</label>
+                    <span class="value datestr">{{incompletedeadline}}</span>
+                </div>
+                <div class="labelvalue incompletegrade">
+                    <label>{{# str }} incomplete_default_grade, gradeexport_ilp_push {{/ str }}</label>
+                    <span class="value gradestr">{{incompletegrade}}</span>
+                </div>
+            {{/incompletedeadline}}
+        </td>
+
+        <td class="status">
+            {{{status}}}
+        </td>
+        
+        {{#statusmessage}}
+            <td colspan="5" class="statusmessage">            
+                {{{statusmessage}}}
+            </td>
+        {{/statusmessage}}
+    </tr>
+
+{{/historyrows}}
+</table>

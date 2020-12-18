@@ -16,15 +16,15 @@
 /**
  * Javascript dealing with each grading row.
  *
- * @module     gradeexport_push_ilp/row_control
- * @package    gradeexport_push_ilp
+ * @module     gradeexport_ilp_push/row_control
+ * @package    gradeexport_ilp_push
  * @author     Eric Merrill (merrill@oakland.edu)
  * @copyright  2019 Oakland University (https://www.oakland.edu)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['jquery', 'gradeexport_ilp_push/page_info', 'core/templates', 'core/str', 'core/log'],
-        function($, pageInfo, templates, str, log) {
+define(['jquery', 'gradeexport_ilp_push/page_info', 'core/ajax', 'core/notification', 'core/templates', 'core/str', 'core/log'],
+        function($, pageInfo, ajax, notification, templates, str, log) {
 
     var RowController = {
         failGrades: false,
@@ -68,6 +68,22 @@ define(['jquery', 'gradeexport_ilp_push/page_info', 'core/templates', 'core/str'
                 RowController.updateVerification(row);
             });
 
+            row.find('.grademode .currentgrademode').eq(0).click(function() {
+                RowController.showGradeModeSelector(row);
+            });
+
+            row.find('.grademode .grademodeselect').eq(0).change(function() {
+                RowController.changeGradeMode(row);
+            });
+
+            row.find('.grademode .grademodeselect').eq(0).focusout(function() {
+                RowController.hideGradeModeSelector(row);
+            });
+
+            row.find('.togglehistory a').eq(0).click(function(event) {
+                event.preventDefault();
+                RowController.toggleHistory(row);
+            });
 
             RowController.updateVerification(row);
         },
@@ -141,6 +157,9 @@ define(['jquery', 'gradeexport_ilp_push/page_info', 'core/templates', 'core/str'
                     errorCode = 'invalid_incomplete_date';
                 }
 
+                if (errorCode != '') {
+                    errorCode = pageInfo.getIncompleteDeadlineStringName();
+                }
                 RowController.updateFormWarning(row, '.incompletedateerror', errorCode, pageInfo.getStringIncompleteDeadline());
 
                 var incompleteSelect = row.find('.incompletegradeselect').eq(0);
@@ -176,6 +195,80 @@ define(['jquery', 'gradeexport_ilp_push/page_info', 'core/templates', 'core/str'
                 confirm.prop("disabled", false);
             }
             return;
+        },
+
+        showGradeModeSelector: function(row) {
+            var currentGradeMode = row.find('.grademode .currentgrademode');
+            var selector = row.find('.grademode .grademodeselect');
+
+            currentGradeMode.hide();
+            selector.show();
+        },
+
+        hideGradeModeSelector: function(row) {
+            var currentGradeMode = row.find('.grademode .currentgrademode');
+            var selector = row.find('.grademode .grademodeselect');
+
+            currentGradeMode.show();
+            selector.hide();
+        },
+
+        changeGradeMode: function(row) {
+            var currentGradeMode = row.find('.grademode .currentgrademode');
+            var selector = row.find('.grademode .grademodeselect');
+
+            var newGradeModeId = selector.find('select').eq(0).val();
+            var studentId = row.data('user-id');
+            var rowId = row.data('row-id');
+            var courseId = row.closest('form').find('input[name="courseid"]').val();
+
+            ajax.call([{
+                methodname: 'gradeexport_ilp_push_update_row_grade_mode',
+                args: {rowid: rowId, grademodeid: newGradeModeId, studentid: studentId, courseid: courseId},
+                done: function(response) {
+                    if (response.warnings.length > 0) {
+                        notification.alert(
+                            response.warnings[0].message,
+                            response.warnings[0].item
+                        );
+
+                        currentGradeMode.show();
+                        selector.hide();
+
+                        return;
+                    }
+                    templates.render('gradeexport_ilp_push/user_row', JSON.parse(response.rowdata))
+                        .then(function(html, js) {
+                            // Find any neighboring status rows and remove them.
+                            row.siblings('tr[data-row-id="' + rowId + '"]').remove();
+                            templates.replaceNode(row, html, js);
+                            row = $('.gradingtable .usergraderow[data-row-id="' + rowId + '"]').eq(0);
+                            RowController.initRow(row);
+                            return null;
+                        }).fail(function(ex) {
+                            notification.exception(ex);
+                        });
+
+                },
+                fail: notification.exception
+            }]);
+
+        },
+
+        toggleHistory: function(row) {
+            var historyTd = $('#historyrow-' + row.data('row-id') + ' td.historycell');
+            var historyDiv = historyTd.find('.historydiv');
+
+            if (historyTd.is(":hidden")) {
+                historyTd.slideDown(100);
+                historyDiv.slideDown(400);
+            } else {
+                historyDiv.animate({height: 0}, 400, function() {
+                    historyDiv.hide();
+                    historyDiv.height('auto');
+                });
+                historyTd.hide(400);
+            }
         }
     };
 

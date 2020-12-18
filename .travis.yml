@@ -5,17 +5,18 @@ services:
   - postgresql
   - docker
 
+services:
+  - mysql
+  - postgresql
+
 cache:
   directories:
     - $HOME/.composer/cache
     - $HOME/.npm
 
-php:
- - $PHPVER
-
 env:
  global:
-  - PHPUNIT_IGNORE_PATHS=cli,db,settings.php,version.php,ws_endpoint.php
+  - PHPUNIT_IGNORE_PATHS=cli,db,settings.php,version.php
   - COVERALLS=FALSE
   - SKIPAMD=FALSE
 
@@ -67,6 +68,7 @@ before_install:
   - export PATH="$(cd ci/bin; pwd):$(cd ci/vendor/bin; pwd):$PATH"
 
 install:
+  - moodle-plugin-ci add-plugin merrill-oakland/lmbnxt
   - moodle-plugin-ci install
 
 script:

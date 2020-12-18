@@ -41,6 +41,10 @@ class settings {
 
     protected $settings = null;
 
+    protected $termid = null;
+
+    protected $termsettings = null;
+
     /**
      * A static factory for the settings object.
      *
@@ -52,6 +56,10 @@ class settings {
         }
 
         return static::$settingobj;
+    }
+
+    protected function set_term_id($termid) {
+
     }
 
     protected function __construct() {

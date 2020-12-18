@@ -52,10 +52,12 @@ class rule_validator {
             }
         }
 
+        $grademode = $grade->get_grade_mode();
+
         // TODO - setting rules.
 
         // If the grade is failing, there must be a date last attended.
-        if (banner_grades::grade_key_is_failing($grade->gradekey)) {
+        if ($grademode->grade_id_is_failing($grade->gradeid)) {
             $lastattenddates = banner_grades::get_allowed_last_attend_dates($course);
             if (is_null($grade->datelastattended)) {
                 $results['errors']['datelastattended'] = get_string('invalid_datelastattended_missing', 'gradeexport_ilp_push');
@@ -73,7 +75,7 @@ class rule_validator {
         }
 
 
-        if (banner_grades::grade_key_is_incomplete($grade->gradekey)) {
+        if ($grademode->grade_id_is_incomplete($grade->gradeid)) {
             if (is_null($grade->incompletegrade)) {
                 // If the grade is incomplete, there must be an incomplete grade.
                 $results['errors']['incompletegrade'] = get_string('invalid_incomplete_grade_missing', 'gradeexport_ilp_push');
@@ -89,13 +91,14 @@ class rule_validator {
             if (is_null($grade->incompletedeadline)) {
                 // TODO - this might not be required...
                 $results['errors']['incompletedeadline'] = get_string('invalid_incomplete_date_missing', 'gradeexport_ilp_push');
-            } else if ($grade->incompletedeadline < $incompletedeadline->start) {
+            } else if (($incompletedeadline->start !== false) && ($grade->incompletedeadline < $incompletedeadline->start)) {
                 // If present, the incomplete date must be within a certain timeline (settings dependent).
                 // TODO better date ranges and error messages...
                 $results['errors']['incompletedeadline'] = get_string('invalid_incomplete_date_early', 'gradeexport_ilp_push');
-            } else if ($grade->incompletedeadline > $incompletedeadline->end) {
+            } else if (($incompletedeadline->end !== false) && ($grade->incompletedeadline > $incompletedeadline->end)) {
                 $results['errors']['incompletedeadline'] = get_string('invalid_incomplete_date_late', 'gradeexport_ilp_push');
             }
+
         }
 
         return $results;

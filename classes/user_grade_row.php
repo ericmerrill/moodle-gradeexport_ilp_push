@@ -58,6 +58,10 @@ class user_grade_row implements templatable {
 
     protected $newgradesave;
 
+    protected $grademode;
+
+    protected $coursegrademode;
+
     protected $user;
 
     protected $course;
@@ -77,12 +81,14 @@ class user_grade_row implements templatable {
     /**
      * Basic constructor.
      */
-    public function __construct($user, $exporter, $grade, $gradeitem) {
+    public function __construct($user, $exporter, $grade, $gradeitem, $grademode) {
         $this->user = $user;
         $this->exporter = $exporter;
         $this->course = $exporter->get_course();
         $this->grade = $grade;
         $this->gradeitem = $gradeitem;
+        $this->grademode = $grademode;
+        $this->coursegrademode = $grademode;
         $this->sis = sis_interface\factory::instance();
         $this->fetch_existing_rows();
     }
@@ -103,6 +109,32 @@ class user_grade_row implements templatable {
         $this->currentsavedgrade = end($savedgrades);
         reset($savedgrades);
         $this->pastsavedgrades = $savedgrades;
+
+        // Get the current grade mode;
+        $grademodeid = $this->currentsavedgrade->grademodeid;
+        $this->grademode = banner_grades::get_grade_mode($grademodeid);
+    }
+
+    /**
+     * Get the user object for the user this row represents.
+     *
+     * @return object
+     */
+    public function get_user() {
+        return $this->user;
+    }
+
+    /**
+     * Get the course object that goes with this row.
+     *
+     * @return object
+     */
+    public function get_course() {
+        return $this->course;
+    }
+
+    public function set_grade_mode($grademode) {
+        $this->grademode = $grademode;
     }
 
     public function get_form_id($prefix = false) {
@@ -118,37 +150,35 @@ class user_grade_row implements templatable {
     }
 
     public function get_current_grade_key() {
-        $letter = null;
-        if ($this->currentsavedgrade) {
-            // TODO - May need to refine how this works later...
-            $letter = $this->currentsavedgrade->grade;
+        if ($this->currentsavedgrade && isset($this->currentsavedgrade->gradeoptid)) {
+            return $this->currentsavedgrade->gradeoptid;
         }
 
-        if (is_null($letter)) {
-            return $this->get_moodle_grade_key();
-        }
+        return $this->get_moodle_grade_key();
+    }
 
-        return banner_grades::find_key_for_letter($letter);
+    public function get_current_grade_mode() {
+        return $this->grademode;
     }
 
     public function get_moodle_grade_key() {
         $letter = $this->get_formatted_grade(GRADE_DISPLAY_TYPE_LETTER);
 
-        return banner_grades::find_key_for_letter($letter);
+        $grade = $this->grademode->get_grade_for_string($letter);
+
+        if (!empty($grade)) {
+            return $grade->id;
+        }
+
+        return false;
     }
 
     public function get_current_incomplete_grade_key() {
-        $letter = null;
-        if ($this->currentsavedgrade) {
-            // TODO - May need to refine how this works later...
-            $letter = $this->currentsavedgrade->incompletegrade;
+        if ($this->currentsavedgrade && isset($this->currentsavedgrade->incompletegradeid)) {
+            return $this->currentsavedgrade->incompletegradeid;
         }
 
-        if (is_null($letter)) {
-            return banner_grades::get_default_incomplete_grade();
-        }
-
-        return banner_grades::find_key_for_letter($letter);
+        return banner_grades::get_default_incomplete_grade();
     }
 
     /**
@@ -184,6 +214,61 @@ class user_grade_row implements templatable {
         return $formatted;
     }
 
+    public function export_history_for_template(\renderer_base $renderer) {
+        $rows = [];
+
+        if (!empty($this->pastsavedgrades)) {
+            foreach ($this->pastsavedgrades as $savedgrade) {
+                $row = new stdClass();
+                if (empty($savedgrade->id)) {
+                    // Not saved to DB, so ignoring for purposes of history.
+                    continue;
+                }
+                if (isset($savedgrade->usersubmittime)) {
+                    $date = $savedgrade->usersubmittime;
+                } else {
+                    $date = $savedgrade->timecreated;
+                }
+                $row->date = userdate($date);
+                $row->grademodename = $savedgrade->get_grade_mode()->name;
+                $grade = $savedgrade->get_grade();
+                if ($grade) {
+                    $row->grade = $grade->get_display_name();
+                } else {
+                    $row->grade = '-';
+                }
+
+                if (isset($savedgrade->datelastattended)) {
+                    $row->datelastattended = userdate($savedgrade->datelastattended, get_string('strftimedate', 'langconfig'));
+                } else {
+                    $row->datelastattended = false;
+                }
+
+                if (isset($savedgrade->incompletedeadline)) {
+                    $row->incompletedeadline = userdate($savedgrade->incompletedeadline, get_string('strftimedate', 'langconfig'));
+                    if (isset($savedgrade->incompletegradeid)) {
+                        $grade = $savedgrade->get_grade_mode()->get_grade($savedgrade->incompletegradeid);
+                        $row->incompletegrade = $grade->get_display_name();
+                    } else {
+                        $row->incompletegrade = '-';
+                    }
+                } else {
+                    $row->incompletedeadline = false;
+                }
+
+                $row->statusmessage = $renderer->render_status_messages($savedgrade);
+                $row->status = $renderer->render_status($savedgrade);
+
+                $rows[] = $row;
+            }
+        }
+
+        $output = new stdClass();
+        $output->historyrows = array_reverse($rows);
+
+        return $output;
+    }
+
     public function export_for_template(\renderer_base $renderer) {
         global $OUTPUT;
 
@@ -197,6 +282,7 @@ class user_grade_row implements templatable {
         $output->username = $this->user->username;
         $output->userid = $this->user->id;
         $output->formid = $this->get_form_id();
+        $output->userrowspan = 1;
 
         $output->gradelink = $renderer->render_grade_link($fullname, $this->user->id, $this->course->id) ;
 
@@ -214,6 +300,9 @@ class user_grade_row implements templatable {
         $output->gradereal = $this->get_formatted_grade(GRADE_DISPLAY_TYPE_REAL);
         $output->gradepercent = $this->get_formatted_grade(GRADE_DISPLAY_TYPE_PERCENTAGE);
 
+        $output->grademodename = $this->get_current_grade_mode()->name;
+        $output->grademodeselect = $renderer->render_row_grade_mode_select($this);
+
         $output->gradeselect = $renderer->render_select_menu($this);
 
         $output->incompletegradeselect = $renderer->render_incomplete_select_menu($this);
@@ -229,8 +318,15 @@ class user_grade_row implements templatable {
             $output->incompletedeadline = false;
         }
 
+        $output->grademodeid = $this->grademode->id;
 
-
+        // Get the history with this grade row.
+        $history = $this->export_history_for_template($renderer);
+        $output->historycount = count($history->historyrows);
+        if (!empty($history->historyrows)) {
+            $output->historyrows = $history->historyrows;
+            $output->userrowspan++;
+        }
 
 
         foreach ($this->currenterrors as $id => $string) {
@@ -239,8 +335,8 @@ class user_grade_row implements templatable {
         }
 
         $currentkey = $this->get_current_grade_key();
-        $output->showincomplete = banner_grades::grade_key_is_incomplete($currentkey);
-        $output->showfailing = banner_grades::grade_key_is_failing($currentkey);
+        $output->showincomplete = $this->grademode->grade_id_is_incomplete($currentkey);
+        $output->showfailing = $this->grademode->grade_id_is_failing($currentkey);
 
         $moodlekey = $this->get_moodle_grade_key();
         $output->truegradekey = $moodlekey;
@@ -248,10 +344,12 @@ class user_grade_row implements templatable {
             $output->equal = true;
         }
 
-        $output->statusmessage = $renderer->render_status_messages($this);
-        $output->status = $renderer->render_status($this);
+        $output->statusmessage = $renderer->render_status_messages($grade);
+        $output->status = $renderer->render_status($grade);
 
-
+        if ($output->statusmessage) {
+            $output->userrowspan++;
+        }
 
 
         return $output;
@@ -339,14 +437,25 @@ class user_grade_row implements templatable {
 
         $grade->submitterid = $USER->id;
         $grade->submitterilpid = $this->sis->get_user_id($USER);
+        $key = $this->get_form_id('grademodeid');
+        $grade->grademodeid = $data->$key;
+        $grademode = banner_grades::get_grade_mode($grade->grademodeid);
 
-        $grade->grade = $this->get_ilp_grade_from_data($data, 'grade');
-        $key = $this->get_form_id('grade');
-        if (is_null($grade->grade)) {
-            // If the grade resolved to null (not a valid banner grade), we are also going to null the data, for latter use.
-            $data->$key = null;
+        if (empty($grademode)) {
+            throw new exception\grade_mode_missing();
         }
-        $grade->gradekey = $data->$key;
+
+        $gradeobj = $this->get_ilp_grade_from_data($data, 'grade');
+        if (is_null($gradeobj)) {
+            // If the grade resolved to null (not a valid banner grade), we are also going to null the data, for latter use.
+            $key = $this->get_form_id('grade');
+            $data->$key = null;
+            $grade->grade = null;
+            $grade->gradeoptid = null;
+        } else {
+            $grade->grade = $gradeobj->bannervalue;
+            $grade->gradeoptid = $gradeobj->id;
+        }
 
         // Check if the grade changed, so we know if we should unconditionally store it.
         if ($this->check_grade_changed($data, 'grade')) {
@@ -354,15 +463,19 @@ class user_grade_row implements templatable {
         }
 
         // Stuff only for incomplete grades.
-        if (banner_grades::grade_key_is_incomplete($grade->gradekey)) {
-            $grade->incompletegrade = $this->get_ilp_grade_from_data($data, 'incompletegrade');
-            $key = $this->get_form_id('incompletegrade');
-            if (is_null($grade->incompletegrade)) {
+        if ($grademode->grade_id_is_incomplete($grade->gradeoptid)) {
+            $gradeobj = $this->get_ilp_grade_from_data($data, 'incompletegrade');
+            if (is_null($gradeobj)) {
                 // If the grade resolved to null (not a valid banner grade), we are also going to null the data, for latter use.
+                $key = $this->get_form_id('incompletegrade');
                 $data->$key = null;
+                $grade->incompletegrade = null;
+                $grade->incompletegradeid = null;
+            } else {
+                $grade->incompletegrade = $gradeobj->bannervalue;
+                $grade->incompletegradeid = $gradeobj->id;
             }
 
-            $grade->incompletegradekey = $data->$key;
             if ($this->check_grade_changed($data, 'incompletegrade') || $grade->confirmed) {
                 $savetodb = true;
             }
@@ -376,7 +489,7 @@ class user_grade_row implements templatable {
         }
 
         // Stuff only for failing grades.
-        if (banner_grades::grade_key_is_failing($grade->gradekey)) {
+        if ($grademode->grade_id_is_failing($grade->gradeoptid)) {
             $lastattended = $this->get_timestamp_from_data($data, 'datelastattended');
             $currentvalue = $this->currentsavedgrade->datelastattended;
             $grade->datelastattended = $lastattended;
@@ -452,13 +565,27 @@ class user_grade_row implements templatable {
     }
 
     protected function get_ilp_grade_from_data($data, $formkey) {
+        $key = $this->get_form_id('grademodeid');
+        $grademodeid = $data->$key;
+        $grademode = banner_grades::get_grade_mode($grademodeid);
+
+        if (empty($grademode)) {
+            throw new exception\grade_mode_missing();
+        }
+
         $datakey = $this->get_form_id($formkey);
 
-        if (!isset($data->$datakey)) {
+        if (empty($data->$datakey)) {
             return null;
         }
 
-        return banner_grades::get_ilp_grade_for_key($data->$datakey);
+        $grade = $grademode->get_grade($data->$datakey);
+
+        if (empty($grade)) {
+            throw new exception\grade_mode_mismatch();
+        }
+
+        return $grade;
     }
 
     protected function get_timestamp_from_data($data, $formkey) {

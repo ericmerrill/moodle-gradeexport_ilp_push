@@ -16,8 +16,8 @@
 /**
  * Javascript dealing with each grading row.
  *
- * @module     gradeexport_push_ilp/row_control
- * @package    gradeexport_push_ilp
+ * @module     gradeexport_ilp_push/row_control
+ * @package    gradeexport_ilp_push
  * @author     Eric Merrill (merrill@oakland.edu)
  * @copyright  2019 Oakland University (https://www.oakland.edu)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -31,14 +31,25 @@ define([], function() {
         defaultIncomplete: false,
         lastAttendDates: false,
         incompleteDeadlineDates: false,
+        gradeModes: false,
 
         init: function(failGrades, incompleteGrades, defaultIncomplete, deadlineDates, lastAttendDates) {
             this.failGrades = failGrades;
             this.incompleteGrades = incompleteGrades;
             this.defaultIncomplete = defaultIncomplete;
-            this.incompleteDeadlineDates = {start: new Date(deadlineDates.start),
+
+            var start = deadlineDates.start;
+            if (start !== false) {
+                start = new Date(start);
+            }
+            var end = deadlineDates.end;
+            if (end !== false) {
+                end = new Date(end);
+            }
+
+            this.incompleteDeadlineDates = {start: start,
                                             userstart: deadlineDates.userstart,
-                                            end: new Date(deadlineDates.end),
+                                            end: end,
                                             userend: deadlineDates.userend};
             this.lastAttendDates = {start: new Date(lastAttendDates.start),
                                     userstart: lastAttendDates.userstart,
@@ -71,13 +82,14 @@ define([], function() {
         },
 
         isAllowedIncompleteDeadline: function(value) {
-            var date = new Date(value);
+            var date = new Date(value).getTime();
+            var st = this.incompleteDeadlineDates.start.getTime();
 
-            if (date < this.incompleteDeadlineDates.start) {
+            if ((this.incompleteDeadlineDates.start !== false) && (date < st)) {
                 return false;
             }
 
-            if (date > this.incompleteDeadlineDates.end) {
+            if ((this.incompleteDeadlineDates.end !== false) && (date > this.incompleteDeadlineDates.end.getTime())) {
                 return false;
             }
 
@@ -101,6 +113,20 @@ define([], function() {
         getStringLastAttendDates: function() {
             return {start: this.lastAttendDates.userstart,
                     end: this.lastAttendDates.userend};
+        },
+
+        getIncompleteDeadlineStringName: function() {
+            if (this.incompleteDeadlineDates.start === false) {
+                return 'invalid_incomplete_date_end';
+            }
+            if (this.incompleteDeadlineDates.end === false) {
+                return 'invalid_incomplete_date_start';
+            }
+            if (this.incompleteDeadlineDates.start.getTime() === this.incompleteDeadlineDates.end.getTime()) {
+                return 'invalid_incomplete_date_single';
+            }
+
+            return 'invalid_incomplete_date_range';
         },
 
         getStringIncompleteDeadline: function() {
