@@ -56,8 +56,8 @@ class export_renderer extends plugin_renderer_base {
         $dateformat = get_string('strftimedatefullshort', 'langconfig');
 
         // Need to get dates in a couple formats for JS to use.
-        $deadlinedates = banner_grades::get_allowed_last_incomplete_deadline_dates($exporter->get_course(), '%F');
-        $userdates = banner_grades::get_allowed_last_incomplete_deadline_dates($exporter->get_course(), $dateformat);
+        $deadlinedates = banner_grades::get_allowed_incomplete_deadline_dates($exporter->get_course(), '%F');
+        $userdates = banner_grades::get_allowed_incomplete_deadline_dates($exporter->get_course(), $dateformat);
 
         $deadlinedates->userstart = $userdates->start;
         $deadlinedates->userend = $userdates->end;
@@ -70,6 +70,7 @@ class export_renderer extends plugin_renderer_base {
 
         // Sending various data to the page for it to use later.
         $params = [banner_grades::get_failing_grade_ids(),
+                   banner_grades::get_last_attend_required_ids(),
                    banner_grades::get_incomplete_grade_ids(),
                    banner_grades::get_default_incomplete_grade(),
                    $deadlinedates,

@@ -33,6 +33,7 @@ require_once($CFG->libdir . '/form/dateselector.php');
 
 use stdClass;
 use templatable;
+use core_date;
 use html_writer;
 use moodle_url;
 use gradeexport_ilp_push\local\sis_interface;
@@ -336,7 +337,7 @@ class user_grade_row implements templatable {
 
         $currentkey = $this->get_current_grade_key();
         $output->showincomplete = $this->grademode->grade_id_is_incomplete($currentkey);
-        $output->showfailing = $this->grademode->grade_id_is_failing($currentkey);
+        $output->showlastattend = $this->grademode->grade_id_requires_last_attend_date($currentkey);
 
         $moodlekey = $this->get_moodle_grade_key();
         $output->truegradekey = $moodlekey;
@@ -422,6 +423,13 @@ class user_grade_row implements templatable {
             return;
         }
 
+        $key = $this->get_form_id('graderow');
+        $key2 = $this->get_form_id('grademodeid');
+        if (empty($data->$key) && empty($data->$key2)) {
+            // This means there is no entry for this use in the returned data.
+            return;
+        }
+
         if ($this->currentsavedgrade && $this->currentsavedgrade->status == saved_grade::GRADING_STATUS_EDITING) {
             $grade = $this->currentsavedgrade;
         } else {
@@ -488,8 +496,8 @@ class user_grade_row implements templatable {
             }
         }
 
-        // Stuff only for failing grades.
-        if ($grademode->grade_id_is_failing($grade->gradeoptid)) {
+        // Stuff only for last attend dates.
+        if ($grademode->grade_id_requires_last_attend_date($grade->gradeoptid)) {
             $lastattended = $this->get_timestamp_from_data($data, 'datelastattended');
             $currentvalue = $this->currentsavedgrade->datelastattended;
             $grade->datelastattended = $lastattended;
@@ -618,7 +626,7 @@ class user_grade_row implements templatable {
             $year += 2000;
         }
 
-        $timestamp = make_timestamp($year, $month, $day, 0, 0, 0, 99, true);
+        $timestamp = make_timestamp($year, $month, $day, 12, 0, 0, core_date::get_default_php_timezone());
 
         if ($timestamp === false) {
             return null;
@@ -640,5 +648,3 @@ class user_grade_row implements templatable {
         return $grade;
     }
 }
-
-

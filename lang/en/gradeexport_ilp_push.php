@@ -87,7 +87,7 @@ $string['message_error_short'] = 'There were {$a->errorcount} error(s) while att
 // Rule validation.
 $string['invalid_datelastattended_early'] = 'Date last attended cannot be before the start of the course.';
 $string['invalid_datelastattended_late'] = 'Date last attended cannot be after the end of the course.';
-$string['invalid_datelastattended_missing'] = 'Date last attended must be entered for a failing student.';
+$string['invalid_datelastattended_missing'] = 'Date last attended must be entered for the selected grade student.';
 $string['invalid_datelastattended_today'] = 'Date last attended cannot be later than today.';
 
 $string['invalid_grade'] = 'A valid grade must be selected.';

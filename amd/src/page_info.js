@@ -27,14 +27,16 @@ define([], function() {
 
     var PageInfo = {
         failGrades: false,
+        requireLastAttendGrades: false,
         incompleteGrades: false,
         defaultIncomplete: false,
         lastAttendDates: false,
         incompleteDeadlineDates: false,
         gradeModes: false,
 
-        init: function(failGrades, incompleteGrades, defaultIncomplete, deadlineDates, lastAttendDates) {
+        init: function(failGrades, requireLastAttendGrades, incompleteGrades, defaultIncomplete, deadlineDates, lastAttendDates) {
             this.failGrades = failGrades;
+            this.requireLastAttendGrades = requireLastAttendGrades;
             this.incompleteGrades = incompleteGrades;
             this.defaultIncomplete = defaultIncomplete;
 
@@ -67,6 +69,14 @@ define([], function() {
 
         gradeIsFailure: function(key) {
             if (this.failGrades.hasOwnProperty(key)) {
+                return true;
+            } else {
+                return false;
+            }
+        },
+
+        gradeRequiresLastAttend: function(key) {
+            if (this.requireLastAttendGrades.hasOwnProperty(key)) {
                 return true;
             } else {
                 return false;

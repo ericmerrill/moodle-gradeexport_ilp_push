@@ -100,6 +100,17 @@ class grade_mode extends base {
     public function grade_id_is_failing($id) {
         $options = $this->get_all_grade_options();
 
+        // TODO - We need to migrate to isfailing instead.
+        if (isset($options[$id]) && !empty($options[$id]->requirelastdate)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function grade_id_requires_last_attend_date(int $id): bool {
+        $options = $this->get_all_grade_options();
+
         if (isset($options[$id]) && !empty($options[$id]->requirelastdate)) {
             return true;
         }
@@ -139,5 +150,3 @@ class grade_mode extends base {
         return $options;
     }
 }
-
-

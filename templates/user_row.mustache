@@ -84,9 +84,10 @@
         </div>
         {{{gradeselect}}}
         <input type="hidden" name="grademodeid-{{{formid}}}" value="{{{grademodeid}}}">
+        <input type="hidden" name="graderow-{{{formid}}}" value="1">
         <span class="gradeerror">{{{gradeerror}}}</span>
 
-        <div class="fail {{^showfailing}}hide{{/showfailing}}">
+        <div class="lastattend {{^showlastattend}}hide{{/showlastattend}}">
             <div class="datelastattended">
                 <label>{{# str }} date_last_attended, gradeexport_ilp_push {{/ str }}</label><input type="date" name="datelastattended-{{{formid}}}" value="{{{datelastattended}}}"{{#locked}} disabled{{/locked}}>
                 <span class="datelastattendederror">{{{datelastattendederror}}}</span>

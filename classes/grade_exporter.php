@@ -275,9 +275,8 @@ class grade_exporter implements templatable {
             throw new moodle_exception('exception_course_mismatch', 'gradeexport_ilp_push');
         }
 
-        $submissions = false;
         foreach ($this->get_user_data() as $row) {
-            $submissions = $row->process_data($data) || $submissions;
+            $row->process_data($data);
         }
 
         task\process_user_course_task::register_task_for_user_course($USER->id, $this->course->id);
@@ -403,5 +402,3 @@ class grade_exporter implements templatable {
     }
 
 }
-
-

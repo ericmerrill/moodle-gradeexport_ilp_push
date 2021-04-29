@@ -44,6 +44,8 @@ class banner_grades {
 
     protected static $failingids = null;
 
+    protected static $requirelastdate = null;
+
     protected static $incompleteids = null;
 
     protected static $grademodes = null;
@@ -62,8 +64,12 @@ class banner_grades {
                 if (!empty($option->isincomplete)) {
                     self::$incompleteids[$option->id] = $option->id;
                 }
+                // TODO - need to update to isfailing.
                 if (!empty($option->requirelastdate)) {
                     self::$failingids[$option->id] = $option->id;
+                }
+                if (!empty($option->requirelastdate)) {
+                    self::$requirelastdate[$option->id] = $option->id;
                 }
             }
         }
@@ -185,6 +191,12 @@ class banner_grades {
         return self::$failingids;
     }
 
+    public static function get_last_attend_required_ids(): ?array {
+        self::load_grade_modes();
+
+        return self::$failingids;
+    }
+
     public static function get_incomplete_grade_ids() {
         self::load_grade_modes();
 
@@ -230,7 +242,7 @@ class banner_grades {
      *                Start set to 'false' will indicate before end (inclusive)
      *                End set to 'false' will indicate after start (inclusive)
      */
-    public static function get_allowed_last_incomplete_deadline_dates($course, $format = false, $tz = 99) {
+    public static function get_allowed_incomplete_deadline_dates($course, $format = false, $tz = 99) {
         $sis = sis_interface\factory::instance();
 
         // First see if there are SIS dates.
@@ -240,9 +252,9 @@ class banner_grades {
         if ($dates === false) {
             $dates = new stdClass();
 
-            // Temp placeholder for 4/27/2020.
-            $dates->start = 1587988800;
-            $dates->end = 1587988800;
+            // Temp placeholder for 04/29/2022.
+            $dates->start = 1651233600;
+            $dates->end   = 1651233600;
         }
 
         // If we still don't have dates, we are going to make them up.
@@ -279,5 +291,3 @@ class banner_grades {
         return $dates;
     }
 }
-
-

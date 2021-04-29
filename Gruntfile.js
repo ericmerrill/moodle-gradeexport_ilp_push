@@ -85,7 +85,8 @@ module.exports = function (grunt) {
         },
         watch: {
             options: {
-                nospawn: true // We need not to spawn so config can be changed dynamically.
+                spawn: false,
+                livereload: true
             },
             amd: {
                 // If any .js file changes in directory "amd/src" then run the "amd" task.
@@ -94,7 +95,7 @@ module.exports = function (grunt) {
             },
             scss: {
                 // If any .scss file changes in directory "scss" then run the "cssignore" task.
-                files: "scss/*.scss",
+                files: ["**/scss/**/*.scss"],
                 tasks: ["cssignore"]
             }
         },

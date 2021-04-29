@@ -29,3 +29,5 @@ defined('MOODLE_INTERNAL') || die();
 $plugin->version   = 2019121007;        // The current plugin version (Date: YYYYMMDDXX)
 $plugin->requires  = 2018050800;        // Requires this Moodle version
 $plugin->component = 'gradeexport_ilp_push'; // Full name of the plugin (used for diagnostics)
+
+// This plugin also requires PHP 7.1 or higher.

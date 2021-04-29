@@ -43,13 +43,13 @@ define(['jquery', 'gradeexport_ilp_push/page_info', 'core/ajax', 'core/notificat
                 var key = $(this).val();
                 if (pageInfo.gradeIsIncomplete(key)) {
                     row.find('.incomplete').show();
-                    row.find('.fail').hide();
-                } else if (pageInfo.gradeIsFailure(key)) {
-                    row.find('.incomplete').hide();
-                    row.find('.fail').show();
                 } else {
                     row.find('.incomplete').hide();
-                    row.find('.fail').hide();
+                }
+                if (pageInfo.gradeRequiresLastAttend(key)) {
+                    row.find('.lastattend').show();
+                } else {
+                    row.find('.lastattend').hide();
                 }
 
                 RowController.updateVerification(row);
@@ -174,7 +174,8 @@ define(['jquery', 'gradeexport_ilp_push/page_info', 'core/ajax', 'core/notificat
                 }
 
                 RowController.updateFormWarning(row, '.incompletegradeerror', errorCode, pageInfo.getIncompleteGrade());
-            } else if (pageInfo.gradeIsFailure(key)) {
+            }
+            if (pageInfo.gradeRequiresLastAttend(key)) {
                 date = row.find('.datelastattended input').eq(0);
 
                 errorCode = '';
