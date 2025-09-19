@@ -45,7 +45,7 @@ class connector {
 
     const CURL_SSL_DONT_VERIFY = 2;
 
-    protected $endpoints = ['grades' => 'api/coursesection/grades'];
+    protected $endpoints = ['grades' => 'api/coursesection/grades/'];
 
     /**
      * Get an array of headers to be used with curl.

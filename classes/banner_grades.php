@@ -226,8 +226,8 @@ class banner_grades {
         }
 
         // Convert to a format.
-        $dates->start = date_format_string($dates->start, $format, $tz);
-        $dates->end = date_format_string($dates->end, $format, $tz);
+        $dates->start = date_format_string((int)$dates->start, $format, $tz);
+        $dates->end = date_format_string((int)$dates->end, $format, $tz);
 
         return $dates;
     }
@@ -282,10 +282,10 @@ class banner_grades {
 
         // Convert to a format.
         if ($dates->start !== false) {
-            $dates->start = date_format_string($dates->start, $format, $tz);
+            $dates->start = date_format_string((int)$dates->start, $format, $tz);
         }
         if ($dates->end !== false) {
-            $dates->end = date_format_string($dates->end, $format, $tz);
+            $dates->end = date_format_string((int)$dates->end, $format, $tz);
         }
 
         return $dates;

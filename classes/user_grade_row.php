@@ -309,12 +309,12 @@ class user_grade_row implements templatable {
         $output->incompletegradeselect = $renderer->render_incomplete_select_menu($this);
 
         if ($grade->datelastattended) {
-            $output->datelastattended = date_format_string($grade->datelastattended, '%F');
+            $output->datelastattended = date_format_string((int)$grade->datelastattended, '%F');
         } else {
             $output->datelastattended = false;
         }
         if ($grade->incompletedeadline) {
-            $output->incompletedeadline = date_format_string($grade->incompletedeadline, '%F');
+            $output->incompletedeadline = date_format_string((int)$grade->incompletedeadline, '%F');
         } else {
             $output->incompletedeadline = false;
         }

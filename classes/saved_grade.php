@@ -68,7 +68,7 @@ class saved_grade extends base {
     /** @var bool Intentionally public key, this will not be saved, only used transiently. */
     public $confirmed = false;
 
-    protected $currentmessages = false;
+    protected $currentmessages = [];
 
     protected $currentfailure = false;
 
@@ -95,7 +95,7 @@ class saved_grade extends base {
     }
 
     public function add_status_message($message) {
-        if ($this->currentmessages === false) {
+        if (count($this->currentmessages) === 0) {
             if (!empty($this->statusmessages)) {
                 $this->previousmessages = $this->statusmessages;
             }
