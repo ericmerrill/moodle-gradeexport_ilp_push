@@ -26,6 +26,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+use gradeexport_ilp_push\grade_exporter;
 use gradeexport_ilp_push\settings;
 use gradeexport_ilp_push\local\ilp\connector;
 use gradeexport_ilp_push\log;
@@ -63,6 +64,16 @@ if ($ADMIN->fulltree) {
             get_string('logginglevel_help', 'gradeexport_ilp_push'), log::ERROR_NOTICE, $loggingoptions));
 
     $settings->add(new \gradeexport_ilp_push\output\admin_setting_grademodes());
+
+    $settings->add(new admin_setting_heading('grade_types', new lang_string('grade_types_heading', 'gradeexport_ilp_push'), ''));
+
+    $types = grade_exporter::get_all_grade_types(true);
+    foreach ($types as $type => $string) {
+        $default = ($type == grade_exporter::GRADE_TYPE_FINAL);
+
+        $settings->add(new admin_setting_configcheckbox('gradeexport_ilp_push/grade_type_enabled_'.$type,
+            $string, '', $default));
+    }
 
     //$grademodes = banner_grades::get_all_grade_modes();
 //     foreach ($grademodes as $grademode) {

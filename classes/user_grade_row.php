@@ -31,6 +31,7 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot.'/grade/export/lib.php');
 require_once($CFG->libdir . '/form/dateselector.php');
 
+use gradeexport_ilp_push\local\exception\grade_mode_missing;
 use stdClass;
 use templatable;
 use core_date;
@@ -59,6 +60,8 @@ class user_grade_row implements templatable {
 
     protected $newgradesave;
 
+    protected $gradetype;
+
     protected $grademode;
 
     protected $coursegrademode;
@@ -77,18 +80,17 @@ class user_grade_row implements templatable {
 
     protected $sis = null;
 
-
-
     /**
      * Basic constructor.
      */
-    public function __construct($user, $exporter, $grade, $gradeitem, $grademode) {
+    public function __construct($user, $exporter, $grade, $gradeitem, $grademode, $gradetype) {
         $this->user = $user;
         $this->exporter = $exporter;
         $this->course = $exporter->get_course();
         $this->grade = $grade;
         $this->gradeitem = $gradeitem;
         $this->grademode = $grademode;
+        $this->gradetype = $gradetype;
         $this->coursegrademode = $grademode;
         $this->sis = sis_interface\factory::instance();
         $this->fetch_existing_rows();
@@ -98,7 +100,7 @@ class user_grade_row implements templatable {
      * Load the existing saved grades for this row.
      */
     public function fetch_existing_rows() {
-        if (!$savedgrades = saved_grade::get_records_for_user_course($this->user, $this->course)) {
+        if (!$savedgrades = saved_grade::get_records_for_user_course($this->user, $this->course, $this->gradetype)) {
             // We will create a default saved_grade object if there are none existing.
             $grade = $this->create_new_saved_grade();
 
@@ -337,7 +339,7 @@ class user_grade_row implements templatable {
 
         $currentkey = $this->get_current_grade_key();
         $output->showincomplete = $this->grademode->grade_id_is_incomplete($currentkey);
-        $output->showlastattend = $this->grademode->grade_id_requires_last_attend_date($currentkey);
+        $output->showlastattend = $this->grademode->grade_id_requires_last_attend_date($currentkey, $this->gradetype);
 
         $moodlekey = $this->get_moodle_grade_key();
         $output->truegradekey = $moodlekey;
@@ -450,7 +452,7 @@ class user_grade_row implements templatable {
         $grademode = banner_grades::get_grade_mode($grade->grademodeid);
 
         if (empty($grademode)) {
-            throw new exception\grade_mode_missing();
+            throw new grade_mode_missing();
         }
 
         $gradeobj = $this->get_ilp_grade_from_data($data, 'grade');
@@ -497,7 +499,7 @@ class user_grade_row implements templatable {
         }
 
         // Stuff only for last attend dates.
-        if ($grademode->grade_id_requires_last_attend_date($grade->gradeoptid)) {
+        if ($grademode->grade_id_requires_last_attend_date($grade->gradeoptid, $grade->gradetype)) {
             $lastattended = $this->get_timestamp_from_data($data, 'datelastattended');
             $currentvalue = $this->currentsavedgrade->datelastattended;
             $grade->datelastattended = $lastattended;
@@ -642,6 +644,7 @@ class user_grade_row implements templatable {
         $grade->studentilpid = $this->sis->get_user_id($this->user);
         $grade->courseid = $this->course->id;
         $grade->courseilpid = $this->sis->get_course_id_for_user($this->course, $this->user);
+        $grade->gradetype = $this->gradetype;
 
         $grade->revision = $this->get_next_revision_number();
 

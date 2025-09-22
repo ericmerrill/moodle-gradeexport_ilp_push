@@ -28,6 +28,7 @@ namespace gradeexport_ilp_push\local\data;
 
 defined('MOODLE_INTERNAL') || die();
 
+use gradeexport_ilp_push\grade_exporter;
 use stdClass;
 
 /**
@@ -108,8 +109,12 @@ class grade_mode extends base {
         return false;
     }
 
-    public function grade_id_requires_last_attend_date(int $id): bool {
+    public function grade_id_requires_last_attend_date(?int $id, ?int $gradetype): bool {
         $options = $this->get_all_grade_options();
+
+        if ($gradetype != grade_exporter::GRADE_TYPE_FINAL) {
+            return false;
+        }
 
         if (isset($options[$id]) && !empty($options[$id]->requirelastdate)) {
             return true;

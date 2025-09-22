@@ -124,10 +124,10 @@ class saved_grade extends base {
      * @param stdClass $course The course.
      * @return saved_grades[]
      */
-    public static function get_records_for_user_course(stdClass $user, stdClass $course) {
+    public static function get_records_for_user_course(stdClass $user, stdClass $course, int $gradetype) {
         global $DB;
 
-        $params = ['studentid' => $user->id, 'courseid' => $course->id];
+        $params = ['studentid' => $user->id, 'courseid' => $course->id, 'gradetype' => $gradetype];
         if (!$records = $DB->get_recordset(static::TABLE, $params, 'id ASC')) {
             return false;
         }

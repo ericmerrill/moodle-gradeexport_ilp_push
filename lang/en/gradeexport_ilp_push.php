@@ -53,13 +53,24 @@ $string['incomplete_default_grade'] = 'Incomplete default grade';
 $string['show_history'] = 'Show history ({$a})';
 $string['hide_history'] = 'Hide history';
 
+$string['grade_type_1'] = 'Midterm 1';
+$string['grade_type_2'] = 'Midterm 2';
+$string['grade_type_3'] = 'Midterm 3';
+$string['grade_type_4'] = 'Midterm 4';
+$string['grade_type_5'] = 'Midterm 5';
+$string['grade_type_6'] = 'Midterm 6';
+$string['grade_type_9'] = 'Final';
+
 // Settings Form.
+$string['grade_type'] = 'Grade type';
 $string['status_filter'] = 'Status Filter';
 $string['filter_all'] = 'All';
 $string['filter_attention'] = 'Needs Action';
 $string['filter_in_progress'] = 'In Progress';
 $string['filter_error'] = 'Errored';
 $string['filter_done'] = 'Complete';
+
+$string['grade'] = 'Grade';
 
 $string['reference_grade'] = 'Reference Grade';
 $string['grade_mode'] = 'Grade Mode';
@@ -134,6 +145,8 @@ $string['error_warn'] = 'Warnings';
 $string['error_major'] = 'Major Errors';
 $string['logpath'] = 'Log file location';
 $string['logpath_help'] = 'This is the location you would like the log file to be saved to. This should be an absolute path on the server. The file specified should already exist, and needs to be writable by the webserver process.';
+
+$string['grade_types_heading'] = "Grade Types";
 
 // Exceptions.
 $string['exception_submitter_mismatch'] = 'Not all saved grades have the same submitter ILP id.';

@@ -71,7 +71,7 @@ class user_grade_row { //implements templatable {
 
     /** @var sis_interface The interface to the SIS in use. */
     protected $sis = null;
-    
+
     /** @var grade_mode The grade mode of this item. */
     protected $grademode = null;
 
@@ -84,7 +84,7 @@ class user_grade_row { //implements templatable {
         $this->exporter = $exporter;
         $this->course = $exporter->get_course();
         $this->sis = sis_interface\factory::instance();
-        
+
         $this->exporter->get_grade_mode();
 
         $this->load_existing_rows();
@@ -94,7 +94,8 @@ class user_grade_row { //implements templatable {
      * Load the existing saved grades for this row.
      */
     protected function load_existing_rows() {
-        if (!$savedgrades = saved_grade::get_records_for_user_course($this->user, $this->course)) {
+        if (!$savedgrades = saved_grade::get_records_for_user_course($this->user, $this->course,
+                $this->exporter->get_grade_type())) {
             return;
         }
 

@@ -185,20 +185,32 @@ class banner_grades {
         return self::find_key_for_letter('F');
     }
 
-    public static function get_failing_grade_ids() {
+    public static function get_failing_grade_ids(int $gradetype) {
         self::load_grade_modes();
+
+        if ($gradetype != grade_exporter::GRADE_TYPE_FINAL) {
+            return [];
+        }
 
         return self::$failingids;
     }
 
-    public static function get_last_attend_required_ids(): ?array {
+    public static function get_last_attend_required_ids(int $gradetype): ?array {
         self::load_grade_modes();
+
+        if ($gradetype != grade_exporter::GRADE_TYPE_FINAL) {
+            return [];
+        }
 
         return self::$failingids;
     }
 
-    public static function get_incomplete_grade_ids() {
+    public static function get_incomplete_grade_ids(int $gradetype) {
         self::load_grade_modes();
+
+        if ($gradetype != grade_exporter::GRADE_TYPE_FINAL) {
+            return [];
+        }
 
         return self::$incompleteids;
     }
