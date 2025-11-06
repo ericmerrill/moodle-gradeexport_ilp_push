@@ -31,6 +31,7 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot.'/grade/export/lib.php');
 require_once($CFG->libdir . '/form/dateselector.php');
 
+use gradeexport_ilp_push\local\data\grade_mode;
 use gradeexport_ilp_push\local\exception\grade_mode_missing;
 use stdClass;
 use templatable;
@@ -83,13 +84,14 @@ class user_grade_row implements templatable {
     /**
      * Basic constructor.
      */
-    public function __construct($user, $exporter, $grade, $gradeitem, $grademode, $gradetype) {
+    public function __construct($user, $exporter, $grade, $gradeitem, grade_mode $grademode, int $gradetype) {
         $this->user = $user;
         $this->exporter = $exporter;
         $this->course = $exporter->get_course();
         $this->grade = $grade;
         $this->gradeitem = $gradeitem;
         $this->grademode = $grademode;
+        $this->grademode->set_grade_type($gradetype);;
         $this->gradetype = $gradetype;
         $this->coursegrademode = $grademode;
         $this->sis = sis_interface\factory::instance();

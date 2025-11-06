@@ -29,6 +29,7 @@ namespace gradeexport_ilp_push\local\sis_interface;
 defined('MOODLE_INTERNAL') || die();
 
 use core_user;
+use gradeexport_ilp_push\grade_exporter;
 
 /**
  * An interface for getting information from the SIS.
@@ -112,6 +113,10 @@ abstract class base {
 
         if (empty($course->idnumber)) {
             return get_string('course_no_id', 'gradeexport_ilp_push');
+        }
+
+        if (empty(grade_exporter::get_all_grade_types(false, true))) {
+            return get_string('no_grade_types', 'gradeexport_ilp_push');
         }
 
         return true;

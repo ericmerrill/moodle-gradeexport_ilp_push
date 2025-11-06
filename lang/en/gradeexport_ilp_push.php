@@ -119,6 +119,7 @@ $string['invalid_datelastattended'] = 'Date last attended must be between {$a->s
 
 $string['grader_no_id'] = 'The current user has no SIS ID, and so cannot export grades to Banner.';
 $string['course_no_id'] = 'The current course has no SIS ID, and so cannot be exported to Banner.';
+$string['no_grade_types'] = 'No grade types enabled. Contact site administrator.';
 
 $string['grade_not_eqaul'] = 'Banner grade does not match Moodle letter grade.';
 
