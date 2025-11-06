@@ -69,9 +69,9 @@ class export_renderer extends plugin_renderer_base {
         $lastattenddates->userend = $userdates->end;
 
         // Sending various data to the page for it to use later.
-        $params = [banner_grades::get_failing_grade_ids(),
-                   banner_grades::get_last_attend_required_ids(),
-                   banner_grades::get_incomplete_grade_ids(),
+        $params = [banner_grades::get_failing_grade_ids($exporter->get_grade_type()),
+                   banner_grades::get_last_attend_required_ids($exporter->get_grade_type()),
+                   banner_grades::get_incomplete_grade_ids($exporter->get_grade_type()),
                    banner_grades::get_default_incomplete_grade(),
                    $deadlinedates,
                    $lastattenddates];

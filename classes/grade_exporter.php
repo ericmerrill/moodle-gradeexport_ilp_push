@@ -26,6 +26,7 @@
 
 namespace gradeexport_ilp_push;
 
+require_once($CFG->libdir.'/grade/grade_object.php');
 require_once($CFG->dirroot.'/grade/export/lib.php');
 
 use grade_item;
@@ -110,6 +111,8 @@ class grade_exporter implements templatable {
         $this->gradeitems = grade_item::fetch_all(array('courseid'=>$this->course->id));
         $this->coursegradeitem = grade_item::fetch_course_item($course->id);
 
+        $this->gradetype = get_user_preferences('gradeexport_ilp_push_grade_type-'.$this->course->id, $this->gradetype);
+
         $this->statusfilter = get_user_preferences('gradeexport_ilp_push_status_filter-'.$this->course->id, $this->statusfilter);
 
         $this->groupid = get_user_preferences('gradeexport_ilp_push_group_filter-'.$this->course->id);
@@ -185,7 +188,7 @@ class grade_exporter implements templatable {
             // We only use one grade item, so that is easy...
             $grade = reset($userdata->grades);
 
-            $userrow = new user_grade_row($user, $this, $grade, $this->currentgradeitem, $this->grademode);
+            $userrow = new user_grade_row($user, $this, $grade, $this->currentgradeitem, $this->grademode, $this->gradetype);
 
             $userrows[] = $userrow;
 
@@ -302,11 +305,14 @@ class grade_exporter implements templatable {
 
         $form = new options_form(null, $params, 'post', '', $class);
 
-        $data = ['statusfilter' => $this->statusfilter,
-                 'groupfilter' => $this->groupid,
-                 'sectionfilter' => $this->sectionid,
-                 'grademode' => $this->grademode->id,
-                 'referencegrade' => $this->currentgradeitem->id];
+        $data = [
+            'gradetype' => $this->gradetype,
+            'statusfilter' => $this->statusfilter,
+            'groupfilter' => $this->groupid,
+            'sectionfilter' => $this->sectionid,
+            'grademode' => $this->grademode->id,
+            'referencegrade' => $this->currentgradeitem->id,
+        ];
 
         $form->set_data($data);
 
@@ -320,6 +326,11 @@ class grade_exporter implements templatable {
         $form = $this->get_options_form();
 
         if ($data = $form->get_data()) {
+            if (isset($data->gradetype)) {
+                set_user_preference('gradeexport_ilp_push_grade_type-'.$this->course->id, $data->gradetype);
+                $this->gradetype = $data->gradetype;
+            }
+
             if (isset($data->statusfilter)) {
                 set_user_preference('gradeexport_ilp_push_status_filter-'.$this->course->id, $data->statusfilter);
                 $this->statusfilter = $data->statusfilter;
@@ -401,4 +412,35 @@ class grade_exporter implements templatable {
         return $allowed;
     }
 
+    public static function get_all_grade_types(bool $includestrings = false, bool $enabledonly = false): array {
+        $types = [
+            self::GRADE_TYPE_MIDTERM_1,
+            self::GRADE_TYPE_MIDTERM_2,
+            self::GRADE_TYPE_MIDTERM_3,
+            self::GRADE_TYPE_MIDTERM_4,
+            self::GRADE_TYPE_MIDTERM_5,
+            self::GRADE_TYPE_MIDTERM_6,
+            self::GRADE_TYPE_FINAL,
+        ];
+
+        if ($enabledonly) {
+            $types = array_filter($types, function($type) {
+                return self::is_grade_mode_enabled($type);
+            });
+        }
+
+        if (!$includestrings) {
+            return $types;
+        }
+
+        $output = [];
+        foreach ($types as $type) {
+            $output[$type] = new \lang_string('grade_type_'.$type, 'gradeexport_ilp_push');
+        }
+        return $output;
+    }
+
+    public static function is_grade_mode_enabled(int $grademode): bool {
+        return (bool)settings::get_setting('grade_type_enabled_'.$grademode);
+    }
 }

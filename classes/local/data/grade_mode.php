@@ -28,6 +28,7 @@ namespace gradeexport_ilp_push\local\data;
 
 defined('MOODLE_INTERNAL') || die();
 
+use gradeexport_ilp_push\grade_exporter;
 use stdClass;
 
 /**
@@ -48,6 +49,8 @@ class grade_mode extends base {
     /** @var array Array of keys will be used to see if two objects are the same. */
     protected $diffkeys = ['name', 'enabled', 'additional'];
 
+    protected $gradetype = grade_exporter::GRADE_TYPE_FINAL;
+
     /**
      * The table name of this object.
      */
@@ -55,6 +58,10 @@ class grade_mode extends base {
 
     /** @var grade_mode_option[] Array of grade mode options. */
     protected $gradeoptions = null;
+
+    public function set_grade_type(int $gradetype) {
+        $this->gradetype = $gradetype;
+    }
 
     public function get_current_grade_options() {
         $options = $this->get_all_grade_options();
@@ -90,6 +97,10 @@ class grade_mode extends base {
     public function grade_id_is_incomplete($id) {
         $options = $this->get_all_grade_options();
 
+        if ($this->gradetype != grade_exporter::GRADE_TYPE_FINAL) {
+            return false;
+        }
+
         if (isset($options[$id]) && !empty($options[$id]->isincomplete)) {
             return true;
         }
@@ -100,6 +111,10 @@ class grade_mode extends base {
     public function grade_id_is_failing($id) {
         $options = $this->get_all_grade_options();
 
+        if ($this->gradetype != grade_exporter::GRADE_TYPE_FINAL) {
+            return false;
+        }
+
         // TODO - We need to migrate to isfailing instead.
         if (isset($options[$id]) && !empty($options[$id]->requirelastdate)) {
             return true;
@@ -108,8 +123,16 @@ class grade_mode extends base {
         return false;
     }
 
-    public function grade_id_requires_last_attend_date(int $id): bool {
+    public function grade_id_requires_last_attend_date(?int $id, ?int $gradetype): bool {
         $options = $this->get_all_grade_options();
+
+        if ($this->gradetype != grade_exporter::GRADE_TYPE_FINAL) {
+            return false;
+        }
+
+        if ($gradetype != grade_exporter::GRADE_TYPE_FINAL) {
+            return false;
+        }
 
         if (isset($options[$id]) && !empty($options[$id]->requirelastdate)) {
             return true;

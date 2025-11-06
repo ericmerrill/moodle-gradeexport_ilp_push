@@ -59,6 +59,10 @@ class options_form extends moodleform {
         $mform->addElement('hidden', 'optionsform', 1);
         $mform->setType('optionsform', PARAM_INT);
 
+        // Grade type filter.
+        $options = grade_exporter::get_all_grade_types(true, true);
+        $mform->addElement('select', 'gradetype', get_string('grade_type', 'gradeexport_ilp_push'), $options, $dirtyclass);
+
         // Status filters.
         $options = [grade_exporter::FILTER_ALL => get_string('filter_all', 'gradeexport_ilp_push'),
                     grade_exporter::FILTER_NEEDS_ATTENTION => get_string('filter_attention', 'gradeexport_ilp_push'),

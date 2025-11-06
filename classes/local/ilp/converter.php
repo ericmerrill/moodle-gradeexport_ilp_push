@@ -30,6 +30,7 @@ defined('MOODLE_INTERNAL') || die();
 
 //use gradeexport_ilp_push\settings;
 use gradeexport_ilp_push\grade_exporter;
+use gradeexport_ilp_push\local\exception\submitter_mismatch_exception;
 use gradeexport_ilp_push\saved_grade;
 use gradeexport_ilp_push\exception;
 use stdClass;
@@ -59,7 +60,7 @@ class converter {
      *
      * @param saved_grade[] $grades An array of saved grades to send.
      * @return string JSON to send
-     * @throws exception\exception_submitter_mismatch
+     * @throws submitter_mismatch_exception
      */
     public function create_request_for_saved_grades(array &$grades) {
         $request = new stdClass();
@@ -71,7 +72,7 @@ class converter {
         $records = [];
         foreach ($grades as $grade) {
             if ($grade->submitterilpid !== $requestor) {
-                throw new exception\exception_submitter_mismatch();
+                throw new submitter_mismatch_exception();
             }
             $records[] = $this->create_saved_grade_request($grade);
         }

@@ -58,7 +58,10 @@ if ($gradingallowed === true) {
     }
 }
 
-print_grade_page_head($COURSE->id, 'export', 'ilp_push', get_string('export_page_header', 'gradeexport_ilp_push'));
+$actionbar = new \core_grades\output\export_action_bar($context, null, 'ilp_push');
+print_grade_page_head($COURSE->id, 'export', 'ilp_push',
+    get_string('exportto', 'grades') . ' ' . get_string('pluginname', 'gradeexport_ilp_push'),
+    false, false, true, null, null, null, $actionbar);
 
 if (!empty($CFG->gradepublishing)) {
     $CFG->gradepublishing = has_capability('gradeexport/txt:publish', $context);

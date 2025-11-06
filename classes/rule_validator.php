@@ -61,7 +61,7 @@ class rule_validator {
         // TODO - setting rules.
 
         // If the grade is requires a date last attended.
-        if ($grademode->grade_id_requires_last_attend_date($grade->gradeoptid)) {
+        if ($grademode->grade_id_requires_last_attend_date($grade->gradeoptid, $grade->gradetype)) {
             $lastattenddates = banner_grades::get_allowed_last_attend_dates($course);
             if (is_null($grade->datelastattended)) {
                 $results['errors']['datelastattended'] = get_string('invalid_datelastattended_missing', 'gradeexport_ilp_push');

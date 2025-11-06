@@ -45,7 +45,7 @@ class connector {
 
     const CURL_SSL_DONT_VERIFY = 2;
 
-    protected $endpoints = ['grades' => 'api/coursesection/grades'];
+    protected $endpoints = ['grades' => 'api/coursesection/grades/'];
 
     /**
      * Get an array of headers to be used with curl.
@@ -81,7 +81,6 @@ class connector {
                     CURLOPT_RETURNTRANSFER => true,
                     CURLOPT_TIMEOUT => 60,
                     CURLOPT_POST => 1,
-                    CURLOPT_RETURNTRANSFER => true,
                     CURLOPT_SSL_VERIFYHOST => 2,
                     CURLOPT_HTTPHEADER => $this->get_connection_headers()];
 
