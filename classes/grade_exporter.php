@@ -26,6 +26,7 @@
 
 namespace gradeexport_ilp_push;
 
+require_once($CFG->libdir.'/grade/grade_object.php');
 require_once($CFG->dirroot.'/grade/export/lib.php');
 
 use grade_item;
